@@ -1,0 +1,13 @@
+[
+  {
+    "code": "S1-CS-01",
+    "title": "Fundamentals of Computers and Office Productivity Tools",
+    "description": "Learn computer basics, hardware, software, file management, office tools, and beginner practical skills.",
+    "overviewLink": "course.html",
+    "lecturesLink": "lectures.html",
+    "assignmentsLink": "assignments.html",
+    "quizzesLink": "quizzes.html",
+    "labLink": "lab.html",
+    "status": "Available"
+  }
+]

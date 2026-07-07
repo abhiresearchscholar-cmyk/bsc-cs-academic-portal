@@ -1,0 +1,38 @@
+{
+  "title": "Quiz 01: Computer Basics",
+  "topic": "What is a Computer?",
+  "marks": 10,
+  "note": "Practice quiz only. Marks are not officially recorded.",
+  "questions": [
+    {
+      "question": "A computer is mainly used to:",
+      "options": ["Process data", "Cook food", "Grow crops directly", "Print money"],
+      "answer": 0,
+      "explanation": "A computer accepts data, processes it, stores it, and gives output."
+    },
+    {
+      "question": "Which one is an input device?",
+      "options": ["Monitor", "Keyboard", "Printer", "Speaker"],
+      "answer": 1,
+      "explanation": "A keyboard is used to enter data into a computer."
+    },
+    {
+      "question": "Which quality means a computer can work very fast?",
+      "options": ["Accuracy", "Speed", "Diligence", "Storage"],
+      "answer": 1,
+      "explanation": "Speed means the computer can perform many operations quickly."
+    },
+    {
+      "question": "Which device shows output on a screen?",
+      "options": ["Mouse", "Scanner", "Monitor", "Keyboard"],
+      "answer": 2,
+      "explanation": "A monitor is an output device used to display information."
+    },
+    {
+      "question": "Computer instructions are called:",
+      "options": ["Software", "Hardware", "Electricity", "Furniture"],
+      "answer": 0,
+      "explanation": "Software is a set of instructions that tells the computer what to do."
+    }
+  ]
+}

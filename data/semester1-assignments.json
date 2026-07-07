@@ -1,0 +1,32 @@
+[
+  {
+    "number": "01",
+    "title": "Basics of Computers",
+    "topic": "Meaning, characteristics, and uses of computers",
+    "instructions": "Write short answers in simple language and give daily-life examples.",
+    "dueDate": "Add date",
+    "download": "downloads/semester1/assignments/assignment-01.pdf",
+    "submit": "#",
+    "status": "Open"
+  },
+  {
+    "number": "02",
+    "title": "Computer Generations",
+    "topic": "Evolution and generations of computers",
+    "instructions": "Prepare a table with generation, technology, features, and examples.",
+    "dueDate": "Add date",
+    "download": "#",
+    "submit": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "03",
+    "title": "Input and Output Devices",
+    "topic": "Common input and output devices",
+    "instructions": "List devices, draw simple diagrams if possible, and explain their use.",
+    "dueDate": "Add date",
+    "download": "#",
+    "submit": "#",
+    "status": "Coming Soon"
+  }
+]

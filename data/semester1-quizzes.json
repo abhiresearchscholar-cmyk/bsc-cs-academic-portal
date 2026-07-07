@@ -1,0 +1,26 @@
+[
+  {
+    "number": "01",
+    "title": "Computer Basics",
+    "topic": "Meaning and uses of computers",
+    "marks": 10,
+    "quizFile": "quizzes/semester1/quiz-01-computer-basics.json",
+    "status": "Available"
+  },
+  {
+    "number": "02",
+    "title": "Characteristics of Computers",
+    "topic": "Speed, accuracy, storage, and limitations",
+    "marks": 10,
+    "quizFile": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "03",
+    "title": "Computer Hardware",
+    "topic": "Input, output, CPU, memory, and storage",
+    "marks": 15,
+    "quizFile": "#",
+    "status": "Coming Soon"
+  }
+]

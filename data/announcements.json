@@ -1,0 +1,30 @@
+[
+  {
+    "date": "2026-08-01",
+    "title": "Welcome to Semester 1",
+    "message": "Students should visit the Lecture Notes page before every class and bring a notebook for important terms.",
+    "category": "General",
+    "important": true
+  },
+  {
+    "date": "2026-08-08",
+    "title": "First Assignment Published",
+    "message": "Assignment 01 is available on the Assignments page. Submit it before the due date announced in class.",
+    "category": "Assignment",
+    "important": true
+  },
+  {
+    "date": "2026-08-12",
+    "title": "Lab Practice Reminder",
+    "message": "Practice creating folders, renaming files, and saving documents during lab hours.",
+    "category": "Lab",
+    "important": false
+  },
+  {
+    "date": "2026-08-18",
+    "title": "Practice Quiz Available",
+    "message": "Quiz 01 is available for practice. Marks are not officially recorded.",
+    "category": "Quiz",
+    "important": false
+  }
+]

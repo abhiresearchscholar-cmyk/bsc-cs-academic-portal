@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Semester 1",
+    "title": "Fundamentals and Office Productivity",
+    "description": "Course overview, lecture notes, assignments, quizzes, lab work, and AI support.",
+    "link": "semester-1.html",
+    "status": "Available"
+  },
+  {
+    "name": "Semester 2",
+    "title": "Semester 2 Courses",
+    "description": "Course material will be added here when the semester starts.",
+    "link": "semester-2.html",
+    "status": "Coming Soon"
+  },
+  {
+    "name": "Second Year",
+    "title": "Three Course Areas",
+    "description": "Second-year theory, practicals, assignments, and question banks.",
+    "link": "second-year.html",
+    "status": "Coming Soon"
+  },
+  {
+    "name": "Third Year",
+    "title": "Two Course Areas",
+    "description": "Advanced topics, project work, practicals, and revision material.",
+    "link": "third-year.html",
+    "status": "Coming Soon"
+  }
+]

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Course Assistant | B.Sc. Computer Science Academic Portal</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header"><div class="container header-inner"><a class="site-brand" href="index.html"><span>B.Sc. Computer Science Academic Portal</span></a><button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button><nav class="site-nav" aria-label="Main navigation"><a href="index.html">Home</a><a href="semester-1.html">Semester 1</a><a href="semester-2.html">Semester 2</a><a href="second-year.html">Second Year</a><a href="third-year.html">Third Year</a><a href="about.html" class="nav-info">About Teacher</a><a href="announcements.html" class="nav-alert">Announcements</a><a href="ai-assistant.html" class="nav-ai active">AI Assistant</a></nav></div></header>
+  <main>
+    <section class="page-title"><div class="container"><p class="eyebrow">Learning Support</p><h1>AI Course Assistant</h1><p>This assistant is a frontend-only placeholder for a local LLM. It works only in the computer lab / college LAN when the backend is running.</p></div></section>
+    <section class="section">
+      <div class="container chat-layout">
+        <aside class="content-block">
+          <h2>Important Instructions</h2>
+          <ul class="check-list">
+            <li>AI Assistant is for learning support only.</li>
+            <li>Do not copy assignments or exam answers from AI.</li>
+            <li>Local LLM works only in the computer lab / college LAN.</li>
+            <li>No API keys are stored in this website.</li>
+          </ul>
+          <p><strong>Backend URL is configured in:</strong></p>
+          <code>assets/js/config.js</code>
+        </aside>
+        <section class="chat-panel" aria-label="AI Course Assistant chat">
+          <div class="assistant-controls">
+            <label>Language
+              <select id="assistant-language">
+                <option>English</option>
+                <option>Hindi</option>
+                <option>Hinglish</option>
+              </select>
+            </label>
+            <label>Mode
+              <select id="assistant-mode">
+                <option>Explain</option>
+                <option>Revise</option>
+                <option>Give Example</option>
+                <option>Quiz Me</option>
+              </select>
+            </label>
+          </div>
+          <div class="chat-window" id="chat-window">
+            <div class="chat-message assistant">Namaste. Ask a question about your Computer Science course. I can explain in simple English, Hindi, or Hinglish when the lab backend is running.</div>
+          </div>
+          <form class="chat-form" id="chat-form">
+            <label class="sr-only" for="chat-input">Type your question</label>
+            <input id="chat-input" type="text" placeholder="Type your question here..." required>
+            <button class="button primary" type="submit">Send</button>
+          </form>
+          <p class="loading-message" id="loading-message" hidden>Thinking...</p>
+          <p class="error-message" id="error-message" hidden>Backend is offline or not reachable. Please use the AI Assistant from the computer lab when the local LLM server is running.</p>
+        </section>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="container"><p>Department of Computer Science / Computer Applications</p><p>Govt. Degree College Bhoranj, Himachal Pradesh</p></div></footer>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/ai-assistant.js"></script>
+</body>
+</html>

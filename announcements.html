@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Announcements | B.Sc. Computer Science Academic Portal</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="site-brand" href="index.html"><span>B.Sc. Computer Science Academic Portal</span></a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="index.html">Home</a><a href="semester-1.html">Semester 1</a><a href="semester-2.html">Semester 2</a><a href="second-year.html">Second Year</a><a href="third-year.html">Third Year</a><a href="about.html" class="nav-info">About Teacher</a><a href="announcements.html" class="nav-alert active">Announcements</a><a href="ai-assistant.html" class="nav-ai">AI Assistant</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="page-title"><div class="container"><p class="eyebrow">Updates</p><h1>Announcements</h1><p>Check this page regularly for class notices, assignment dates, quiz information, and lab updates.</p></div></section>
+    <section class="section">
+      <div class="container">
+        <label class="search-label" for="announcement-search">Search announcements</label>
+        <input class="search-input" id="announcement-search" type="search" placeholder="Search by title, category, or date">
+        <div class="announcement-list" data-render="announcements"></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="container"><p>Department of Computer Science / Computer Applications</p><p>Govt. Degree College Bhoranj, Himachal Pradesh</p></div></footer>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/data-render.js"></script>
+</body>
+</html>

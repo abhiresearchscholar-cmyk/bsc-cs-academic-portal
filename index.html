@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B.Sc. Computer Science Academic Portal | Govt. Degree College Bhoranj</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="site-brand brand-with-mark" href="index.html">
+        <img src="assets/images/silentroot.png" alt="">
+        <span>B.Sc. Computer Science Academic Portal</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="index.html" class="active">Home</a>
+        <a href="semester-1.html">Semester 1</a>
+        <a href="semester-2.html">Semester 2</a>
+        <a href="second-year.html">Second Year</a>
+        <a href="third-year.html">Third Year</a>
+        <a href="about.html" class="nav-info">About Teacher</a>
+        <a href="announcements.html" class="nav-alert">Announcements</a>
+        <a href="ai-assistant.html" class="nav-ai">AI Assistant</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero portal-hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Department of Computer Science</p>
+          <h1>B.Sc. Computer Science Academic Portal</h1>
+          <p class="hero-text">A central learning space for B.Sc. Computer Science students to access lecture notes, slides, assignments, quizzes, lab activities, question banks, announcements, and AI learning support.</p>
+          <div class="hero-pills" aria-label="Portal highlights">
+            <span>Lecture Notes</span>
+            <span>Lab Practice</span>
+            <span>AI Learning Support</span>
+          </div>
+          <div class="hero-actions">
+            <a class="button primary" href="#academic-navigation">Choose Semester / Year</a>
+            <button class="button secondary open-ai-widget" type="button">Ask AI Assistant</button>
+          </div>
+        </div>
+        <aside class="hero-emblem" aria-label="Silent Root AI learning symbol">
+          <img class="hero-silent-logo" src="assets/images/silentroot.png" alt="Silent Root symbol">
+          <div class="hero-terminal" aria-live="polite">
+            <div class="terminal-bar">
+              <span></span><span></span><span></span>
+              <strong>silentroot@bsc-cs:~</strong>
+            </div>
+            <div class="terminal-screen">
+              <p><span class="prompt">$</span> <span data-hero-type-line="Welcome to B.Sc. Computer Science Academic Portal"></span></p>
+              <p><span class="prompt">$</span> <span data-hero-type-line="I am your AI assistant."></span></p>
+              <p><span class="prompt">$</span> <span data-hero-type-line="Local LLM is available only in the computer lab."></span></p>
+              <p><span class="prompt">$</span> <span data-hero-type-line="Ask me for simple English, Hinglish, revision, and examples."></span><span class="cursor">_</span></p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container two-column">
+        <article>
+          <h2>Start Here</h2>
+          <p>Welcome to the B.Sc. Computer Science academic portal. This website is designed for students who are building their computer science foundation step by step, including beginners from rural and Hindi-medium backgrounds.</p>
+        </article>
+        <article>
+          <h2>What This Website Provides</h2>
+          <p>B.Sc. Computer Science develops logical thinking, problem solving, programming knowledge, office productivity skills, database understanding, networking basics, and practical computer confidence.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section soft-bg">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">About Teacher</p>
+          <h2>Academic and Professional Profile</h2>
+        </div>
+        <div class="profile-grid">
+          <img class="profile-photo" src="assets/images/teacher-photo.jpeg" alt="Abhinav Sharma">
+          <div class="content-block">
+            <h3>Abhinav Sharma</h3>
+            <p><strong>Designation:</strong> Assistant Professor, Computer Applications</p>
+            <p><strong>College:</strong> Government College Bhoranj (Tarkwari), Hamirpur, Himachal Pradesh</p>
+            <p><strong>Qualifications:</strong> PhD in Cyber Security, M.Tech in Computer Science, B.Tech in Information Technology, Advanced Program in Cyber Security and Cyber Defense from IIT Kanpur.</p>
+            <p><strong>Teaching and research areas:</strong> Computer applications, cybersecurity foundations, SIEM, threat analytics, SOC automation, agentic AI, multi-agent systems, LLMs for security, explainable AI, alert triage, and insider-threat detection.</p>
+            <a class="button secondary" href="about.html">Read More</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="academic-navigation">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Academic Navigation</p>
+          <h2>Choose Your Semester or Year</h2>
+          <p class="section-intro">Start here. Open the correct semester or year, then choose the course and learning activity you need.</p>
+        </div>
+        <div class="academic-grid" data-render="semesters"></div>
+      </div>
+    </section>
+
+    <section class="section soft-bg">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Latest Announcements</p>
+          <h2>Recent Updates</h2>
+          <p class="section-intro">Only the latest three announcements are shown here. Open the Announcements page for all updates.</p>
+        </div>
+        <div class="announcement-list compact" data-render="latest-announcements"></div>
+      </div>
+    </section>
+
+    <section class="section soft-bg">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Study Method</p>
+          <h2>How to Use This Website</h2>
+        </div>
+        <div class="steps">
+          <div class="step-card"><span>1</span><h3>Choose Semester / Year</h3><p>First open your correct semester or year from the homepage.</p></div>
+          <div class="step-card"><span>2</span><h3>Open Your Course</h3><p>Use the course page to access lectures, assignments, quizzes, lab work, and question banks.</p></div>
+          <div class="step-card"><span>3</span><h3>Study Before Class</h3><p>Read lecture notes before class and download slides or notes when available.</p></div>
+          <div class="step-card"><span>4</span><h3>Practice Regularly</h3><p>Complete assignments before due dates, attempt quizzes for revision, and check announcements regularly.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container two-column">
+        <article class="content-block">
+          <h2>Important Instructions</h2>
+          <ul class="check-list">
+            <li>Bring a notebook to class and write important terms in simple language.</li>
+            <li>Practice lab activities repeatedly until you can do them independently.</li>
+            <li>Submit assignments before the due date through the given link.</li>
+            <li>Use the AI Course Assistant only for learning support, not for copying answers.</li>
+          </ul>
+        </article>
+        <article class="content-block">
+          <h2>How Quizzes and Assignments Work</h2>
+          <p>Practice quizzes help you revise topics. Quiz marks are not officially recorded unless the teacher announces it separately.</p>
+          <p>Assignments may be submitted through Google Classroom, Google Form, or another method announced by the teacher.</p>
+          <p>The AI Assistant is for explanation and revision only. It works only in the computer lab / college LAN when the local LLM backend is running.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section soft-bg">
+      <div class="container two-column">
+        <article class="content-block">
+          <h2>AI Learning Support</h2>
+          <p>The AI Assistant can explain concepts, give simple examples, help revise lecture topics, and support English, Hindi, or Hinglish prompts.</p>
+          <p>It should not be used for copying assignment answers or exam answers.</p>
+          <a class="button secondary" href="ai-assistant.html">Open AI Assistant Info</a>
+        </article>
+        <article class="content-block">
+          <h2>Program Information</h2>
+          <img class="info-image" src="assets/images/program-infographic.png" alt="B.Sc. Physical Science with Computer Science infographic">
+        </article>
+      </div>
+    </section>
+
+    <section class="section soft-bg">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Available Learning Resources</p>
+          <h2>Student Resources</h2>
+        </div>
+        <div class="link-grid">
+          <a class="link-card" href="announcements.html"><strong>Announcements</strong><span>Class notices and updates</span></a>
+          <a class="link-card" href="assignments.html"><strong>Assignments</strong><span>Homework and submission links</span></a>
+          <a class="link-card" href="quizzes.html"><strong>Quizzes</strong><span>Practice and marks-based quizzes</span></a>
+          <a class="link-card" href="lab.html"><strong>Practical Lab</strong><span>Beginner-friendly lab activities</span></a>
+          <a class="link-card" href="question-bank.html"><strong>Question Bank</strong><span>Short, long, diagram, and viva questions</span></a>
+          <a class="link-card" href="ai-assistant.html"><strong>AI Course Assistant</strong><span>Learning support in simple English and Hinglish</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Department of Computer Science / Computer Applications</p>
+      <p>Govt. Degree College Bhoranj, Himachal Pradesh</p>
+    </div>
+  </footer>
+
+  <aside class="ai-widget" id="ai-widget" aria-label="AI Course Assistant" hidden>
+    <div class="ai-widget-header">
+      <img src="assets/images/silentroot.png" alt="">
+      <div>
+        <strong>AI Course Assistant</strong>
+        <span>Lab access only</span>
+      </div>
+      <button class="ai-widget-close" type="button" aria-label="Close AI assistant">×</button>
+    </div>
+    <div class="ai-widget-body lab-only">
+      <div class="chat-message assistant">AI Assistant is available only in the computer lab.</div>
+      <p class="ai-lab-note">Please use the lab computer or the approved lab network to access the local LLM. Outside the lab, use lecture notes, quizzes, assignments, and question banks for study.</p>
+      <a class="button small secondary" href="ai-assistant.html">Open AI Assistant Page</a>
+    </div>
+  </aside>
+
+  <button class="ai-widget-launcher open-ai-widget" type="button" aria-label="Open AI Course Assistant">
+    <img src="assets/images/silentroot.png" alt="">
+    <span>Ask AI</span>
+  </button>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/data-render.js"></script>
+</body>
+</html>

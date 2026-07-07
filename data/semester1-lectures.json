@@ -1,0 +1,122 @@
+[
+  {
+    "number": "01",
+    "title": "What is a Computer?",
+    "section": "Section I: Introduction to Computers",
+    "description": "Meaning of computer, basic purpose, and simple examples from daily life.",
+    "ppt": "downloads/semester1/ppt/lecture-01.pptx",
+    "notes": "downloads/semester1/notes/lecture-01-notes.pdf",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "quiz-player.html?quiz=quizzes/semester1/quiz-01-computer-basics.json",
+    "status": "Available"
+  },
+  {
+    "number": "02",
+    "title": "Characteristics of Computers",
+    "section": "Section I: Introduction to Computers",
+    "description": "Speed, accuracy, storage, diligence, versatility, and limitations of computers.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "03",
+    "title": "Evolution of Computers",
+    "section": "Section I: Introduction to Computers",
+    "description": "Early calculating devices and the development of computer generations.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "04",
+    "title": "Types of Computers",
+    "section": "Section I: Introduction to Computers",
+    "description": "Microcomputers, minicomputers, mainframes, supercomputers, and embedded computers.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "05",
+    "title": "Block Diagram of a Computer",
+    "section": "Section I: Introduction to Computers",
+    "description": "Input unit, CPU, memory, output unit, control unit, and arithmetic logic unit.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "06",
+    "title": "Memory and Storage",
+    "section": "Section I: Introduction to Computers",
+    "description": "Primary memory, secondary storage, RAM, ROM, hard disk, SSD, and pen drive.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "07",
+    "title": "Input and Output Devices",
+    "section": "Section I: Introduction to Computers",
+    "description": "Keyboard, mouse, scanner, monitor, printer, speakers, and other common devices.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "08",
+    "title": "Software and Operating Systems",
+    "section": "Section I: Introduction to Computers",
+    "description": "System software, application software, and the role of operating systems.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "09",
+    "title": "Basic Programming Concepts",
+    "section": "Section I: Introduction to Computers",
+    "description": "Program, algorithm, flowchart, variables, input, output, and simple logic.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "number": "10",
+    "title": "Section I Revision",
+    "section": "Section I: Introduction to Computers",
+    "description": "Revision of important terms, short questions, diagrams, and exam preparation.",
+    "ppt": "#",
+    "notes": "#",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Coming Soon"
+  }
+]
