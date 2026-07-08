@@ -98,10 +98,7 @@ async function renderLectures() {
         <p>${lecture.description}</p>
         <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
         <div class="card-actions">
-          ${lecture.lecture ? linkButton(lecture.lecture, "Open Lecture", "button small") : ""}
-          ${linkButton(lecture.ppt, "PPT", "button small")}
-          ${linkButton(lecture.notes, "PDF Notes", "button small secondary")}
-          ${linkButton(lecture.quiz, "Practice Quiz", "button small muted")}
+          ${lecture.lecture ? linkButton(lecture.lecture, "Open Lecture", "button small") : linkButton("#", "Lecture Coming Soon", "button small")}
         </div>
       </article>
     `;
