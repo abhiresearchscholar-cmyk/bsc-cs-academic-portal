@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 01 — How a Computer Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ===================================================================
+     DESIGN TOKENS  ·  Signature duotone: AMBER = 1/HIGH/ON, BLUE = 0/LOW/OFF.
+     Machine world is amber+blue; the human / meaning layer is violet.
+     =================================================================== */
+  :root{
+    --bg:#090D18; --bg-2:#0C1120; --panel:#111A2E; --panel-2:#16203a;
+    --line:#22304d; --line-soft:#1a2540;
+    --ink:#EAF0FA; --ink-dim:#8593ad; --ink-faint:#5b6785;
+    --one:#FFB020; --one-soft:#4a3a1a; --one-glow:rgba(255,176,32,.45);
+    --zero:#4C74D0; --zero-soft:#1e2c4d;
+    --human:#B892FF; --human-glow:rgba(184,146,255,.4);
+    --ok:#4ade80; --no:#f87171;
+    --r:16px; --r-sm:10px; --maxw:1080px;
+    --f-display:'Space Grotesk',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--one);color:#1a1205}
+  a{color:var(--one);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  .layer + .layer{border-top:1px solid var(--line-soft)}
+
+  /* ---------- RAIL ---------- */
+  .rail{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:12px}
+  .rail button{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;transition:color .3s}
+  .rail .dot{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid var(--line);transition:all .3s;flex:none}
+  .rail button:hover{color:var(--ink-dim)}
+  .rail button.active{color:var(--one)}
+  .rail button.active .dot{background:var(--one);box-shadow:0 0 0 4px var(--one-glow);border-color:var(--one)}
+  .rail .label{opacity:0;transform:translateX(-4px);transition:all .3s;white-space:nowrap}
+  .rail button:hover .label,.rail button.active .label{opacity:1;transform:none}
+  @media(max-width:1300px){.rail{display:none}}
+
+  /* ---------- TYPE ---------- */
+  .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--one);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .num{font-weight:700;color:var(--bg);background:var(--one);padding:2px 8px;border-radius:6px;letter-spacing:.02em}
+  h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,46px);margin-bottom:20px}
+  h3{font-size:22px;margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-dim);max-width:60ch}
+  p{max-width:65ch;color:var(--ink-dim)}
+  strong{color:var(--ink);font-weight:600}
+  .amber{color:var(--one)} .blue{color:var(--zero)} .violet{color:var(--human)} .mono{font-family:var(--f-mono)}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:0;height:100vh;min-height:660px;display:flex;align-items:center;position:relative;overflow:hidden}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 42%,transparent 38%,var(--bg) 100%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--one);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+  .hero-tag .pill{background:var(--one);color:var(--bg);padding:3px 9px;border-radius:6px;font-weight:700}
+  .hero h1{font-size:clamp(38px,7.4vw,84px);margin-bottom:24px}
+  .hero h1 .flip{color:var(--one)}
+  .hero .lede{font-size:clamp(18px,2.3vw,23px);max-width:54ch}
+  .hero-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-hint .arrow{width:1px;height:26px;background:linear-gradient(var(--ink-faint),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(-6px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+
+  /* ---------- OBJECTIVES ---------- */
+  .objectives{padding:60px 0;background:var(--bg-2);border-bottom:1px solid var(--line-soft)}
+  .obj-head{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:22px}
+  .obj-head b{color:var(--one)}
+  .obj-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.obj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.obj-grid{grid-template-columns:repeat(5,1fr)}}
+  .obj{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .obj .on{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-bottom:8px}
+  .obj p{font-size:13.5px;color:var(--ink-dim)}
+
+  /* ---------- WIDGET SHELL ---------- */
+  .stage{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:34px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .stage-title{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .readout{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)}
+  .readout b{color:var(--one)}
+  .btn{font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .btn:hover{border-color:var(--one);color:var(--one)}
+  .btn.primary{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .recap{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);margin-top:26px;padding-left:14px;border-left:2px solid var(--one)}
+
+  /* in-class callout */
+  .callout{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--human);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(184,146,255,.05);max-width:65ch}
+  .callout .ic{font-size:16px;flex:none;filter:grayscale(.1)}
+  .callout .tx{font-size:14px;color:var(--ink-dim)}
+  .callout .tx b{color:var(--human)}
+
+  /* ---------- 00 TRANSISTOR ---------- */
+  .tr-wrap{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+  @media(min-width:720px){.tr-wrap{grid-template-columns:1.3fr 1fr}}
+  .tr-svg{width:100%;height:auto;display:block}
+  .flow-dot{fill:var(--one)}
+  .tr-side .big-state{font-family:var(--f-display);font-size:44px;font-weight:700;line-height:1;margin-bottom:6px}
+  .tr-side .big-state.on{color:var(--one)} .tr-side .big-state.off{color:var(--zero)}
+
+  /* ---------- 01 SIGNAL ---------- */
+  .sig-svg{width:100%;height:auto;display:block}
+  .sig-bits{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:22px}
+  .sig-bit{width:44px;height:44px;border-radius:8px;font-family:var(--f-mono);font-weight:700;font-size:18px;border:1px solid #2c4272;background:var(--zero-soft);color:var(--zero);transition:all .2s}
+  .sig-bit.on{background:var(--one-soft);border-color:var(--one);color:var(--one);box-shadow:0 0 0 1px var(--one)}
+  .sig-bit:hover{transform:translateY(-2px)}
+
+  /* ---------- 02 BINARY ---------- */
+  .bits{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .bit{width:66px;flex:1 1 52px;max-width:78px;aspect-ratio:1/1.25;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--zero-soft);border:1px solid #2c4272;transition:all .25s;position:relative;user-select:none}
+  .bit .val{font-family:var(--f-mono);font-size:30px;font-weight:700;color:var(--zero)}
+  .bit .place{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint)}
+  .bit.on{background:var(--one-soft);border-color:var(--one);box-shadow:0 0 0 1px var(--one),0 6px 24px var(--one-glow)}
+  .bit.on .val{color:var(--one)} .bit.on .place{color:#b98a3a}
+  .bit:hover{transform:translateY(-3px)}
+  .decimal-out{text-align:center;margin-top:22px}
+  .decimal-out .num{font-family:var(--f-display);font-size:clamp(44px,9vw,76px);font-weight:700;color:var(--ink);line-height:1}
+  .decimal-out .expr{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);margin-top:8px;min-height:20px}
+  .decimal-out .expr .t{color:var(--one)}
+
+  /* ---------- 03 ENCODING ---------- */
+  .txt-input{width:100%;font-family:var(--f-mono);font-size:18px;padding:14px 16px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink)}
+  .txt-input:focus{outline:none;border-color:var(--one)}
+  .char-grid{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}
+  .char-cell{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 12px 10px;text-align:center}
+  .char-cell .glyph{font-family:var(--f-display);font-size:26px;font-weight:600;margin-bottom:8px}
+  .char-cell .code{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);margin-top:8px}
+  .byte{display:flex;gap:3px;justify-content:center}
+  .b{width:15px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:11px;font-weight:700}
+  .b.one{background:var(--one);color:#1a1205}
+  .b.zero{background:var(--zero-soft);color:var(--zero);border:1px solid #2c4272}
+
+  /* ---------- 04 GATES ---------- */
+  .gate-pick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+  .gate-pick .btn.active{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .gate-lab{display:grid;grid-template-columns:1fr;gap:26px;align-items:center}
+  @media(min-width:760px){.gate-lab{grid-template-columns:1.2fr 1fr}}
+  .gate-svg{width:100%;height:auto}
+  .gate-desc{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);margin-bottom:16px;min-height:18px}
+  .toggle{width:100%;font-family:var(--f-mono);font-weight:700;font-size:20px;padding:14px;border-radius:var(--r-sm);border:1px solid #2c4272;background:var(--zero-soft);color:var(--zero);transition:all .2s}
+  .toggle.on{background:var(--one-soft);border-color:var(--one);color:var(--one);box-shadow:0 0 0 1px var(--one),0 4px 18px var(--one-glow)}
+  .input-stack{display:flex;flex-direction:column;gap:12px}
+  .input-stack .lbl{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+  .out-lamp{margin-top:14px;text-align:center;padding:16px;border-radius:var(--r-sm);border:1px dashed var(--line)}
+  .out-lamp .lamp{font-family:var(--f-display);font-size:40px;font-weight:700;color:var(--zero)}
+  .out-lamp .lamp.on{color:var(--one)}
+  .out-lamp .cap{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase}
+  .ttable{width:100%;border-collapse:collapse;font-family:var(--f-mono);font-size:13px;margin-top:22px}
+  .ttable th,.ttable td{padding:8px 10px;text-align:center;border:1px solid var(--line-soft)}
+  .ttable th{color:var(--ink-faint);font-weight:500;text-transform:uppercase;font-size:10px;letter-spacing:.1em}
+  .ttable td{color:var(--ink-dim)}
+  .ttable tr.hi td{background:var(--one-soft);color:var(--one)}
+  .ttable td.one{color:var(--one);font-weight:700}
+
+  /* ---------- 05 ADDER ---------- */
+  .adder-grid{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+  @media(min-width:720px){.adder-grid{grid-template-columns:1fr 1fr}}
+  .add-eq{font-family:var(--f-mono);text-align:center;font-size:clamp(26px,6vw,42px);font-weight:700;letter-spacing:.04em}
+  .add-eq .in{color:var(--ink)} .add-eq .res{color:var(--one)}
+  .add-note{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);text-align:center;margin-top:10px;min-height:20px}
+
+  /* ---------- 06 ARCHITECTURE ---------- */
+  .arch-wrap{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:900px){.arch-wrap{grid-template-columns:1.55fr 1fr}}
+  .arch-svg{width:100%;height:auto}
+  .arch-svg .comp rect{transition:all .25s;cursor:pointer}
+  .arch-svg .comp:hover rect{stroke:var(--one)}
+  .arch-svg .comp.sel rect{stroke:var(--one);stroke-width:2.5}
+  .arch-svg .comp.flash rect{fill:var(--one-soft);stroke:var(--one)}
+  .arch-svg text{pointer-events:none}
+  .arch-info{border:1px solid var(--line);border-radius:var(--r-sm);padding:20px;background:var(--bg);min-height:150px}
+  .arch-info .t{font-family:var(--f-display);font-size:20px;font-weight:600;margin-bottom:8px;color:var(--one)}
+  .arch-info p{font-size:14.5px}
+  .arch-step{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);margin-top:16px;min-height:18px}
+  .arch-step b{color:var(--one)}
+
+  /* ---------- 07 CPU ---------- */
+  .cpu-stage{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:840px){.cpu-stage{grid-template-columns:1.4fr 1fr}}
+  .pipe{display:flex;flex-direction:column;gap:10px}
+  .stagebox{border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;background:var(--bg);display:flex;align-items:center;gap:14px;transition:all .3s}
+  .stagebox .sn{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);width:70px;flex:none;letter-spacing:.08em;text-transform:uppercase}
+  .stagebox .sd{font-size:14px;color:var(--ink-dim)}
+  .stagebox.active{border-color:var(--one);background:var(--one-soft);box-shadow:0 0 0 1px var(--one)}
+  .stagebox.active .sd,.stagebox.active .sn{color:var(--one)}
+  .prog{font-family:var(--f-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;line-height:1.9}
+  .prog .line{padding:2px 8px;border-radius:5px;color:var(--ink-dim)}
+  .prog .line.cur{background:var(--one-soft);color:var(--one)}
+  .regs{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+  .reg{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 16px;font-family:var(--f-mono);flex:1}
+  .reg .rn{font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em}
+  .reg .rv{font-size:24px;color:var(--one);font-weight:700}
+
+  /* ---------- 08 STACK ---------- */
+  .stack-col{display:flex;flex-direction:column;gap:10px}
+  .strip{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px 18px;background:var(--bg);opacity:.32;transition:all .45s;transform:translateY(4px)}
+  .strip.shown{opacity:1;transform:none}
+  .strip .tier{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;display:flex;justify-content:space-between}
+  .strip .code{font-family:var(--f-mono);font-size:15px;color:var(--ink);word-break:break-word}
+  .strip.human{border-color:var(--human);box-shadow:inset 0 0 0 1px rgba(184,146,255,.15)}
+  .strip.human .tier{color:var(--human)} .strip.human .code{color:var(--human)}
+  .strip.metal{border-color:var(--one)}
+  .strip.metal .tier{color:var(--one)} .strip.metal .code{letter-spacing:2px}
+  .strip .code .one{color:var(--one)} .strip .code .zero{color:var(--zero)}
+
+  /* ---------- 09 ACTIVITIES ---------- */
+  .act-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:780px){.act-grid{grid-template-columns:1fr 1fr}}
+  .act{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .act h3{font-size:19px;margin-bottom:6px}
+  .act .prompt{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+  .target{font-family:var(--f-display);font-size:44px;font-weight:700;color:var(--one);line-height:1;margin-bottom:8px}
+  .feedback{font-family:var(--f-mono);font-size:13px;margin-top:14px;min-height:20px;color:var(--ink-faint)}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--no)}
+  .mini-bits{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
+  .mini-bit{width:40px;height:50px;border-radius:8px;font-family:var(--f-mono);font-weight:700;font-size:16px;border:1px solid #2c4272;background:var(--zero-soft);color:var(--zero);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .2s}
+  .mini-bit .pl{font-size:8px;color:var(--ink-faint)}
+  .mini-bit.on{background:var(--one-soft);border-color:var(--one);color:var(--one)}
+  .mini-bit.on .pl{color:#b98a3a}
+  .mini-bit:hover{transform:translateY(-2px)}
+  .act-input{font-family:var(--f-mono);font-size:18px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--ink);width:74px;text-align:center}
+  .act-input:focus{outline:none;border-color:var(--one)}
+  .show-bits{display:flex;gap:5px;margin:6px 0 12px;flex-wrap:wrap}
+  .show-bits .sb{width:28px;height:38px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:700;font-size:14px}
+  .show-bits .sb.one{background:var(--one);color:#1a1205}
+  .show-bits .sb.zero{background:var(--zero-soft);color:var(--zero);border:1px solid #2c4272}
+  .score{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+
+  /* quiz */
+  .quiz{margin-top:28px}
+  .quiz-h{font-family:var(--f-display);font-size:22px;margin-bottom:16px}
+  .q{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);margin-bottom:14px}
+  .q .qt{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .q .qt .n{font-family:var(--f-mono);color:var(--one);margin-right:8px}
+  .q .opts{display:flex;flex-direction:column;gap:8px}
+  .q .opt{text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink-dim);background:var(--panel);transition:all .18s}
+  .q .opt:hover:not(:disabled){border-color:var(--one);color:var(--ink)}
+  .q .opt.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .q .opt.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .q .exp{font-size:13px;color:var(--ink-faint);margin-top:10px;display:none}
+  .q.answered .exp{display:block}
+  .quiz-score{font-family:var(--f-mono);font-size:14px;color:var(--one);margin-top:10px}
+
+  /* ---------- 10 WHY / HOMEWORK ---------- */
+  .why{background:linear-gradient(180deg,var(--bg),#070a12)}
+  .why h2{max-width:16ch}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:34px}
+  @media(min-width:680px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .card .k{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .card p{font-size:15px}
+  .hw{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel);margin-top:30px}
+  .hw .k{font-family:var(--f-mono);font-size:12px;color:var(--human);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+  .hw ol{margin:0 0 0 18px;color:var(--ink-dim);font-size:15px}
+  .hw li{margin-bottom:10px}
+  .hw li b{color:var(--ink)}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line-soft);text-align:center}
+  footer .m{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  @media(max-width:520px){section{padding:70px 0}.stage{padding:20px}.bit{max-width:none}}
+</style>
+</head>
+<body>
+
+<nav class="rail" id="rail" aria-label="Lecture navigation"></nav>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner"><div class="wrap">
+    <div class="hero-tag"><span class="pill">Lecture 01</span> Foundations · BSc Computer Science</div>
+    <h1>A computer only ever<br>does <span class="flip">one thing</span>.</h1>
+    <p class="lede">It decides between <span class="amber">on</span> and <span class="blue">off</span> — billions of times a second. Everything else you will ever build is that single trick, stacked into meaning. Today we climb the whole stack: from a switch, to a signal, to a sentence.</p>
+  </div></div>
+  <div class="hero-hint"><span>scroll to begin</span><span class="arrow"></span></div>
+</header>
+
+<!-- ===================== OBJECTIVES ===================== -->
+<section class="objectives" id="obj">
+  <div class="wrap">
+    <div class="obj-head">By the end of this session you will be able to — <b>five things</b></div>
+    <div class="obj-grid">
+      <div class="obj"><div class="on">01</div><p>Explain what a computer physically <em>is</em>: switches on silicon.</p></div>
+      <div class="obj"><div class="on">02</div><p>Read and write <em>binary</em>, and see 1s and 0s as voltage.</p></div>
+      <div class="obj"><div class="on">03</div><p>Describe how numbers, text, and images are all just <em>bits</em>.</p></div>
+      <div class="obj"><div class="on">04</div><p>Name the parts of a computer and what each one <em>does</em>.</p></div>
+      <div class="obj"><div class="on">05</div><p>Trace how your <em>code</em> turns into signals on a wire.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 00 TRANSISTOR ===================== -->
+<section class="layer" id="s0" data-title="The switch">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">00</span> The switch</div>
+    <h2>Underneath everything is a tiny switch you control with electricity.</h2>
+    <p>The whole machine is built from one component repeated at unimaginable scale: the <strong>transistor</strong>. A transistor is a switch with no moving parts — a small voltage on its <span class="amber">gate</span> decides whether current is allowed to flow. <strong>Gate on, current passes. Gate off, it stops.</strong> A modern chip packs <strong>tens of billions</strong> of these onto a fingernail of silicon — that is what an "IC", an integrated circuit, actually is.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · a single transistor</span><span class="readout">Gate voltage: <b id="trState">OFF</b></span></div>
+      <div class="tr-wrap">
+        <div>
+          <svg class="tr-svg" viewBox="0 0 420 220" id="trSvg" role="img" aria-label="A transistor switching current on and off">
+            <line x1="30" y1="110" x2="170" y2="110" stroke="#2c3a5a" stroke-width="6" stroke-linecap="round"/>
+            <line x1="250" y1="110" x2="390" y2="110" stroke="#2c3a5a" stroke-width="6" stroke-linecap="round"/>
+            <line x1="210" y1="200" x2="210" y2="150" stroke="#2c3a5a" stroke-width="6" stroke-linecap="round" id="gateWire"/>
+            <rect x="170" y="90" width="80" height="40" rx="8" fill="#0c1120" stroke="#2c3a5a" stroke-width="2" id="channel"/>
+            <text x="210" y="115" text-anchor="middle" font-family="'JetBrains Mono'" font-size="12" fill="#5b6785" id="chanLabel">gate</text>
+            <circle cx="210" cy="200" r="12" fill="#16203a" stroke="#2c3a5a" stroke-width="2"/>
+            <text x="30" y="140" font-family="'JetBrains Mono'" font-size="11" fill="#5b6785">source</text>
+            <text x="352" y="140" font-family="'JetBrains Mono'" font-size="11" fill="#5b6785">drain</text>
+            <g id="flowDots"></g>
+          </svg>
+          <div class="btn-row"><button class="btn primary" id="trToggle">Flip the gate</button></div>
+        </div>
+        <div class="tr-side">
+          <div class="big-state off" id="trBig">OFF</div>
+          <p id="trExplain" style="font-size:15px">The gate is closed, so no current flows from source to drain. The transistor is holding a <span class="blue">0</span>.</p>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>In class:</b> Ask the room — a light switch has two positions. How many "things" can one switch remember? (Answer: exactly two. Hold that thought for the next slide.)</div></div>
+    <div class="recap">TAKEAWAY · A transistor = a switch controlled by electricity. Billions of them on one chip = the hardware of a computer.</div>
+  </div>
+</section>
+
+<!-- ===================== 01 SIGNAL ===================== -->
+<section class="layer" id="s1" data-title="Electricity">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">01</span> Electricity as a signal</div>
+    <h2>On a real wire, 1 and 0 are just high and low voltage.</h2>
+    <p>A wire inside a computer carries a voltage that changes over time. When the voltage is <span class="amber">high</span> we read a <strong>1</strong>; when it drops <span class="blue">low</span> we read a <strong>0</strong>. Slice time into equal ticks (that's the job of the <strong>clock</strong>), read the voltage at each tick, and a single wire streams out a sequence like <span class="mono">10110100</span>. That's it — electricity <em>is</em> the information. <strong>Edit the bits below</strong> and watch the signal reshape as current flows through it.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · one wire, voltage over time</span><span class="readout">reading: <b id="sigRead">10110100</b></span></div>
+      <svg class="sig-svg" viewBox="0 0 700 240" id="sigSvg" role="img" aria-label="Voltage waveform for a bit pattern">
+        <g id="sigWave"></g>
+        <g id="sigDots"></g>
+      </svg>
+      <div class="sig-bits" id="sigBits"></div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>In class:</b> Type your birth year in binary into the bits and let students read the waveform back as 1s and 0s. Voltage → number, live.</div></div>
+    <div class="recap">TAKEAWAY · A bit is not abstract — it's a voltage level on a wire, sampled once per clock tick. High = 1, low = 0.</div>
+  </div>
+</section>
+
+<!-- ===================== 02 BINARY ===================== -->
+<section class="layer" id="s2" data-title="1s and 0s">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">02</span> One and zero</div>
+    <h2>Two states are all you need. We call them 1 and 0.</h2>
+    <p>One switch = one <strong>bit</strong>, and one bit can only say two things. Line up eight switches and you get a <strong>byte</strong> — now, by turning them on and off in patterns, you can count all the way to 255. Each position is worth double the one to its right. <strong>Click the switches</strong> and watch the number build.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · one byte (8 bits)</span><span class="readout">click a bit to flip it</span></div>
+      <div class="bits" id="bits"></div>
+      <div class="decimal-out"><div class="num" id="decNum">0</div><div class="expr" id="decExpr">all switches off</div></div>
+      <div class="btn-row" style="justify-content:center"><button class="btn" id="countUp">Count 0 → 255</button><button class="btn ghost" id="clearBits">Reset</button></div>
+    </div>
+    <div class="recap">TAKEAWAY · 1 bit = 1 switch. 8 bits = 1 byte = 256 patterns (0–255). Place values double: 1, 2, 4, 8, 16, 32, 64, 128.</div>
+  </div>
+</section>
+
+<!-- ===================== 03 ENCODING ===================== -->
+<section class="layer" id="s3" data-title="Meaning">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">03</span> Bits become meaning</div>
+    <h2>If numbers are just patterns, then so is everything else.</h2>
+    <p>A number is a pattern of bits, so we simply <strong>agree</strong> that certain patterns mean other things. In <strong>ASCII</strong>, capital <span class="mono">A</span> is 65, <span class="mono">B</span> is 66. Store that number and you've stored a letter. The same move gives us pixels (numbers for colour), audio (numbers for pressure), everything. <strong>Type below</strong> and watch your words become switches.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · text → binary</span><span class="readout" id="byteCount"></span></div>
+      <input class="txt-input" id="txtIn" value="Hi!" maxlength="18" aria-label="Type text to convert to binary" spellcheck="false">
+      <div class="char-grid" id="charGrid"></div>
+    </div>
+    <div class="recap">TAKEAWAY · Meaning is a convention over numbers. Letters, colours, sound, images — all of it is bytes plus an agreement.</div>
+  </div>
+</section>
+
+<!-- ===================== 04 GATES ===================== -->
+<section class="layer" id="s4" data-title="Logic gates">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">04</span> Logic gates</div>
+    <h2>Wire switches together and they start making decisions.</h2>
+    <p>A computer has to <em>reason</em> with bits. Connect a few transistors in clever arrangements and you get <strong>logic gates</strong> — tiny circuits that take input bits and produce an output bit by a fixed rule. These are the verbs of the machine. <strong>Pick a gate, flip the inputs</strong>, and read off the rule.</p>
+    <div class="stage">
+      <div class="gate-pick" id="gatePick"></div>
+      <div class="gate-desc" id="gateDesc"></div>
+      <div class="gate-lab">
+        <div><svg class="gate-svg" viewBox="0 0 360 200" id="gateSvg" role="img" aria-label="Logic gate diagram"></svg></div>
+        <div>
+          <div class="input-stack">
+            <div><div class="lbl">Input A</div><button class="toggle" id="inA">0</button></div>
+            <div id="inBwrap"><div class="lbl">Input B</div><button class="toggle" id="inB">0</button></div>
+          </div>
+          <div class="out-lamp"><div class="lamp" id="outLamp">0</div><div class="cap">Output</div></div>
+        </div>
+      </div>
+      <table class="ttable" id="ttable"></table>
+    </div>
+    <div class="recap">TAKEAWAY · A logic gate turns input bits into an output bit by a fixed rule. Gates are how hardware "thinks".</div>
+  </div>
+</section>
+
+<!-- ===================== 05 ADDER ===================== -->
+<section class="layer" id="s5" data-title="Adding">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">05</span> From logic to arithmetic</div>
+    <h2>Two gates, wired just so, can add.</h2>
+    <p>Take an <span class="amber">XOR</span> gate (1 when inputs <em>differ</em>) and an <span class="amber">AND</span> gate, feed them the same two bits, and you've built a <strong>half adder</strong>. XOR gives the <strong>sum</strong> bit; AND gives the <strong>carry</strong>. In binary, <span class="mono">1 + 1 = 10</span> — just like <span class="mono">9 + 1 = 10</span> in decimal. Stack enough of these and you can add any numbers, which is the seed of all computation. <strong>Flip the inputs</strong> and watch it add.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · half adder</span></div>
+      <div class="adder-grid">
+        <div><div class="input-stack">
+          <div><div class="lbl">Bit A</div><button class="toggle" id="addA">0</button></div>
+          <div><div class="lbl">Bit B</div><button class="toggle" id="addB">0</button></div>
+        </div></div>
+        <div><div class="add-eq"><span class="in" id="eqA">0</span> + <span class="in" id="eqB">0</span> = <span class="res" id="eqR">00</span></div><div class="add-note" id="addNote">0 + 0 = 0. Carry 0, sum 0.</div></div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · Arithmetic is logic gates arranged to carry. This little circuit is the seed of the ALU inside every CPU.</div>
+  </div>
+</section>
+
+<!-- ===================== 06 ARCHITECTURE ===================== -->
+<section class="layer" id="s6" data-title="The whole computer">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">06</span> The whole computer</div>
+    <h2>Now zoom all the way out. Here's the machine.</h2>
+    <p>Everything we've built sits inside a handful of parts wired to a shared <strong>system bus</strong> — the classic layout every computer follows. The <strong>CPU</strong> does the thinking (with its Control Unit, ALU, and Registers). <strong>RAM</strong> holds the running program. <strong>Storage</strong> keeps your files when the power's off. <strong>Input</strong> and <strong>Output</strong> connect it to you. <strong>Click any part</strong> to learn what it does — or hit <strong>Run a program</strong> to watch data move between them.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · computer architecture</span></div>
+      <div class="arch-wrap">
+        <div>
+          <svg class="arch-svg" viewBox="0 0 720 460" id="archSvg" role="img" aria-label="Diagram of a computer's parts connected by a system bus">
+            <!-- connectors -->
+            <g stroke="#2c3a5a" stroke-width="3">
+              <line x1="120" y1="92" x2="120" y2="300"/>
+              <line x1="600" y1="92" x2="600" y2="300"/>
+              <line x1="360" y1="222" x2="360" y2="300"/>
+              <line x1="185" y1="350" x2="185" y2="308"/>
+              <line x1="535" y1="350" x2="535" y2="308"/>
+            </g>
+            <!-- bus -->
+            <rect x="70" y="292" width="580" height="16" rx="8" fill="#16203a" stroke="#2c3a5a" stroke-width="1.5"/>
+            <text x="360" y="304" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#5b6785" letter-spacing="2">SYSTEM BUS</text>
+            <!-- input -->
+            <g class="comp" data-key="input"><rect x="60" y="40" width="120" height="52" rx="10" fill="#111a2e" stroke="#2c3a5a" stroke-width="2"/><text x="120" y="72" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="15" fill="#eaf0fa">Input</text></g>
+            <!-- output -->
+            <g class="comp" data-key="output"><rect x="540" y="40" width="120" height="52" rx="10" fill="#111a2e" stroke="#2c3a5a" stroke-width="2"/><text x="600" y="72" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="15" fill="#eaf0fa">Output</text></g>
+            <!-- CPU outer -->
+            <g class="comp" data-key="cpu"><rect x="248" y="70" width="224" height="152" rx="12" fill="#0e1526" stroke="#2c3a5a" stroke-width="2"/><text x="360" y="90" text-anchor="middle" font-family="'JetBrains Mono'" font-size="11" fill="#8593ad" letter-spacing="2">CPU</text></g>
+            <!-- inner: CU / ALU / registers (drawn after CPU so they're clickable on top) -->
+            <g class="comp" data-key="cu"><rect x="262" y="104" width="94" height="46" rx="8" fill="#111a2e" stroke="#2c3a5a" stroke-width="1.5"/><text x="309" y="132" text-anchor="middle" font-family="'IBM Plex Sans'" font-size="12" fill="#eaf0fa">Control</text></g>
+            <g class="comp" data-key="alu"><rect x="364" y="104" width="94" height="46" rx="8" fill="#111a2e" stroke="#2c3a5a" stroke-width="1.5"/><text x="411" y="132" text-anchor="middle" font-family="'IBM Plex Sans'" font-size="12" fill="#eaf0fa">ALU</text></g>
+            <g class="comp" data-key="reg"><rect x="262" y="160" width="196" height="42" rx="8" fill="#111a2e" stroke="#2c3a5a" stroke-width="1.5"/><text x="360" y="186" text-anchor="middle" font-family="'IBM Plex Sans'" font-size="12" fill="#eaf0fa">Registers</text></g>
+            <!-- RAM -->
+            <g class="comp" data-key="ram"><rect x="110" y="350" width="150" height="64" rx="10" fill="#111a2e" stroke="#2c3a5a" stroke-width="2"/><text x="185" y="378" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="15" fill="#eaf0fa">RAM</text><text x="185" y="396" text-anchor="middle" font-family="'JetBrains Mono'" font-size="9" fill="#5b6785">memory</text></g>
+            <!-- Storage -->
+            <g class="comp" data-key="storage"><rect x="460" y="350" width="150" height="64" rx="10" fill="#111a2e" stroke="#2c3a5a" stroke-width="2"/><text x="535" y="378" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="15" fill="#eaf0fa">Storage</text><text x="535" y="396" text-anchor="middle" font-family="'JetBrains Mono'" font-size="9" fill="#5b6785">disk / SSD</text></g>
+            <!-- packet -->
+            <circle id="packet" r="7" fill="#FFB020" opacity="0" style="filter:drop-shadow(0 0 6px #FFB020)"/>
+          </svg>
+        </div>
+        <div>
+          <div class="arch-info" id="archInfo">
+            <div class="t" id="archT">Tap a part to explore</div>
+            <p id="archP">Each block is one job. Data travels between them along the system bus. Start by clicking the CPU — the brain — or press <strong>Run a program</strong> below to see the whole thing work together.</p>
+          </div>
+          <div class="arch-step" id="archStep"></div>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="archRun">Run a program</button><button class="btn ghost" id="archReset">Clear</button></div>
+    </div>
+    <div class="recap">TAKEAWAY · CPU thinks · RAM remembers (for now) · Storage remembers (for keeps) · Input/Output talk to you · the Bus connects them all.</div>
+  </div>
+</section>
+
+<!-- ===================== 07 CPU CYCLE ===================== -->
+<section class="layer" id="s7" data-title="The CPU">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">07</span> The processor's cycle</div>
+    <h2>Inside the CPU is a loop that never stops.</h2>
+    <p>The CPU runs one relentless cycle: <strong>fetch</strong> the next instruction from memory, <strong>decode</strong> what it means, <strong>execute</strong> it, then repeat — billions of times a second. A program is just a list of these tiny instructions in memory. Below is a four-instruction program that adds numbers. <strong>Step through it</strong> and watch the cycle turn.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · fetch → decode → execute</span><span class="readout">cycle <b id="cycleNum">0</b></span></div>
+      <div class="cpu-stage">
+        <div class="pipe" id="pipe"></div>
+        <div>
+          <div class="prog" id="prog"></div>
+          <div class="regs">
+            <div class="reg"><div class="rn">Accumulator</div><div class="rv" id="regAcc">0</div></div>
+            <div class="reg"><div class="rn">Instr. pointer</div><div class="rv" id="regIp">0</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="cpuStep">Step</button><button class="btn" id="cpuRun">Run</button><button class="btn ghost" id="cpuReset">Reset</button></div>
+    </div>
+    <div class="recap">TAKEAWAY · A program = a list of instructions in memory. The CPU fetches, decodes, and executes them in an endless loop.</div>
+  </div>
+</section>
+
+<!-- ===================== 08 ABSTRACTION ===================== -->
+<section class="layer" id="s8" data-title="Understanding us">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">08</span> How it understands us</div>
+    <h2>The computer doesn't understand you. Layers of translation do.</h2>
+    <p>You write <span class="violet">human-friendly code</span>. The silicon only knows <span class="amber">voltage</span>. Between them sits a stack of translators, each turning the layer above into the one below. "Understanding" is just this fall from <span class="violet">meaning</span> to <span class="amber">metal</span> — and it lands right back at Layer 00, the switch. <strong>Translate the sentence down</strong> and watch it happen.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · from a sentence to a signal</span></div>
+      <div class="stack-col" id="stackCol"></div>
+      <div class="btn-row"><button class="btn primary" id="stackDown">Translate down ↓</button><button class="btn ghost" id="stackReset">Back to the top</button></div>
+    </div>
+    <div class="recap">TAKEAWAY · Every layer hides the one below. Code → assembly → machine code → binary → voltage. That's the whole machine.</div>
+  </div>
+</section>
+
+<!-- ===================== 09 ACTIVITIES ===================== -->
+<section class="layer" id="s9" data-title="Activities">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">09</span> Check yourself</div>
+    <h2>Your turn. Three quick challenges, then a graded quiz.</h2>
+    <p>These are built for the classroom: race a neighbour, or put them on the projector and solve them together. Everything you need was on the slides above.</p>
+
+    <div class="act-grid">
+      <!-- Activity 1: binary target -->
+      <div class="act">
+        <h3>① Hit the number</h3>
+        <div class="prompt">Flip the switches so the byte equals the target.</div>
+        <div class="target" id="tgtNum">42</div>
+        <div class="mini-bits" id="tgtBits"></div>
+        <div class="readout">current: <b id="tgtCur" style="color:var(--one)">0</b></div>
+        <div class="feedback" id="tgtFb">Set the bits to match.</div>
+        <div class="btn-row"><button class="btn" id="tgtNew">New target</button><span class="score" id="tgtScore" style="align-self:center">solved: 0</span></div>
+      </div>
+
+      <!-- Activity 2: decode -->
+      <div class="act">
+        <h3>② Decode the byte</h3>
+        <div class="prompt">This byte is one uppercase letter in ASCII. Which letter?</div>
+        <div class="show-bits" id="decBits"></div>
+        <div class="readout">hint: ASCII 'A' = 65, and it counts up from there.</div>
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+          <input class="act-input" id="decGuess" maxlength="1" aria-label="Your guessed letter" spellcheck="false">
+          <button class="btn primary" id="decCheck">Check</button>
+          <button class="btn ghost" id="decNext">New byte</button>
+        </div>
+        <div class="feedback" id="decFb"></div>
+      </div>
+    </div>
+
+    <!-- Quiz -->
+    <div class="quiz">
+      <div class="quiz-h">③ Quick quiz</div>
+      <div id="quiz"></div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 10 WHY / RECAP / HOMEWORK ===================== -->
+<section class="why layer" id="s10" data-title="Why & recap">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">10</span> Why we study this</div>
+    <h2>You just walked the whole machine — from a switch to a sentence.</h2>
+    <p>Everything in your degree lives somewhere on this stack. Circuits and architecture near the bottom. Data structures, algorithms, and languages in the middle. AI, graphics, and networks near the top. Knowing the whole ladder separates someone who <em>uses</em> computers from someone who can <strong>build and reason about</strong> them.</p>
+    <div class="cards">
+      <div class="card"><div class="k">Nothing is magic</div><p>Once you see it's switches all the way down, no layer is intimidating. Every abstraction can be opened.</p></div>
+      <div class="card"><div class="k">You can debug anything</div><p>When something breaks, you know which layer to look at — the code, the compiler, the memory, or the metal.</p></div>
+      <div class="card"><div class="k">You can build the future</div><p>New chips, new languages, new AI — all invented by people who understood this stack and pushed one layer further.</p></div>
+    </div>
+
+    <div class="hw">
+      <div class="k">Homework · before Lecture 02</div>
+      <ol>
+        <li><b>Convert by hand:</b> write the numbers 19, 100, and 200 in 8-bit binary. Check yourself with the byte widget above.</li>
+        <li><b>Encode your name:</b> spell your first name in ASCII (letter → number → binary). One byte per letter.</li>
+        <li><b>Truth tables:</b> fill in the full truth table for XOR and for NAND from memory, then verify with the gate widget.</li>
+        <li><b>Explain in one paragraph:</b> what is the difference between RAM and Storage, and why does a computer need both?</li>
+        <li><b>Stretch:</b> a colour pixel is often 3 bytes (Red, Green, Blue). How many distinct colours can that represent? (Hint: 256 × 256 × 256.)</li>
+      </ol>
+    </div>
+
+    <p class="recap" style="margin-top:34px">THE WHOLE STORY · switch → signal → bit → byte → meaning → gate → arithmetic → the machine → the CPU loop → your language. That's a computer.</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="m">Lecture 01 · How a Computer Works · an interactive teaching aid — press any widget to explore</div></div></footer>
+
+<script>
+"use strict";
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const wait = ms => new Promise(r=>setTimeout(r, reduced?0:ms));
+
+/* ---------- RAIL + scroll-spy ---------- */
+const nav=[
+  {id:'top',n:'—',t:'Cover'},{id:'s0',n:'00',t:'The switch'},{id:'s1',n:'01',t:'Electricity'},
+  {id:'s2',n:'02',t:'1s & 0s'},{id:'s3',n:'03',t:'Meaning'},{id:'s4',n:'04',t:'Logic gates'},
+  {id:'s5',n:'05',t:'Adding'},{id:'s6',n:'06',t:'Whole computer'},{id:'s7',n:'07',t:'The CPU'},
+  {id:'s8',n:'08',t:'Understanding us'},{id:'s9',n:'09',t:'Activities'},{id:'s10',n:'10',t:'Why & recap'}
+];
+const rail=$('#rail');
+nav.forEach(s=>{
+  const el=document.getElementById(s.id);
+  const b=document.createElement('button');
+  b.innerHTML=`<span class="dot"></span><span class="label">${s.n==='—'?'top':s.n} · ${s.t}</span>`;
+  b.dataset.for=s.id;
+  b.addEventListener('click',()=>el&&el.scrollIntoView({behavior:reduced?'auto':'smooth'}));
+  rail.appendChild(b);
+});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting)$$('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.for===e.target.id));
+}),{rootMargin:'-45% 0px -45% 0px'});
+nav.forEach(s=>{const el=document.getElementById(s.id);if(el)spy.observe(el);});
+
+/* ---------- HERO grid ---------- */
+(function heroGrid(){
+  const cv=$('#heroCanvas'),ctx=cv.getContext('2d');
+  let cols,rows,gap=26,size=6,t=0,mouse={x:-999,y:-999};
+  const AMBER='#FFB020',BLUE='#26385f';
+  function resize(){
+    cv.width=cv.offsetWidth*devicePixelRatio; cv.height=cv.offsetHeight*devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    cols=Math.ceil(cv.offsetWidth/gap)+1; rows=Math.ceil(cv.offsetHeight/gap)+1;
+  }
+  resize(); addEventListener('resize',resize);
+  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
+  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-999;});
+  function draw(){
+    const W=cv.offsetWidth,H=cv.offsetHeight; ctx.clearRect(0,0,W,H);
+    const wave=(t*0.9)%(W+H+400)-200;
+    for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+      const px=x*gap+14,py=y*gap+14,diag=px+py,dw=Math.abs(diag-wave);
+      const onWave=dw<60?1-(dw/60):0;
+      const dx=px-mouse.x,dy=py-mouse.y,md=Math.hypot(dx,dy),onMouse=md<90?1-(md/90):0;
+      const heat=Math.max(onWave,onMouse);
+      if(heat>0.05){ctx.fillStyle=AMBER;ctx.globalAlpha=0.15+heat*0.85;const s=size+heat*4;ctx.fillRect(px-s/2,py-s/2,s,s);}
+      else{ctx.fillStyle=BLUE;ctx.globalAlpha=0.5;ctx.fillRect(px-size/2,py-size/2,size,size);}
+    }
+    ctx.globalAlpha=1;
+  }
+  if(reduced){draw();return;}
+  (function loop(){t+=2.4;draw();requestAnimationFrame(loop);})();
+})();
+
+/* ---------- 00 TRANSISTOR ---------- */
+(function transistor(){
+  let on=false,anim=null;
+  const dots=$('#flowDots'),chan=$('#channel'),chanLabel=$('#chanLabel'),gateWire=$('#gateWire');
+  const big=$('#trBig'),explain=$('#trExplain'),state=$('#trState');
+  for(let i=0;i<6;i++){const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('r','5');c.setAttribute('cy','110');c.setAttribute('class','flow-dot');c.dataset.p=(i/6);dots.appendChild(c);}
+  function frame(){
+    $$('.flow-dot',dots).forEach(c=>{let p=parseFloat(c.dataset.p)+0.012;if(p>1)p-=1;c.dataset.p=p;c.setAttribute('cx',30+p*360);c.style.opacity=(p>0.42&&p<0.58)?0:1;});
+    anim=requestAnimationFrame(frame);
+  }
+  function render(){
+    state.textContent=on?'ON':'OFF'; big.textContent=on?'ON':'OFF'; big.className='big-state '+(on?'on':'off');
+    chan.setAttribute('fill',on?'#4a3a1a':'#0c1120'); chan.setAttribute('stroke',on?'#FFB020':'#2c3a5a');
+    chanLabel.setAttribute('fill',on?'#FFB020':'#5b6785'); gateWire.setAttribute('stroke',on?'#FFB020':'#2c3a5a');
+    dots.style.display=on?'block':'none';
+    explain.innerHTML=on?'The gate is open, so current flows freely from source to drain. The transistor is holding a <span class="amber">1</span>.':'The gate is closed, so no current flows from source to drain. The transistor is holding a <span class="blue">0</span>.';
+    if(on&&!reduced){if(!anim)frame();}else{cancelAnimationFrame(anim);anim=null;}
+  }
+  $('#trToggle').addEventListener('click',()=>{on=!on;render();});
+  render();
+})();
+
+/* ---------- 01 SIGNAL ---------- */
+(function signal(){
+  let bits=[1,0,1,1,0,1,0,0];
+  const wave=$('#sigWave'),dotsG=$('#sigDots'),bitsWrap=$('#sigBits'),read=$('#sigRead');
+  const X0=54,X1=660,HI=64,LO=170,N=8,cellW=(X1-X0)/N;
+  bits.forEach((b,i)=>{
+    const btn=document.createElement('button');
+    btn.className='sig-bit'+(b?' on':''); btn.textContent=b; btn.dataset.i=i;
+    btn.addEventListener('click',()=>{bits[i]^=1;btn.textContent=bits[i];btn.classList.toggle('on',!!bits[i]);draw();});
+    bitsWrap.appendChild(btn);
+  });
+  const NDOTS=14, dots=[];
+  for(let i=0;i<NDOTS;i++){const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('r','4');c.setAttribute('fill','#FFB020');dotsG.appendChild(c);dots.push({el:c,p:i/NDOTS});}
+  function yFor(p){const cell=Math.min(N-1,Math.floor(p*N));return bits[cell]?HI:LO;}
+  function draw(){
+    read.textContent=bits.join('');
+    let g='';
+    // axis
+    g+=`<text x="46" y="${HI+5}" text-anchor="end" font-family="'JetBrains Mono'" font-size="11" fill="#b98a3a">5V</text>`;
+    g+=`<text x="46" y="${LO+5}" text-anchor="end" font-family="'JetBrains Mono'" font-size="11" fill="#4C74D0">0V</text>`;
+    g+=`<line x1="${X0}" y1="${HI}" x2="${X1}" y2="${HI}" stroke="#22304d" stroke-width="1" stroke-dasharray="3 5"/>`;
+    g+=`<line x1="${X0}" y1="${LO}" x2="${X1}" y2="${LO}" stroke="#22304d" stroke-width="1" stroke-dasharray="3 5"/>`;
+    // tick lines + bit labels
+    for(let i=0;i<=N;i++){const x=X0+i*cellW;g+=`<line x1="${x}" y1="${HI-14}" x2="${x}" y2="${LO+14}" stroke="#1a2540" stroke-width="1"/>`;}
+    for(let i=0;i<N;i++){const cx=X0+i*cellW+cellW/2,col=bits[i]?'#FFB020':'#4C74D0';g+=`<text x="${cx}" y="34" text-anchor="middle" font-family="'JetBrains Mono'" font-weight="700" font-size="15" fill="${col}">${bits[i]}</text>`;}
+    // waveform polyline
+    let pts=[],x=X0;
+    bits.forEach((b,i)=>{const y=b?HI:LO;if(i===0)pts.push([x,y]);else{const py=bits[i-1]?HI:LO;if(py!==y){pts.push([x,py]);pts.push([x,y]);}}x+=cellW;pts.push([x,y]);});
+    g+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#FFB020" stroke-width="3" stroke-linejoin="round"/>`;
+    g+=`<text x="${(X0+X1)/2}" y="${LO+40}" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#5b6785" letter-spacing="1">time  →  (one clock tick per bit)</text>`;
+    wave.innerHTML=g;
+  }
+  function frame(){
+    dots.forEach(d=>{d.p+=0.004;if(d.p>1)d.p-=1;const x=X0+d.p*(X1-X0);d.el.setAttribute('cx',x);d.el.setAttribute('cy',yFor(d.p));d.el.setAttribute('opacity',0.85);});
+    requestAnimationFrame(frame);
+  }
+  draw();
+  if(!reduced)frame(); else dots.forEach(d=>{const x=X0+d.p*(X1-X0);d.el.setAttribute('cx',x);d.el.setAttribute('cy',yFor(d.p));});
+})();
+
+/* ---------- 02 BINARY ---------- */
+(function binary(){
+  const places=[128,64,32,16,8,4,2,1];let val=0;
+  const wrap=$('#bits'),num=$('#decNum'),expr=$('#decExpr');
+  places.forEach(p=>{const b=document.createElement('button');b.className='bit';b.innerHTML=`<span class="val">0</span><span class="place">${p}</span>`;b.setAttribute('aria-label',`bit worth ${p}`);b.dataset.p=p;b.addEventListener('click',()=>{val^=p;render();});wrap.appendChild(b);});
+  function render(){
+    let parts=[];
+    $$('.bit',wrap).forEach(b=>{const p=+b.dataset.p,on=(val&p)!==0;b.classList.toggle('on',on);$('.val',b).textContent=on?'1':'0';if(on)parts.push(p);});
+    num.textContent=val;
+    expr.innerHTML=parts.length?parts.map(p=>`<span class="t">${p}</span>`).join(' + ')+` = ${val}`:'all switches off';
+  }
+  $('#clearBits').addEventListener('click',()=>{val=0;render();});
+  $('#countUp').addEventListener('click',function(){if(this.dataset.running)return;this.dataset.running='1';val=0;const step=()=>{render();if(val<255){val++;setTimeout(step,reduced?0:16);}else this.removeAttribute('data-running');};step();});
+  render();
+})();
+
+/* ---------- 03 ENCODING ---------- */
+(function encode(){
+  const input=$('#txtIn'),grid=$('#charGrid'),count=$('#byteCount');
+  const toByte=n=>[...n.toString(2).padStart(8,'0')].map(d=>`<span class="b ${d==='1'?'one':'zero'}">${d}</span>`).join('');
+  function render(){
+    const txt=input.value;grid.innerHTML='';
+    [...txt].forEach(ch=>{const code=ch.charCodeAt(0);const cell=document.createElement('div');cell.className='char-cell';const disp=ch===' '?'␣':ch;cell.innerHTML=`<div class="glyph">${disp.replace('<','&lt;').replace('>','&gt;')}</div><div class="byte">${toByte(code&255)}</div><div class="code">ASCII ${code}</div>`;grid.appendChild(cell);});
+    const n=txt.length;count.textContent=n?`${n} char${n>1?'s':''} · ${n} byte${n>1?'s':''} · ${n*8} bits`:'type something';
+  }
+  input.addEventListener('input',render);render();
+})();
+
+/* ---------- 04 GATES ---------- */
+(function gates(){
+  const defs={
+    AND:{f:(a,b)=>a&&b,two:true,desc:'AND → output 1 only if BOTH inputs are 1.'},
+    OR:{f:(a,b)=>a||b,two:true,desc:'OR → output 1 if EITHER input is 1.'},
+    XOR:{f:(a,b)=>a!==b,two:true,desc:'XOR → output 1 only if the inputs DIFFER.'},
+    NAND:{f:(a,b)=>!(a&&b),two:true,desc:'NAND → the opposite of AND (the "universal" gate).'},
+    NOT:{f:a=>!a,two:false,desc:'NOT → flips its single input.'}
+  };
+  let cur='AND',A=false,B=false;
+  const pick=$('#gatePick'),svg=$('#gateSvg'),inA=$('#inA'),inB=$('#inB'),inBwrap=$('#inBwrap'),lamp=$('#outLamp'),table=$('#ttable'),desc=$('#gateDesc');
+  Object.keys(defs).forEach(k=>{const b=document.createElement('button');b.className='btn'+(k===cur?' active':'');b.textContent=k;b.addEventListener('click',()=>{cur=k;A=B=false;drawAll();});pick.appendChild(b);});
+  const out=()=>defs[cur].two?defs[cur].f(A,B):defs[cur].f(A);
+  function shape(name){
+    const on=out(),st=on?'#FFB020':'#3a4a6e',aC=A?'#FFB020':'#3a4a6e',bC=B?'#FFB020':'#3a4a6e';
+    let body='';
+    if(name==='NOT'){body=`<polygon points="150,60 150,140 220,100" fill="none" stroke="${st}" stroke-width="3"/><circle cx="230" cy="100" r="8" fill="none" stroke="${st}" stroke-width="3"/>`;}
+    else if(name==='OR'||name==='XOR'){body=`<path d="M140,55 Q195,55 235,100 Q195,145 140,145 Q165,100 140,55 Z" fill="none" stroke="${st}" stroke-width="3"/>`;if(name==='XOR')body=`<path d="M128,55 Q153,100 128,145" fill="none" stroke="${st}" stroke-width="3"/>`+body;}
+    else{body=`<path d="M140,55 L190,55 Q235,55 235,100 Q235,145 190,145 L140,145 Z" fill="none" stroke="${st}" stroke-width="3"/>`;if(name==='NAND')body+=`<circle cx="247" cy="100" r="8" fill="none" stroke="${st}" stroke-width="3"/>`;}
+    const two=defs[name].two;
+    const wires=two?`<line x1="40" y1="72" x2="140" y2="72" stroke="${aC}" stroke-width="4"/><line x1="40" y1="128" x2="140" y2="128" stroke="${bC}" stroke-width="4"/><circle cx="40" cy="72" r="6" fill="${aC}"/><circle cx="40" cy="128" r="6" fill="${bC}"/><text x="18" y="76" font-family="'JetBrains Mono'" font-size="13" fill="${aC}">${A?1:0}</text><text x="18" y="132" font-family="'JetBrains Mono'" font-size="13" fill="${bC}">${B?1:0}</text>`:`<line x1="40" y1="100" x2="150" y2="100" stroke="${aC}" stroke-width="4"/><circle cx="40" cy="100" r="6" fill="${aC}"/><text x="18" y="104" font-family="'JetBrains Mono'" font-size="13" fill="${aC}">${A?1:0}</text>`;
+    const ox=name==='NAND'?255:name==='NOT'?238:235;
+    const outW=`<line x1="${ox}" y1="100" x2="330" y2="100" stroke="${st}" stroke-width="4"/><circle cx="330" cy="100" r="7" fill="${st}"/><text x="316" y="86" font-family="'JetBrains Mono'" font-size="14" font-weight="700" fill="${st}">${on?1:0}</text>`;
+    svg.innerHTML=wires+body+outW;
+  }
+  function buildTable(){
+    const two=defs[cur].two,rows=two?[[0,0],[0,1],[1,0],[1,1]]:[[0],[1]];
+    let head=two?'<tr><th>A</th><th>B</th><th>out</th></tr>':'<tr><th>A</th><th>out</th></tr>',body='';
+    rows.forEach(r=>{const o=two?(defs[cur].f(!!r[0],!!r[1])?1:0):(defs[cur].f(!!r[0])?1:0);const isCur=two?(r[0]===(A?1:0)&&r[1]===(B?1:0)):(r[0]===(A?1:0));const cells=two?`<td>${r[0]}</td><td>${r[1]}</td><td class="${o?'one':''}">${o}</td>`:`<td>${r[0]}</td><td class="${o?'one':''}">${o}</td>`;body+=`<tr class="${isCur?'hi':''}">${cells}</tr>`;});
+    table.innerHTML=head+body;
+  }
+  function drawAll(){
+    $$('#gatePick .btn').forEach(b=>b.classList.toggle('active',b.textContent===cur));
+    desc.textContent=defs[cur].desc;
+    const two=defs[cur].two;inBwrap.style.display=two?'block':'none';
+    inA.textContent=A?'1':'0';inA.classList.toggle('on',A);inB.textContent=B?'1':'0';inB.classList.toggle('on',B);
+    const o=out();lamp.textContent=o?'1':'0';lamp.classList.toggle('on',o);
+    shape(cur);buildTable();
+  }
+  inA.addEventListener('click',()=>{A=!A;drawAll();});
+  inB.addEventListener('click',()=>{B=!B;drawAll();});
+  drawAll();
+})();
+
+/* ---------- 05 ADDER ---------- */
+(function adder(){
+  let A=false,B=false;const bA=$('#addA'),bB=$('#addB'),eqA=$('#eqA'),eqB=$('#eqB'),eqR=$('#eqR'),note=$('#addNote');
+  function render(){
+    bA.textContent=A?'1':'0';bA.classList.toggle('on',A);bB.textContent=B?'1':'0';bB.classList.toggle('on',B);
+    const sum=(A!==B)?1:0,carry=(A&&B)?1:0;eqA.textContent=A?1:0;eqB.textContent=B?1:0;eqR.textContent=`${carry}${sum}`;
+    const dec=(A?1:0)+(B?1:0);
+    note.innerHTML=`${A?1:0} + ${B?1:0} = ${dec} &nbsp;·&nbsp; carry <span class="amber">${carry}</span>, sum <span class="amber">${sum}</span> &nbsp;→&nbsp; binary <span class="amber">${carry}${sum}</span>`;
+  }
+  bA.addEventListener('click',()=>{A=!A;render();});bB.addEventListener('click',()=>{B=!B;render();});render();
+})();
+
+/* ---------- 06 ARCHITECTURE ---------- */
+(function arch(){
+  const info={
+    input:['Input','Keyboard, mouse, mic, camera, touchscreen — the devices that turn your actions into data the computer can store.'],
+    output:['Output','Screen, speakers, printer — they turn the computer\'s bits back into things you can see and hear.'],
+    cpu:['CPU — the brain','The Central Processing Unit runs the program. It fetches, decodes, and executes instructions billions of times a second, using the three parts inside it.'],
+    cu:['Control Unit','The traffic controller. It reads each instruction, works out what it means, and tells every other part what to do and when.'],
+    alu:['ALU','The Arithmetic Logic Unit does the actual maths and logic — add, subtract, compare, AND, OR. It\'s built from the very logic gates you played with earlier.'],
+    reg:['Registers','A handful of tiny, ultra-fast storage slots inside the CPU that hold the numbers it\'s working on right this instant.'],
+    ram:['RAM — working memory','Fast but temporary. It holds the running program and its data while the computer is on, and empties the moment the power is cut.'],
+    storage:['Storage — disk / SSD','Slower but permanent. Your files, apps, and OS live here even when the machine is off. Programs are copied from here into RAM to run.'],
+  };
+  const svg=$('#archSvg'),T=$('#archT'),P=$('#archP'),step=$('#archStep'),packet=$('#packet');
+  let running=false;
+  $$('.comp',svg).forEach(g=>g.addEventListener('click',()=>{
+    if(running)return;
+    const k=g.dataset.key;if(!info[k])return;
+    $$('.comp',svg).forEach(c=>c.classList.remove('sel'));g.classList.add('sel');
+    T.textContent=info[k][0];P.textContent=info[k][1];
+  }));
+  function comp(k){return svg.querySelector(`.comp[data-key="${k}"]`);}
+  function flash(keys){$$('.comp',svg).forEach(c=>c.classList.remove('flash'));keys.forEach(k=>{const c=comp(k);if(c)c.classList.add('flash');});}
+  function move(points,dur){return new Promise(res=>{
+    packet.setAttribute('opacity','1');
+    let segs=[],total=0;
+    for(let i=0;i<points.length-1;i++){const a=points[i],b=points[i+1],len=Math.hypot(b[0]-a[0],b[1]-a[1]);segs.push({a,b,len});total+=len;}
+    let start=null;
+    function frame(ts){
+      if(start===null)start=ts;let t=reduced?1:(ts-start)/dur;if(t>1)t=1;
+      let dist=t*total,acc=0,x=points[0][0],y=points[0][1];
+      for(const s of segs){if(dist<=acc+s.len){const f=s.len?(dist-acc)/s.len:1;x=s.a[0]+(s.b[0]-s.a[0])*f;y=s.a[1]+(s.b[1]-s.a[1])*f;break;}acc+=s.len;x=s.b[0];y=s.b[1];}
+      packet.setAttribute('cx',x);packet.setAttribute('cy',y);
+      if(t<1)requestAnimationFrame(frame);else res();
+    }
+    requestAnimationFrame(frame);
+  });}
+  const P_load=[[535,350],[535,300],[185,300],[185,350]];
+  const P_fetch=[[185,350],[185,300],[360,300],[360,222]];
+  const P_result=[[360,222],[360,300],[600,300],[600,92]];
+  async function run(){
+    if(running)return;running=true;$$('.comp',svg).forEach(c=>c.classList.remove('sel'));
+    step.innerHTML='<b>1.</b> Loading the program from storage into memory…';flash(['storage','ram']);await move(P_load,1000);
+    step.innerHTML='<b>2.</b> CPU fetches the next instruction from RAM…';flash(['ram','cpu']);await move(P_fetch,1000);
+    step.innerHTML='<b>3.</b> The ALU executes it — real maths, done with logic gates…';flash(['alu']);await wait(800);
+    step.innerHTML='<b>4.</b> The result is sent out to the screen.';flash(['cpu','output']);await move(P_result,1000);
+    step.innerHTML='<b>Done.</b> That loop repeats billions of times a second.';
+    packet.setAttribute('opacity','0');flash([]);running=false;
+  }
+  $('#archRun').addEventListener('click',run);
+  $('#archReset').addEventListener('click',()=>{if(running)return;$$('.comp',svg).forEach(c=>c.classList.remove('sel','flash'));packet.setAttribute('opacity','0');step.textContent='';T.textContent='Tap a part to explore';P.textContent='Each block is one job. Data travels between them along the system bus. Click the CPU, or press Run a program.';});
+})();
+
+/* ---------- 07 CPU CYCLE ---------- */
+(function cpu(){
+  const stages=[{n:'Fetch',d:'Read the next instruction from memory'},{n:'Decode',d:'Work out what the instruction means'},{n:'Execute',d:'Do it — the ALU / registers act'}];
+  const program=[{t:'LOAD 5',act:s=>{s.acc=5;}},{t:'ADD 3',act:s=>{s.acc+=3;}},{t:'ADD 4',act:s=>{s.acc+=4;}},{t:'HALT',act:s=>{s.done=true;}}];
+  const pipe=$('#pipe'),progEl=$('#prog'),acc=$('#regAcc'),ip=$('#regIp'),cyc=$('#cycleNum');
+  let state,stageIdx,running;
+  function build(){
+    pipe.innerHTML='';stages.forEach((s,i)=>{const d=document.createElement('div');d.className='stagebox';d.dataset.i=i;d.innerHTML=`<span class="sn">${s.n}</span><span class="sd">${s.d}</span>`;pipe.appendChild(d);});
+    progEl.innerHTML=program.map((p,i)=>`<div class="line" data-i="${i}">${String(i).padStart(2,'0')}  ${p.t}</div>`).join('');
+  }
+  function render(){
+    $$('.stagebox',pipe).forEach(b=>b.classList.toggle('active',+b.dataset.i===stageIdx));
+    $$('.line',progEl).forEach(l=>l.classList.toggle('cur',+l.dataset.i===state.ip));
+    acc.textContent=state.acc;ip.textContent=state.ip;cyc.textContent=state.cycle;
+  }
+  function reset(){state={acc:0,ip:0,done:false,cycle:0};stageIdx=-1;running=false;build();render();}
+  function step(){
+    if(state.done)return;stageIdx++;
+    if(stageIdx>2){const instr=program[state.ip];instr.act(state);if(!state.done)state.ip++;stageIdx=-1;state.cycle++;if(state.ip>=program.length)state.done=true;}
+    render();
+  }
+  $('#cpuStep').addEventListener('click',step);
+  $('#cpuReset').addEventListener('click',reset);
+  $('#cpuRun').addEventListener('click',function(){if(running)return;running=true;const iv=setInterval(()=>{step();if(state.done){clearInterval(iv);running=false;}},reduced?10:420);});
+  reset();
+})();
+
+/* ---------- 08 ABSTRACTION STACK ---------- */
+(function stack(){
+  const layers=[
+    {tier:'Layer 08 · Human language',cls:'human',code:'“Add five and three, then show me the answer.”'},
+    {tier:'Layer 07 · High-level code (Python)',cls:'',code:'print(5 + 3)'},
+    {tier:'Layer 06 · Assembly',cls:'',code:'MOV AX, 5\nADD AX, 3\nCALL print'},
+    {tier:'Layer 03 · Machine code (hex)',cls:'',code:'B8 05 00   05 03 00   E8 ...'},
+    {tier:'Layer 02 · Binary',cls:'',codeHTML:'<span class="one">1</span><span class="zero">0</span><span class="one">1</span><span class="one">1</span><span class="one">1</span><span class="zero">0</span><span class="zero">0</span><span class="zero">0</span> <span class="zero">0</span><span class="zero">0</span><span class="zero">0</span><span class="zero">0</span><span class="zero">0</span><span class="one">1</span><span class="zero">0</span><span class="one">1</span>'},
+    {tier:'Layer 00 · Voltage on the wire',cls:'metal',code:'▁▔▁▔▔▁▁▁   ▁▁▁▁▁▔▁▔'}
+  ];
+  const col=$('#stackCol');let shown=1;
+  function build(){
+    col.innerHTML='';
+    layers.forEach((l,i)=>{const d=document.createElement('div');d.className='strip '+l.cls+(i<shown?' shown':'');const inner=l.codeHTML||(l.code||'').replace(/</g,'&lt;').replace(/\n/g,'<br>');d.innerHTML=`<div class="tier"><span>${l.tier}</span>${i===0?'<span>you write this ↓</span>':i===layers.length-1?'<span>the metal ↑</span>':''}</div><div class="code">${inner}</div>`;col.appendChild(d);});
+  }
+  $('#stackDown').addEventListener('click',()=>{if(shown<layers.length){shown++;build();}});
+  $('#stackReset').addEventListener('click',()=>{shown=1;build();});
+  build();
+})();
+
+/* ---------- 09a ACTIVITY: hit the number ---------- */
+(function actTarget(){
+  const places=[128,64,32,16,8,4,2,1];let val=0,target=42,solved=0;
+  const tgt=$('#tgtNum'),bitsW=$('#tgtBits'),cur=$('#tgtCur'),fb=$('#tgtFb'),score=$('#tgtScore');
+  places.forEach(p=>{const b=document.createElement('button');b.className='mini-bit';b.innerHTML=`<span>0</span><span class="pl">${p}</span>`;b.dataset.p=p;b.addEventListener('click',()=>{val^=p;render();});bitsW.appendChild(b);});
+  function newTarget(){target=Math.floor(Math.random()*255)+1;val=0;tgt.textContent=target;fb.className='feedback';fb.textContent='Set the bits to match.';render();}
+  function render(){
+    $$('.mini-bit',bitsW).forEach(b=>{const p=+b.dataset.p,on=(val&p)!==0;b.classList.toggle('on',on);b.firstChild.textContent=on?'1':'0';});
+    cur.textContent=val;
+    if(val===target){fb.className='feedback ok';fb.textContent='✓ Correct! That\'s '+target+' in binary.';solved++;score.textContent='solved: '+solved;}
+    else if(fb.classList.contains('ok')){fb.className='feedback';fb.textContent='Set the bits to match.';}
+  }
+  $('#tgtNew').addEventListener('click',newTarget);
+  tgt.textContent=target;render();
+})();
+
+/* ---------- 09b ACTIVITY: decode the byte ---------- */
+(function actDecode(){
+  const bitsW=$('#decBits'),guess=$('#decGuess'),fb=$('#decFb');let code=0;
+  function newByte(){code=65+Math.floor(Math.random()*26);guess.value='';fb.className='feedback';fb.textContent='';render();}
+  function render(){bitsW.innerHTML=[...code.toString(2).padStart(8,'0')].map(d=>`<span class="sb ${d==='1'?'one':'zero'}">${d}</span>`).join('');}
+  function check(){
+    const g=(guess.value||'').toUpperCase();
+    if(!g){fb.className='feedback';fb.textContent='Type a letter first.';return;}
+    if(g.charCodeAt(0)===code){fb.className='feedback ok';fb.textContent=`✓ Yes! ${code} in binary is the letter ${String.fromCharCode(code)}.`;}
+    else{fb.className='feedback no';fb.textContent=`Not quite — that byte is the number ${code}. Try again, or hit New byte.`;}
+  }
+  $('#decCheck').addEventListener('click',check);
+  $('#decNext').addEventListener('click',newByte);
+  guess.addEventListener('keydown',e=>{if(e.key==='Enter')check();});
+  newByte();
+})();
+
+/* ---------- 09c QUIZ ---------- */
+(function quiz(){
+  const Q=[
+    {q:'What is a transistor, at its simplest?',o:['A tiny switch controlled by electricity','A small battery','A type of memory','A cooling fan'],a:0,e:'It\'s a voltage-controlled switch. Billions of them make up a chip.'},
+    {q:'How many different values can one byte (8 bits) hold?',o:['8','16','256','1000'],a:2,e:'2⁸ = 256 possible patterns, i.e. the numbers 0 to 255.'},
+    {q:'An AND gate outputs 1 when…',o:['either input is 1','both inputs are 1','the inputs differ','always'],a:1,e:'AND needs BOTH inputs high to output a 1.'},
+    {q:'Which part holds the running program and is wiped when power is off?',o:['Storage / SSD','RAM','The ALU','The bus'],a:1,e:'RAM is fast but temporary. Storage is slower but permanent.'},
+    {q:'Your Python code eventually becomes…',o:['more Python','voltage patterns on wires','nothing','a photograph'],a:1,e:'Every layer translates down: code → assembly → machine code → binary → voltage.'}
+  ];
+  const box=$('#quiz'),scoreEl=$('#quizScore');let answered=0,correct=0;
+  Q.forEach((item,qi)=>{
+    const d=document.createElement('div');d.className='q';
+    d.innerHTML=`<div class="qt"><span class="n">Q${qi+1}</span>${item.q}</div><div class="opts"></div><div class="exp">${item.e}</div>`;
+    const opts=$('.opts',d);
+    item.o.forEach((txt,oi)=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=txt;
+      b.addEventListener('click',()=>{
+        if(d.classList.contains('answered'))return;
+        d.classList.add('answered');answered++;
+        if(oi===item.a){b.classList.add('correct');correct++;}
+        else{b.classList.add('wrong');$$('.opt',opts)[item.a].classList.add('correct');}
+        $$('.opt',opts).forEach(x=>x.disabled=true);
+        scoreEl.textContent=`Score: ${correct} / ${answered}`+(answered===Q.length?' — all done!':'');
+      });
+      opts.appendChild(b);
+    });
+    box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

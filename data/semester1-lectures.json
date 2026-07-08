@@ -1,9 +1,10 @@
 [
   {
     "number": "01",
-    "title": "What is a Computer?",
+    "title": "How a Computer Works",
     "section": "Section I: Introduction to Computers",
-    "description": "Meaning of computer, basic purpose, and simple examples from daily life.",
+    "description": "Interactive lecture explaining how input, processing, memory, storage, and output work together.",
+    "lecture": "downloads/semester1/lectures/lecture-01-how-computers-work.html",
     "ppt": "downloads/semester1/ppt/lecture-01.pptx",
     "notes": "downloads/semester1/notes/lecture-01-notes.pdf",
     "diagram": "#",
