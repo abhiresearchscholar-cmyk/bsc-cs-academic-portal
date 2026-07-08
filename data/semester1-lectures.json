@@ -5,11 +5,11 @@
     "section": "Section I: Introduction to Computers",
     "description": "Interactive lecture explaining how input, processing, memory, storage, and output work together.",
     "lecture": "downloads/semester1/lectures/lecture-01-how-computers-work.html",
-    "ppt": "downloads/semester1/ppt/lecture-01.pptx",
-    "notes": "downloads/semester1/notes/lecture-01-notes.pdf",
+    "ppt": "#",
+    "notes": "#",
     "diagram": "#",
     "lab": "lab.html",
-    "quiz": "quiz-player.html?quiz=quizzes/semester1/quiz-01-computer-basics.json",
+    "quiz": "#",
     "status": "Available"
   },
   {
