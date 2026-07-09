@@ -1,6 +1,6 @@
 async function loadJson(path) {
   const separator = path.includes("?") ? "&" : "?";
-  const response = await fetch(path + separator + "v=20260708-lecture-html");
+  const response = await fetch(path + separator + "v=20260709-lecture02");
   if (!response.ok) {
     throw new Error("Could not load " + path);
   }

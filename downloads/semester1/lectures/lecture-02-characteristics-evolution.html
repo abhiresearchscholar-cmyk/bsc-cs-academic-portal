@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 02 — Characteristics & Evolution of Computers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#090D18; --bg-2:#0C1120; --panel:#111A2E; --panel-2:#16203a;
+    --line:#22304d; --line-soft:#1a2540;
+    --ink:#EAF0FA; --ink-dim:#8593ad; --ink-faint:#5b6785;
+    --one:#FFB020; --one-soft:#4a3a1a; --one-glow:rgba(255,176,32,.45);
+    --zero:#4C74D0; --zero-soft:#1e2c4d;
+    --human:#B892FF; --human-glow:rgba(184,146,255,.4);
+    --ok:#4ade80; --no:#f87171;
+    --r:16px; --r-sm:10px; --maxw:1080px;
+    --f-display:'Space Grotesk',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--one);color:#1a1205}
+  a{color:var(--one);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  .layer + .layer{border-top:1px solid var(--line-soft)}
+
+  /* rail */
+  .rail{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:12px}
+  .rail button{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;transition:color .3s}
+  .rail .dot{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid var(--line);transition:all .3s;flex:none}
+  .rail button:hover{color:var(--ink-dim)}
+  .rail button.active{color:var(--one)}
+  .rail button.active .dot{background:var(--one);box-shadow:0 0 0 4px var(--one-glow);border-color:var(--one)}
+  .rail .label{opacity:0;transform:translateX(-4px);transition:all .3s;white-space:nowrap}
+  .rail button:hover .label,.rail button.active .label{opacity:1;transform:none}
+  @media(max-width:1300px){.rail{display:none}}
+
+  /* type */
+  .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--one);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .num{font-weight:700;color:var(--bg);background:var(--one);padding:2px 8px;border-radius:6px;letter-spacing:.02em}
+  h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,46px);margin-bottom:20px}
+  h3{font-size:22px;margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-dim);max-width:60ch}
+  p{max-width:65ch;color:var(--ink-dim)}
+  strong{color:var(--ink);font-weight:600}
+  .amber{color:var(--one)} .blue{color:var(--zero)} .violet{color:var(--human)} .mono{font-family:var(--f-mono)}
+
+  /* hero */
+  .hero{padding:0;height:100vh;min-height:660px;display:flex;align-items:center;position:relative;overflow:hidden}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 42%,transparent 38%,var(--bg) 100%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--one);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+  .hero-tag .pill{background:var(--one);color:var(--bg);padding:3px 9px;border-radius:6px;font-weight:700}
+  .hero h1{font-size:clamp(36px,7vw,80px);margin-bottom:24px}
+  .hero h1 .flip{color:var(--one)}
+  .hero .lede{font-size:clamp(18px,2.3vw,23px);max-width:56ch}
+  .hero-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-hint .arrow{width:1px;height:26px;background:linear-gradient(var(--ink-faint),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(-6px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+
+  /* objectives */
+  .objectives{padding:60px 0;background:var(--bg-2);border-bottom:1px solid var(--line-soft)}
+  .obj-head{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:22px}
+  .obj-head b{color:var(--one)}
+  .obj-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.obj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.obj-grid{grid-template-columns:repeat(5,1fr)}}
+  .obj{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .obj .on{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-bottom:8px}
+  .obj p{font-size:13.5px;color:var(--ink-dim)}
+
+  /* shell */
+  .stage{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:34px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .stage-title{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .readout{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)} .readout b{color:var(--one)}
+  .btn{font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .btn:hover{border-color:var(--one);color:var(--one)}
+  .btn.primary{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .recap{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);margin-top:26px;padding-left:14px;border-left:2px solid var(--one)}
+  .callout{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--human);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(184,146,255,.05);max-width:65ch}
+  .callout .ic{font-size:16px;flex:none} .callout .tx{font-size:14px;color:var(--ink-dim)} .callout .tx b{color:var(--human)}
+
+  /* 00 characteristics accordion */
+  .char-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  @media(min-width:640px){.char-grid{grid-template-columns:1fr 1fr}}
+  .char{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);overflow:hidden;transition:border-color .2s}
+  .char.open{border-color:var(--one)}
+  .char-head{display:flex;align-items:center;gap:16px;padding:18px;width:100%;text-align:left}
+  .char-ico{width:44px;height:44px;flex:none}
+  .char-ttl{font-family:var(--f-display);font-size:18px;font-weight:600;color:var(--ink)}
+  .char-sub{font-size:13px;color:var(--ink-dim)}
+  .char-plus{margin-left:auto;font-family:var(--f-mono);color:var(--one);font-size:20px;transition:transform .3s}
+  .char.open .char-plus{transform:rotate(45deg)}
+  .char-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .char-body .in{padding:0 18px 20px 78px;font-size:14.5px;color:var(--ink-dim)}
+  .char-ico .spin{transform-origin:center;animation:spin 6s linear infinite}
+  .char-ico .pulse{transform-origin:center;animation:pulse 2.2s ease-in-out infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+
+  /* 01 speed race */
+  .race{display:flex;flex-direction:column;gap:16px}
+  .lane{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px 18px;background:var(--bg)}
+  .lane .lh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+  .lane .who{font-family:var(--f-display);font-weight:600;font-size:16px}
+  .lane .odo{font-family:var(--f-mono);font-size:15px;color:var(--one)}
+  .lane.human .odo{color:var(--human)}
+  .track{height:12px;border-radius:6px;background:var(--zero-soft);overflow:hidden}
+  .track .fill{height:100%;width:0;background:var(--one);border-radius:6px;transition:width .1s linear}
+  .lane.human .track .fill{background:var(--human)}
+  .verdict{font-family:var(--f-mono);font-size:14px;color:var(--ink);text-align:center;margin-top:6px;min-height:22px}
+  .verdict b{color:var(--one)}
+  .ladder{display:grid;grid-template-columns:1fr;gap:8px;margin-top:26px}
+  @media(min-width:620px){.ladder{grid-template-columns:repeat(2,1fr)}}
+  .rung{display:flex;gap:14px;align-items:baseline;border:1px solid var(--line-soft);border-radius:var(--r-sm);padding:12px 14px;background:var(--bg)}
+  .rung .u{font-family:var(--f-mono);font-weight:700;color:var(--one);width:118px;flex:none}
+  .rung .x{font-size:13px;color:var(--ink-dim)}
+
+  /* 02 gigo */
+  .gigo-toggle{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+  .gigo-toggle .btn.active{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .gigo-toggle .btn.active.bad{background:var(--no);border-color:var(--no);color:#2a0a0a}
+  .pipe3{display:grid;grid-template-columns:1fr;gap:12px;align-items:stretch}
+  @media(min-width:640px){.pipe3{grid-template-columns:1fr 1fr 1fr}}
+  .pbox{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);text-align:center}
+  .pbox .pl{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px}
+  .pbox .pv{font-family:var(--f-mono);font-size:20px;font-weight:700}
+  .pbox.mid{border-color:var(--one)} .pbox.mid .pv{color:var(--one)}
+  .pbox.in .pv{color:var(--ink)} .pbox.out .pv.good{color:var(--ok)} .pbox.out .pv.bad{color:var(--no)}
+  .gigo-note{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);text-align:center;margin-top:18px;min-height:20px}
+
+  /* 03 limits */
+  .lim-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  @media(min-width:640px){.lim-grid{grid-template-columns:1fr 1fr}}
+  @media(min-width:960px){.lim-grid{grid-template-columns:1fr 1fr 1fr}}
+  .lim{border:1px solid var(--line);border-left:3px solid var(--no);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:18px;background:var(--panel)}
+  .lim .lt{font-family:var(--f-display);font-weight:600;font-size:16px;margin-bottom:8px;color:var(--ink)}
+  .lim p{font-size:14px}
+
+  /* 04 mechanical timeline */
+  .mech-scroll{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 18px;margin-top:8px;scroll-snap-type:x mandatory}
+  .mech-scroll::-webkit-scrollbar{height:8px}
+  .mech-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  .mcard{flex:0 0 210px;scroll-snap-align:start;border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel);position:relative}
+  .mcard .my{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.06em}
+  .mcard .mt{font-family:var(--f-display);font-weight:600;font-size:17px;margin:8px 0 6px}
+  .mcard p{font-size:13px}
+  .mech-hint{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);margin-top:2px}
+
+  /* 05 generations */
+  .gen-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+  .gen-tab{font-family:var(--f-mono);font-weight:700;font-size:14px;padding:12px 18px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .2s;min-width:64px}
+  .gen-tab:hover{border-color:var(--one)}
+  .gen-tab.active{background:var(--one);color:#1a1205;border-color:var(--one)}
+  .gen-tab small{display:block;font-size:9px;font-weight:500;letter-spacing:.04em;opacity:.8}
+  .gen-lab{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+  @media(min-width:780px){.gen-lab{grid-template-columns:.85fr 1.15fr}}
+  .gen-glyph{width:100%;height:200px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 45%,#131d34,#0a0f1c)}
+  .gen-glyph svg{width:150px;height:150px}
+  .gen-meta .gt{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase}
+  .gen-meta h3{font-size:26px;margin:6px 0 4px}
+  .gen-meta .yrs{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);margin-bottom:14px}
+  .gen-meta .note{font-size:14.5px;color:var(--ink-dim);margin-bottom:16px}
+  .gen-rows{display:flex;flex-direction:column;gap:8px}
+  .grow{display:flex;gap:12px;font-size:13.5px;border-top:1px solid var(--line-soft);padding-top:8px}
+  .grow .k{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em;width:96px;flex:none}
+  .grow .v{color:var(--ink-dim)}
+  .size-bar{margin-top:16px}
+  .size-bar .sl{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;display:flex;justify-content:space-between}
+  .size-track{height:14px;background:var(--zero-soft);border-radius:7px;overflow:hidden}
+  .size-fill{height:100%;background:linear-gradient(90deg,var(--one),#ff7a45);border-radius:7px;transition:width .5s ease}
+
+  /* 06 moore */
+  .moore-svg{width:100%;height:auto}
+  .moore-read{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);text-align:center;margin-top:12px;min-height:20px}
+  .moore-read b{color:var(--one)}
+  .mpt{cursor:pointer;transition:r .15s}
+  .mpt:hover{r:8}
+
+  /* 07 shrink */
+  .shrink-wrap{display:grid;grid-template-columns:1fr;gap:26px;align-items:center}
+  @media(min-width:760px){.shrink-wrap{grid-template-columns:1fr 1fr}}
+  .shrink-view{height:220px;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 60%,#131d34,#0a0f1c);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .shrink-box{background:linear-gradient(135deg,var(--one),#ff7a45);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:700;color:#1a1205;transition:width .5s ease,height .5s ease,font-size .5s ease;box-shadow:0 0 30px var(--one-glow)}
+  .shrink-cap{position:absolute;bottom:12px;font-family:var(--f-mono);font-size:11px;color:var(--ink-faint)}
+  .shrink-stats{display:flex;flex-direction:column;gap:12px}
+  .sstat{border:1px solid var(--line-soft);border-radius:var(--r-sm);padding:12px 14px;background:var(--bg)}
+  .sstat .sk{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em}
+  .sstat .sv{font-family:var(--f-display);font-weight:600;font-size:18px;color:var(--ink)}
+  input[type=range]{width:100%;accent-color:var(--one);margin-top:8px}
+  .slider-labels{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);margin-top:4px}
+
+  /* activities + quiz (shared) */
+  .act-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:780px){.act-grid{grid-template-columns:1fr 1fr}}
+  .act{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .act h3{font-size:19px;margin-bottom:6px}
+  .act .prompt{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+  .clue{border:1px solid var(--one);border-radius:var(--r-sm);padding:16px;background:var(--one-soft);color:var(--one);font-family:var(--f-mono);font-size:15px;text-align:center;margin-bottom:14px}
+  .opt-row{display:flex;gap:8px;flex-wrap:wrap}
+  .opt-btn{font-family:var(--f-mono);font-weight:700;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--ink);transition:all .18s}
+  .opt-btn:hover:not(:disabled){border-color:var(--one)}
+  .opt-btn.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .opt-btn.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .feedback{font-family:var(--f-mono);font-size:13px;margin-top:14px;min-height:20px;color:var(--ink-faint)}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--no)}
+  .score{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+  .tf-stmt{font-size:15px;color:var(--ink);margin-bottom:14px;min-height:44px}
+  .quiz{margin-top:28px}
+  .quiz-h{font-family:var(--f-display);font-size:22px;margin-bottom:16px}
+  .q{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);margin-bottom:14px}
+  .q .qt{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .q .qt .n{font-family:var(--f-mono);color:var(--one);margin-right:8px}
+  .q .opts{display:flex;flex-direction:column;gap:8px}
+  .q .opt{text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink-dim);background:var(--panel);transition:all .18s}
+  .q .opt:hover:not(:disabled){border-color:var(--one);color:var(--ink)}
+  .q .opt.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .q .opt.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .q .exp{font-size:13px;color:var(--ink-faint);margin-top:10px;display:none}
+  .q.answered .exp{display:block}
+  .quiz-score{font-family:var(--f-mono);font-size:14px;color:var(--one);margin-top:10px}
+
+  /* why / homework */
+  .why{background:linear-gradient(180deg,var(--bg),#070a12)}
+  .why h2{max-width:18ch}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:34px}
+  @media(min-width:680px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .card .k{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .card p{font-size:15px}
+  .hw{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel);margin-top:30px}
+  .hw .k{font-family:var(--f-mono);font-size:12px;color:var(--human);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+  .hw ol{margin:0 0 0 18px;color:var(--ink-dim);font-size:15px}
+  .hw li{margin-bottom:10px} .hw li b{color:var(--ink)}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line-soft);text-align:center}
+  footer .m{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  @media(max-width:520px){section{padding:70px 0}.stage{padding:20px}}
+</style>
+</head>
+<body>
+
+<nav class="rail" id="rail" aria-label="Lecture navigation"></nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner"><div class="wrap">
+    <div class="hero-tag"><span class="pill">Lecture 02</span> Characteristics &amp; Evolution · BSc Computer Science</div>
+    <h1>Why the machine is<br>so <span class="flip">good at this</span> — and<br>how it got here.</h1>
+    <p class="lede">In Lecture 01 we saw what a computer <em>is</em>. Now: what makes it powerful — its speed, accuracy, and tireless nature — and the 80-year journey from room-sized vacuum tubes to the chip in your pocket.</p>
+  </div></div>
+  <div class="hero-hint"><span>scroll to begin</span><span class="arrow"></span></div>
+</header>
+
+<!-- OBJECTIVES -->
+<section class="objectives" id="obj">
+  <div class="wrap">
+    <div class="obj-head">By the end of this session you will be able to — <b>five things</b></div>
+    <div class="obj-grid">
+      <div class="obj"><div class="on">01</div><p>List the key <em>characteristics</em> of a computer and explain each.</p></div>
+      <div class="obj"><div class="on">02</div><p>Explain <em>GIGO</em> and why accuracy is about the machine, not the data.</p></div>
+      <div class="obj"><div class="on">03</div><p>State the real <em>limitations</em> of computers.</p></div>
+      <div class="obj"><div class="on">04</div><p>Name the <em>five generations</em> and the technology that defines each.</p></div>
+      <div class="obj"><div class="on">05</div><p>Describe <em>Moore's Law</em> and the shrink to smaller, faster, cheaper.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 00 CHARACTERISTICS -->
+<section class="layer" id="s0" data-title="Characteristics">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">00</span> The defining traits</div>
+    <h2>What makes a computer so useful? Seven characteristics.</h2>
+    <p>A computer isn't magic — it's a set of very strong, very specific talents. These are the traits every intro course lists, and together they explain why we hand computers our banking, our maps, and our medicine. <strong>Tap each card</strong> to open it up.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · tap to expand</span></div>
+      <div class="char-grid" id="charGrid"></div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>In class:</b> Ask students which single characteristic they rely on most in a phone. Most say "speed" — but "storage" and "versatility" are why it replaced a dozen gadgets.</div></div>
+    <div class="recap">TAKEAWAY · Speed · Accuracy · Diligence · Versatility · Storage · Automation · Reliability — the seven strengths of a computer.</div>
+  </div>
+</section>
+
+<!-- 01 SPEED -->
+<section class="layer" id="s1" data-title="Speed">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">01</span> See the speed</div>
+    <h2>How fast is "fast"? Faster than you can imagine.</h2>
+    <p>Humans think in seconds. Computers think in <strong>nanoseconds</strong> — billionths of a second. That gap is almost impossible to picture, so let's race one. <strong>Press start</strong> and see how many simple sums each of you finishes in the same few moments.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · human vs computer</span><span class="readout" id="raceState">ready</span></div>
+      <div class="race">
+        <div class="lane human"><div class="lh"><span class="who">🧍 You</span><span class="odo" id="odoHuman">0</span></div><div class="track"><div class="fill" id="fillHuman"></div></div></div>
+        <div class="lane"><div class="lh"><span class="who">💻 Computer</span><span class="odo" id="odoCpu">0</span></div><div class="track"><div class="fill" id="fillCpu"></div></div></div>
+      </div>
+      <div class="verdict" id="verdict"></div>
+      <div class="btn-row"><button class="btn primary" id="raceStart">Start the race</button></div>
+      <div class="ladder" id="ladder"></div>
+    </div>
+    <div class="recap">TAKEAWAY · Speed is measured in ms → µs → ns → ps. A modern CPU does billions of operations every single second.</div>
+  </div>
+</section>
+
+<!-- 02 GIGO -->
+<section class="layer" id="s2" data-title="Accuracy & GIGO">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">02</span> Accuracy &amp; GIGO</div>
+    <h2>The computer is always right. That's the problem.</h2>
+    <p>A computer never makes an arithmetic mistake — its answer is exact, every time. So when the output is wrong, the fault is almost always in the <strong>input</strong> or the <strong>instructions</strong> we gave it. This is <strong>GIGO — Garbage In, Garbage Out</strong>. The machine will process nonsense just as flawlessly as it processes truth. <strong>Feed it good and bad data</strong> and watch.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · Garbage In, Garbage Out</span></div>
+      <div class="gigo-toggle">
+        <button class="btn active" id="gigoGood">Feed correct data</button>
+        <button class="btn bad" id="gigoBad">Feed wrong data</button>
+      </div>
+      <div class="pipe3">
+        <div class="pbox in"><div class="pl">Input</div><div class="pv" id="gIn">price = 100</div></div>
+        <div class="pbox mid"><div class="pl">Process · 100% accurate</div><div class="pv" id="gMid">price × 5</div></div>
+        <div class="pbox out"><div class="pl">Output</div><div class="pv good" id="gOut">500</div></div>
+      </div>
+      <div class="gigo-note" id="gNote">Correct data in → correct answer out. The computer did its job perfectly.</div>
+    </div>
+    <div class="recap">TAKEAWAY · Accuracy is a property of the machine, not your data. Wrong in, wrong out — computed perfectly.</div>
+  </div>
+</section>
+
+<!-- 03 LIMITS -->
+<section class="layer" id="s3" data-title="Limitations">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">03</span> The limits</div>
+    <h2>Powerful, yes — but a computer can't do these.</h2>
+    <p>Balance is important. For all their strengths, computers have no mind of their own. They follow instructions with perfect obedience and zero understanding.</p>
+    <div class="lim-grid" id="limGrid"></div>
+    <div class="recap">TAKEAWAY · A computer has speed and accuracy, but no common sense, no intent, and no feelings. It only ever does exactly what it's told.</div>
+  </div>
+</section>
+
+<!-- 04 MECHANICAL -->
+<section class="layer" id="s4" data-title="Before electricity">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">04</span> Before the electronic age</div>
+    <h2>The idea is ancient. The electricity is new.</h2>
+    <p>People have built calculating machines for thousands of years — long before electronics. Each one solved a piece of the puzzle: counting, gears, punched cards, programmability. <strong>Scroll the timeline</strong> across the mechanical era.</p>
+    <div class="mech-hint">← drag / scroll →</div>
+    <div class="mech-scroll" id="mechScroll"></div>
+    <div class="recap">TAKEAWAY · From the abacus to Babbage's Analytical Engine, the concepts of computing existed for centuries — waiting for the electronic switch.</div>
+  </div>
+</section>
+
+<!-- 05 GENERATIONS -->
+<section class="layer" id="s5" data-title="Five generations">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">05</span> The five generations</div>
+    <h2>Every generation is defined by a smaller, faster switch.</h2>
+    <p>Modern computing is told in five "generations", each marked by the technology used to switch a bit on and off — the very thing from Lecture 01. Watch the switch shrink from a glowing glass tube to billions on a chip. <strong>Pick a generation.</strong></p>
+    <div class="stage">
+      <div class="gen-tabs" id="genTabs"></div>
+      <div class="gen-lab">
+        <div class="gen-glyph" id="genGlyph"></div>
+        <div class="gen-meta">
+          <div class="gt" id="genTech">Vacuum tubes</div>
+          <h3 id="genName">First Generation</h3>
+          <div class="yrs" id="genYrs">1940 – 1956</div>
+          <div class="note" id="genNote"></div>
+          <div class="gen-rows" id="genRows"></div>
+          <div class="size-bar">
+            <div class="sl"><span>Physical size</span><span id="genFits">a whole room</span></div>
+            <div class="size-track"><div class="size-fill" id="genSize" style="width:100%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · Gen I vacuum tubes → Gen II transistors → Gen III integrated circuits → Gen IV microprocessors → Gen V AI. Smaller, faster, cheaper each time.</div>
+  </div>
+</section>
+
+<!-- 06 MOORE -->
+<section class="layer" id="s6" data-title="Moore's Law">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">06</span> Moore's Law</div>
+    <h2>The number of transistors on a chip doubles about every two years.</h2>
+    <p>In 1965 Gordon Moore noticed a pattern that has held for decades: chips keep packing in roughly twice as many transistors every ~2 years. Plotted on a <strong>logarithmic</strong> scale it becomes an almost straight line — that's exponential growth. <strong>Hover the points</strong> to see the chips.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · transistor count per chip (log scale)</span></div>
+      <svg class="moore-svg" viewBox="0 0 740 430" id="mooreSvg" role="img" aria-label="Chart of transistor counts growing exponentially from 1971 to today"></svg>
+      <div class="moore-read" id="mooreRead">Hover a point to inspect a chip.</div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>In class:</b> Ask why the line looks straight even though transistor counts went from thousands to <em>billions</em>. Answer: the y-axis is logarithmic — each step up is ×10.</div></div>
+    <div class="recap">TAKEAWAY · Moore's Law = exponential growth. From ~2,300 transistors (1971) to over 100 billion today.</div>
+  </div>
+</section>
+
+<!-- 07 SHRINK -->
+<section class="layer" id="s7" data-title="Smaller & cheaper">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">07</span> Smaller, faster, cheaper</div>
+    <h2>The same power that filled a room now hides in a fingertip.</h2>
+    <p>The real story of computing is compression: every generation delivered more power in less space, for less money and less energy. <strong>Drag the slider</strong> through the generations and watch a computer shrink.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · drag through the decades</span><span class="readout">Gen <b id="shGen">I</b></span></div>
+      <div class="shrink-wrap">
+        <div class="shrink-view"><div class="shrink-box" id="shBox">ENIAC</div><div class="shrink-cap" id="shCap">fills a whole room</div></div>
+        <div>
+          <div class="shrink-stats">
+            <div class="sstat"><div class="sk">Fits in</div><div class="sv" id="shFits">a whole room</div></div>
+            <div class="sstat"><div class="sk">Speed</div><div class="sv" id="shSpeed">thousands of ops/sec</div></div>
+            <div class="sstat"><div class="sk">Cost per calculation</div><div class="sv" id="shCost">astronomically high</div></div>
+          </div>
+          <input type="range" id="shSlider" min="0" max="4" value="0" step="1" aria-label="Generation slider">
+          <div class="slider-labels"><span>I</span><span>II</span><span>III</span><span>IV</span><span>V</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · Same computing power, shrinking from a room → a desk → a lap → a pocket → invisible, while cost per calculation collapses toward zero.</div>
+  </div>
+</section>
+
+<!-- 08 ACTIVITIES -->
+<section class="layer" id="s8" data-title="Activities">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">08</span> Check yourself</div>
+    <h2>Your turn. Two challenges, then a graded quiz.</h2>
+    <p>Great for the classroom — solve them together on the projector, or race a neighbour. Everything you need is on the slides above.</p>
+    <div class="act-grid">
+      <div class="act">
+        <h3>① Name that generation</h3>
+        <div class="prompt">Read the clue, then pick the generation.</div>
+        <div class="clue" id="genClue">—</div>
+        <div class="opt-row" id="genOpts"></div>
+        <div class="feedback" id="genFb">Which generation is it?</div>
+        <div class="btn-row"><button class="btn" id="genNew">New clue</button><span class="score" id="genScore" style="align-self:center">solved: 0</span></div>
+      </div>
+      <div class="act">
+        <h3>② Fact or myth?</h3>
+        <div class="prompt">Is the statement about computers true or false?</div>
+        <div class="tf-stmt" id="tfStmt">—</div>
+        <div class="opt-row"><button class="opt-btn" id="tfTrue">TRUE</button><button class="opt-btn" id="tfFalse">FALSE</button><button class="btn ghost" id="tfNext" style="margin-left:auto">Next</button></div>
+        <div class="feedback" id="tfFb"></div>
+      </div>
+    </div>
+    <div class="quiz">
+      <div class="quiz-h">③ Quick quiz</div>
+      <div id="quiz"></div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 WHY / RECAP / HOMEWORK -->
+<section class="why layer" id="s9" data-title="Why & recap">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">09</span> Why it matters</div>
+    <h2>Knowing the traits and the timeline changes how you build.</h2>
+    <p>Understanding a computer's strengths tells you what to hand it (repetitive, exact, high-volume work) and what to keep for humans (judgement, creativity, care). Understanding the timeline tells you where the field is heading — and how fast.</p>
+    <div class="cards">
+      <div class="card"><div class="k">Design for the strengths</div><p>Give computers the speed-and-repetition jobs; design the humans back in where judgement matters.</p></div>
+      <div class="card"><div class="k">Respect the limits</div><p>GIGO is a career-long lesson: your program is only as good as its data and its logic.</p></div>
+      <div class="card"><div class="k">Ride the curve</div><p>Moore's Law shaped every product of the last 50 years. Knowing the trend helps you bet on the next one.</p></div>
+    </div>
+    <div class="hw">
+      <div class="k">Homework · before Lecture 03</div>
+      <ol>
+        <li><b>Characteristics in the wild:</b> pick any app you used today and name three computer characteristics it depends on.</li>
+        <li><b>GIGO story:</b> describe a real-world example where wrong input produced a confidently wrong output.</li>
+        <li><b>Build the table:</b> make a 5-row table of the generations — year range, technology, and one example machine each.</li>
+        <li><b>Moore's maths:</b> if a chip has 2,300 transistors in 1971 and doubles every 2 years, roughly how many by 1991? (Show your working.)</li>
+        <li><b>Stretch:</b> in one paragraph, argue whether "no ideas of its own" is still a fair limitation in the age of modern AI.</li>
+      </ol>
+    </div>
+    <p class="recap" style="margin-top:34px">THE WHOLE STORY · seven strengths · one big limit (GIGO) · a mechanical past · five generations · an exponential curve. That's how the machine got so good, and how it got here.</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="m">Lecture 02 · Characteristics &amp; Evolution of Computers · an interactive teaching aid — press any widget to explore</div></div></footer>
+
+<script>
+"use strict";
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+
+/* RAIL */
+const nav=[
+  {id:'top',n:'—',t:'Cover'},{id:'s0',n:'00',t:'Characteristics'},{id:'s1',n:'01',t:'Speed'},
+  {id:'s2',n:'02',t:'Accuracy & GIGO'},{id:'s3',n:'03',t:'Limitations'},{id:'s4',n:'04',t:'Before electricity'},
+  {id:'s5',n:'05',t:'Five generations'},{id:'s6',n:'06',t:"Moore's Law"},{id:'s7',n:'07',t:'Smaller & cheaper'},
+  {id:'s8',n:'08',t:'Activities'},{id:'s9',n:'09',t:'Why & recap'}
+];
+const rail=$('#rail');
+nav.forEach(s=>{const el=document.getElementById(s.id);const b=document.createElement('button');b.innerHTML=`<span class="dot"></span><span class="label">${s.n==='—'?'top':s.n} · ${s.t}</span>`;b.dataset.for=s.id;b.addEventListener('click',()=>el&&el.scrollIntoView({behavior:reduced?'auto':'smooth'}));rail.appendChild(b);});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.for===e.target.id));}),{rootMargin:'-45% 0px -45% 0px'});
+nav.forEach(s=>{const el=document.getElementById(s.id);if(el)spy.observe(el);});
+
+/* HERO grid (shared course signature) */
+(function heroGrid(){
+  const cv=$('#heroCanvas'),ctx=cv.getContext('2d');
+  let cols,rows,gap=26,size=6,t=0,mouse={x:-999,y:-999};
+  const AMBER='#FFB020',BLUE='#26385f';
+  function resize(){cv.width=cv.offsetWidth*devicePixelRatio;cv.height=cv.offsetHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cols=Math.ceil(cv.offsetWidth/gap)+1;rows=Math.ceil(cv.offsetHeight/gap)+1;}
+  resize();addEventListener('resize',resize);
+  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
+  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-999;});
+  function draw(){const W=cv.offsetWidth,H=cv.offsetHeight;ctx.clearRect(0,0,W,H);const wave=(t*0.9)%(W+H+400)-200;for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const px=x*gap+14,py=y*gap+14,diag=px+py,dw=Math.abs(diag-wave);const onWave=dw<60?1-(dw/60):0;const dx=px-mouse.x,dy=py-mouse.y,md=Math.hypot(dx,dy),onMouse=md<90?1-(md/90):0;const heat=Math.max(onWave,onMouse);if(heat>0.05){ctx.fillStyle=AMBER;ctx.globalAlpha=0.15+heat*0.85;const s=size+heat*4;ctx.fillRect(px-s/2,py-s/2,s,s);}else{ctx.fillStyle=BLUE;ctx.globalAlpha=0.5;ctx.fillRect(px-size/2,py-size/2,size,size);}}ctx.globalAlpha=1;}
+  if(reduced){draw();return;}
+  (function loop(){t+=2.4;draw();requestAnimationFrame(loop);})();
+})();
+
+/* 00 CHARACTERISTICS */
+(function chars(){
+  const ico={
+    speed:`<svg viewBox="0 0 44 44"><g class="pulse"><path d="M8 30 A16 16 0 0 1 36 30" fill="none" stroke="#FFB020" stroke-width="2.5"/><line x1="22" y1="30" x2="31" y2="18" stroke="#FFB020" stroke-width="3" stroke-linecap="round"/><circle cx="22" cy="30" r="2.5" fill="#FFB020"/></g></svg>`,
+    accuracy:`<svg viewBox="0 0 44 44"><g class="pulse"><circle cx="22" cy="22" r="14" fill="none" stroke="#FFB020" stroke-width="2.5"/><circle cx="22" cy="22" r="7" fill="none" stroke="#FFB020" stroke-width="2"/><circle cx="22" cy="22" r="2" fill="#FFB020"/></g></svg>`,
+    diligence:`<svg viewBox="0 0 44 44"><g class="spin"><path d="M22 8 a14 14 0 1 1 -10 4" fill="none" stroke="#FFB020" stroke-width="2.5"/><path d="M12 12 l0 6 l6 0" fill="none" stroke="#FFB020" stroke-width="2.5" stroke-linecap="round"/></g></svg>`,
+    versatility:`<svg viewBox="0 0 44 44"><g class="pulse"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="#FFB020" stroke-width="2.5"/><circle cx="30" cy="15" r="6" fill="none" stroke="#FFB020" stroke-width="2.5"/><path d="M22 34 l-6-10 h12 z" fill="none" stroke="#FFB020" stroke-width="2.5"/></g></svg>`,
+    storage:`<svg viewBox="0 0 44 44"><g class="pulse"><ellipse cx="22" cy="12" rx="12" ry="4" fill="none" stroke="#FFB020" stroke-width="2.5"/><path d="M10 12 v20 a12 4 0 0 0 24 0 v-20" fill="none" stroke="#FFB020" stroke-width="2.5"/><path d="M10 22 a12 4 0 0 0 24 0" fill="none" stroke="#FFB020" stroke-width="2"/></g></svg>`,
+    automation:`<svg viewBox="0 0 44 44"><g class="spin"><circle cx="22" cy="22" r="6" fill="none" stroke="#FFB020" stroke-width="2.5"/><g stroke="#FFB020" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="6" x2="22" y2="12"/><line x1="22" y1="32" x2="22" y2="38"/><line x1="6" y1="22" x2="12" y2="22"/><line x1="32" y1="22" x2="38" y2="22"/><line x1="11" y1="11" x2="15" y2="15"/><line x1="29" y1="29" x2="33" y2="33"/><line x1="33" y1="11" x2="29" y2="15"/><line x1="15" y1="29" x2="11" y2="33"/></g></g></svg>`,
+    reliability:`<svg viewBox="0 0 44 44"><g class="pulse"><path d="M22 7 l13 5 v9 c0 9 -6 14 -13 16 c-7 -2 -13 -7 -13 -16 v-9 z" fill="none" stroke="#FFB020" stroke-width="2.5"/><path d="M16 22 l4 4 l8 -9" fill="none" stroke="#FFB020" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`
+  };
+  const data=[
+    {k:'speed',t:'Speed',s:'Operates in nanoseconds — billionths of a second.',d:`A computer performs millions to billions of operations every second. Work that would take a human years is finished in moments. Speed is measured in milliseconds (10⁻³ s), microseconds (10⁻⁶), nanoseconds (10⁻⁹) and even picoseconds (10⁻¹²).`},
+    {k:'accuracy',t:'Accuracy',s:"It doesn't make mistakes — the data might.",d:`The results of a computer are exact, every single time. Errors almost always come from wrong input or faulty instructions, not the machine itself. This idea has a name: GIGO — Garbage In, Garbage Out.`},
+    {k:'diligence',t:'Diligence',s:'No tiredness, no boredom, ever.',d:`Unlike a person, a computer can repeat the same task millions of times with exactly the same speed and accuracy. It never gets tired, distracted, or bored — the last calculation is as sharp as the first.`},
+    {k:'versatility',t:'Versatility',s:'One machine, countless jobs.',d:`The very same computer can do your accounts, play music, run a game, edit a video, and browse the web — simply by changing the program it is running. It is a general-purpose tool.`},
+    {k:'storage',t:'Storage',s:'Remembers vast amounts, recalls instantly.',d:`Computers store enormous quantities of data — text, images, audio, video — and can retrieve any piece of it in a fraction of a second. Capacity grows every year while cost falls.`},
+    {k:'automation',t:'Automation',s:'Runs on its own once told how.',d:`Give a computer a program and it carries out the whole sequence of tasks automatically, without a human guiding each step. This is what lets one operator run a huge factory or server farm.`},
+    {k:'reliability',t:'Reliability',s:'Consistent results, again and again.',d:`A well-built computer produces dependable, repeatable results over long periods. That trust is exactly why we place computers in charge of banking, medical devices, and flight control.`}
+  ];
+  const grid=$('#charGrid');
+  data.forEach((c,i)=>{
+    const el=document.createElement('div');el.className='char';
+    el.innerHTML=`<button class="char-head" aria-expanded="false"><span class="char-ico">${ico[c.k]}</span><span><span class="char-ttl">${c.t}</span><br><span class="char-sub">${c.s}</span></span><span class="char-plus">+</span></button><div class="char-body"><div class="in">${c.d}</div></div>`;
+    const head=$('.char-head',el),body=$('.char-body',el);
+    head.addEventListener('click',()=>{const open=el.classList.toggle('open');head.setAttribute('aria-expanded',open);body.style.maxHeight=open?body.scrollHeight+'px':'0';});
+    grid.appendChild(el);
+    if(i===0){el.classList.add('open');head.setAttribute('aria-expanded','true');requestAnimationFrame(()=>{body.style.maxHeight=body.scrollHeight+'px';});}
+  });
+})();
+
+/* 01 SPEED RACE */
+(function race(){
+  const odoH=$('#odoHuman'),odoC=$('#odoCpu'),fillH=$('#fillHuman'),fillC=$('#fillCpu'),verdict=$('#verdict'),state=$('#raceState'),btn=$('#raceStart');
+  const HUMAN_TARGET=5, CPU_TARGET=1000000000, DUR=4000;
+  let running=false;
+  const fmt=n=>Math.floor(n).toLocaleString('en-US');
+  function run(){
+    if(running)return;running=true;state.textContent='racing…';verdict.textContent='';btn.disabled=true;
+    const t0=performance.now();
+    function frame(now){
+      let p=reduced?1:Math.min(1,(now-t0)/DUR);
+      const e=1-Math.pow(1-p,3); // ease-out
+      const h=e*HUMAN_TARGET, c=e*CPU_TARGET;
+      odoH.textContent=fmt(h); odoC.textContent=fmt(c);
+      fillH.style.width=(h/HUMAN_TARGET*100)+'%'; fillC.style.width=(p*100)+'%';
+      if(p<1)requestAnimationFrame(frame);
+      else{state.textContent='done';running=false;btn.disabled=false;verdict.innerHTML=`In the time you did <b>5</b> sums, the computer did <b>1,000,000,000</b> — two hundred million times more.`;}
+    }
+    requestAnimationFrame(frame);
+  }
+  btn.addEventListener('click',run);
+  const rungs=[
+    ['1 second','you blink — a CPU does billions of operations'],
+    ['1 millisecond','10⁻³ s · a camera flash'],
+    ['1 microsecond','10⁻⁶ s · light travels 300 metres'],
+    ['1 nanosecond','10⁻⁹ s · light travels just 30 cm'],
+    ['1 picosecond','10⁻¹² s · the fastest transistors switch'],
+  ];
+  $('#ladder').innerHTML=rungs.map(r=>`<div class="rung"><span class="u">${r[0]}</span><span class="x">${r[1]}</span></div>`).join('');
+})();
+
+/* 02 GIGO */
+(function gigo(){
+  const gIn=$('#gIn'),gMid=$('#gMid'),gOut=$('#gOut'),note=$('#gNote'),bGood=$('#gigoGood'),bBad=$('#gigoBad');
+  function good(){
+    bGood.classList.add('active');bBad.classList.remove('active');
+    gIn.textContent='price = 100';gMid.textContent='price × 5';gOut.textContent='500';gOut.className='pv good';
+    note.innerHTML='Correct data in → correct answer out. The computer did its job perfectly.';
+  }
+  function bad(){
+    bBad.classList.add('active');bGood.classList.remove('active');
+    gIn.textContent='price = 1O0';gMid.textContent='price × 5';gOut.textContent='ERROR';gOut.className='pv bad';
+    note.innerHTML='A typo (letter O, not zero) went in. The computer computed it <b style="color:#f87171">flawlessly</b> — and still gave garbage. <b style="color:#f87171">GIGO.</b>';
+  }
+  bGood.addEventListener('click',good);bBad.addEventListener('click',bad);good();
+})();
+
+/* 03 LIMITS */
+(function limits(){
+  const lims=[
+    {t:'No common sense',d:"A computer has zero intuition. It does exactly what it's told — even when that would be obviously wrong to any human."},
+    {t:'No goals of its own',d:'It cannot decide what problem to solve or why. Every task must be defined for it by a person or another program.'},
+    {t:'No feelings',d:'It has no emotions, ethics, or judgement. It cannot care about the consequences of what it computes.'},
+    {t:'GIGO',d:'Garbage In, Garbage Out. Feed it wrong data or wrong logic and it will confidently produce a wrong answer.'},
+    {t:"Can't fix your logic",d:"If your instructions are flawed, the computer won't notice. It has no way to know what you actually meant."},
+    {t:'Needs power & instructions',d:'Without electricity and a program, it does nothing at all. It is a tool, not an agent.'}
+  ];
+  $('#limGrid').innerHTML=lims.map(l=>`<div class="lim"><div class="lt">${l.t}</div><p>${l.d}</p></div>`).join('');
+})();
+
+/* 04 MECHANICAL */
+(function mech(){
+  const items=[
+    {y:'c. 2400 BC',t:'Abacus',d:'The first counting tool — beads on rods for fast arithmetic.'},
+    {y:'1617',t:"Napier's Bones",d:'Rods that turned hard multiplication into simple addition.'},
+    {y:'1642',t:'Pascaline',d:"Blaise Pascal's gear-driven mechanical adding machine."},
+    {y:'1673',t:'Leibniz Wheel',d:'Could add, subtract, multiply and divide with gears.'},
+    {y:'1801',t:'Jacquard Loom',d:'Punched cards controlled weaving — a programmable machine.'},
+    {y:'1837',t:'Analytical Engine',d:"Babbage's design for a general-purpose mechanical computer."},
+    {y:'1843',t:'Ada Lovelace',d:'Wrote the first algorithm — regarded as the first programmer.'},
+    {y:'1890',t:'Hollerith Tabulator',d:'Punched-card machine that sped up the US census; seeded IBM.'}
+  ];
+  $('#mechScroll').innerHTML=items.map(m=>`<div class="mcard"><div class="my">${m.y}</div><div class="mt">${m.t}</div><p>${m.d}</p></div>`).join('');
+})();
+
+/* 05 GENERATIONS */
+const GENS=[
+  {r:'I',roman:'First Generation',yrs:'1940 – 1956',tech:'Vacuum tubes',ex:'ENIAC · UNIVAC I · IBM 650',speed:'Thousands of ops/sec',power:'~150 kW · very hot',lang:'Machine language, punch cards',fits:'a whole room',sizeW:100,note:'Enormous, power-hungry and unreliable — tubes burned out constantly. But these were the first true electronic computers.'},
+  {r:'II',roman:'Second Generation',yrs:'1956 – 1963',tech:'Transistors',ex:'IBM 1401 · IBM 7090 · CDC 1604',speed:'Hundreds of thousands ops/sec',power:'Far less heat',lang:'Assembly, then FORTRAN & COBOL',fits:'a few cabinets',sizeW:64,note:'Transistors replaced tubes — smaller, faster, cheaper, cooler and much more reliable.'},
+  {r:'III',roman:'Third Generation',yrs:'1964 – 1971',tech:'Integrated circuits',ex:'IBM System/360 · PDP-8',speed:'Millions of ops/sec',power:'Lower still',lang:'Operating systems, high-level languages',fits:'a large desk',sizeW:40,note:'Many transistors packed onto one chip. Keyboards and monitors appear; computers reach businesses.'},
+  {r:'IV',roman:'Fourth Generation',yrs:'1971 – present',tech:'Microprocessors (VLSI)',ex:'Intel 4004 · Altair · Apple II · IBM PC',speed:'Billions of ops/sec',power:'Watts',lang:'GUIs, networks, the internet',fits:'a desktop → your lap',sizeW:20,note:'A whole CPU on one chip. The personal computer is born and computing reaches everyone.'},
+  {r:'V',roman:'Fifth Generation',yrs:'present – future',tech:'AI · parallel · quantum',ex:'Smartphones · GPUs · AI accelerators',speed:'Trillions of ops/sec',power:'Milliwatts → megawatts',lang:'Natural language, machine learning',fits:'a fingertip → invisible',sizeW:8,note:'Massively parallel and increasingly intelligent — computers that learn, see and talk.'}
+];
+function genGlyph(i){
+  if(i===0)return `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="58" rx="26" ry="42" fill="none" stroke="#FFB020" stroke-width="2.5"/><path d="M50 40 Q60 70 70 40" fill="none" stroke="#FFB020" stroke-width="2" class="pulse" style="animation:pulse 1.3s ease-in-out infinite"/><line x1="52" y1="100" x2="52" y2="112" stroke="#FFB020" stroke-width="3"/><line x1="68" y1="100" x2="68" y2="112" stroke="#FFB020" stroke-width="3"/><circle cx="60" cy="52" r="30" fill="#FFB020" opacity="0.08" class="pulse" style="animation:pulse 1.3s ease-in-out infinite"/></svg>`;
+  if(i===1)return `<svg viewBox="0 0 120 120"><line x1="20" y1="60" x2="52" y2="60" stroke="#FFB020" stroke-width="3"/><line x1="68" y1="60" x2="100" y2="60" stroke="#FFB020" stroke-width="3"/><line x1="60" y1="100" x2="60" y2="76" stroke="#FFB020" stroke-width="3"/><rect x="50" y="48" width="20" height="24" rx="4" fill="#FFB020" opacity="0.15" stroke="#FFB020" stroke-width="2"/><circle cx="60" cy="100" r="6" fill="none" stroke="#FFB020" stroke-width="2.5"/></svg>`;
+  if(i===2)return `<svg viewBox="0 0 120 120"><rect x="36" y="40" width="48" height="40" rx="4" fill="#FFB020" opacity="0.12" stroke="#FFB020" stroke-width="2.5"/><g stroke="#FFB020" stroke-width="2.5">${[0,1,2,3].map(k=>`<line x1="${44+k*11}" y1="40" x2="${44+k*11}" y2="30"/><line x1="${44+k*11}" y1="80" x2="${44+k*11}" y2="90"/>`).join('')}</g><rect x="50" y="52" width="8" height="8" fill="#FFB020"/><rect x="62" y="60" width="8" height="8" fill="#FFB020"/></svg>`;
+  if(i===3)return `<svg viewBox="0 0 120 120"><rect x="30" y="30" width="60" height="60" rx="6" fill="#FFB020" opacity="0.1" stroke="#FFB020" stroke-width="2.5"/><g stroke="#FFB020" stroke-width="1" opacity="0.85">${Array.from({length:6}).map((_,r)=>Array.from({length:6}).map((__,c)=>`<rect x="${38+c*7.5}" y="${38+r*7.5}" width="5" height="5" fill="#FFB020" opacity="${0.25+((r+c)%3)*0.25}"/>`).join('')).join('')}</g><text x="60" y="105" text-anchor="middle" font-family="'JetBrains Mono'" font-size="9" fill="#FFB020">CPU</text></svg>`;
+  return `<svg viewBox="0 0 120 120"><g stroke="#FFB020" stroke-width="1.5" opacity="0.7">${[[40,40],[40,80],[80,35],[85,65],[78,95],[60,60]].flatMap((a,ai,arr)=>arr.slice(ai+1).map(b=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}"/>`)).join('')}</g>${[[40,40],[40,80],[80,35],[85,65],[78,95],[60,60]].map((n,ni)=>`<circle cx="${n[0]}" cy="${n[1]}" r="6" fill="#FFB020" opacity="${0.4+0.1*ni}" class="pulse" style="animation:pulse ${1.2+ni*0.2}s ease-in-out infinite"/>`).join('')}</svg>`;
+}
+(function generations(){
+  const tabs=$('#genTabs'),glyph=$('#genGlyph'),tech=$('#genTech'),name=$('#genName'),yrs=$('#genYrs'),note=$('#genNote'),rows=$('#genRows'),fits=$('#genFits'),size=$('#genSize');
+  GENS.forEach((g,i)=>{const b=document.createElement('button');b.className='gen-tab'+(i===0?' active':'');b.innerHTML=`Gen ${g.r}<small>${g.tech.split(' ')[0]}</small>`;b.addEventListener('click',()=>show(i));tabs.appendChild(b);});
+  function show(i){
+    const g=GENS[i];
+    $$('.gen-tab',tabs).forEach((b,bi)=>b.classList.toggle('active',bi===i));
+    glyph.innerHTML=genGlyph(i);tech.textContent=g.tech;name.textContent=g.roman;yrs.textContent=g.yrs;note.textContent=g.note;fits.textContent=g.fits;size.style.width=g.sizeW+'%';
+    rows.innerHTML=[['Examples',g.ex],['Speed',g.speed],['Power',g.power],['Software',g.lang]].map(r=>`<div class="grow"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');
+  }
+  show(0);
+})();
+
+/* 06 MOORE */
+(function moore(){
+  const svg=$('#mooreSvg'),read=$('#mooreRead');
+  const data=[
+    {y:1971,c:2300,n:'Intel 4004'},{y:1974,c:6000,n:'Intel 8080'},{y:1978,c:29000,n:'Intel 8086'},
+    {y:1982,c:134000,n:'Intel 80286'},{y:1985,c:275000,n:'Intel 80386'},{y:1989,c:1200000,n:'Intel 80486'},
+    {y:1993,c:3100000,n:'Pentium'},{y:1997,c:7500000,n:'Pentium II'},{y:2000,c:42000000,n:'Pentium 4'},
+    {y:2006,c:291000000,n:'Core 2 Duo'},{y:2010,c:1170000000,n:'Core i7'},{y:2017,c:19200000000,n:'AMD Epyc'},
+    {y:2022,c:114000000000,n:'Apple M1 Ultra'}
+  ];
+  const XL=64,XR=712,YT=30,YB=360,yMinL=3,yMaxL=12,xMin=1970,xMax=2024;
+  const xP=y=>XL+(y-xMin)/(xMax-xMin)*(XR-XL);
+  const yP=c=>{const l=Math.log10(c);return YT+(1-(l-yMinL)/(yMaxL-yMinL))*(YB-YT);};
+  const fmt=n=>{if(n>=1e9)return (n/1e9)+' billion';if(n>=1e6)return (n/1e6)+' million';return n.toLocaleString('en-US');};
+  let g='';
+  for(let d=yMinL;d<=yMaxL;d++){const yy=YT+(1-(d-yMinL)/(yMaxL-yMinL))*(YB-YT);g+=`<line x1="${XL}" y1="${yy}" x2="${XR}" y2="${yy}" stroke="#1a2540" stroke-width="1"/><text x="${XL-8}" y="${yy+4}" text-anchor="end" font-family="'JetBrains Mono'" font-size="10" fill="#5b6785">10^${d}</text>`;}
+  for(let yr=1970;yr<=2020;yr+=10){const xx=xP(yr);g+=`<line x1="${xx}" y1="${YT}" x2="${xx}" y2="${YB}" stroke="#141d33" stroke-width="1"/><text x="${xx}" y="${YB+20}" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#5b6785">${yr}</text>`;}
+  g+=`<text x="${(XL+XR)/2}" y="${YB+40}" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#8593ad" letter-spacing="1">YEAR  →</text>`;
+  g+=`<text x="16" y="${(YT+YB)/2}" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#8593ad" transform="rotate(-90 16 ${(YT+YB)/2})">TRANSISTORS PER CHIP  →</text>`;
+  const pts=data.map(d=>[xP(d.y),yP(d.c)]);
+  const poly=pts.map(p=>p.join(',')).join(' ');
+  const len=pts.reduce((a,p,i)=>i?a+Math.hypot(p[0]-pts[i-1][0],p[1]-pts[i-1][1]):0,0);
+  g+=`<polyline id="mLine" points="${poly}" fill="none" stroke="#FFB020" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="${len}" stroke-dashoffset="${reduced?0:len}"/>`;
+  data.forEach((d,i)=>{g+=`<circle class="mpt" cx="${pts[i][0]}" cy="${pts[i][1]}" r="5" fill="#FFB020" data-i="${i}"/>`;});
+  svg.innerHTML=g;
+  const line=$('#mLine',svg);
+  if(!reduced&&line){line.style.transition='stroke-dashoffset 1.8s ease';requestAnimationFrame(()=>{line.style.strokeDashoffset='0';});}
+  $$('.mpt',svg).forEach(pt=>{
+    const d=data[+pt.dataset.i];
+    const set=()=>{read.innerHTML=`<b>${d.n}</b> · ${d.y} · about <b>${fmt(d.c)}</b> transistors`;};
+    pt.addEventListener('mouseenter',set);pt.addEventListener('click',set);
+  });
+})();
+
+/* 07 SHRINK */
+(function shrink(){
+  const box=$('#shBox'),cap=$('#shCap'),slider=$('#shSlider'),genL=$('#shGen'),fits=$('#shFits'),speed=$('#shSpeed'),cost=$('#shCost');
+  const sizes=[180,120,80,44,20], labels=['ENIAC','IBM 1401','PDP-8','IBM PC','SoC'];
+  const costs=['astronomically high','very high','high','low','almost zero'];
+  function show(i){
+    const g=GENS[i];genL.textContent=g.r;
+    const s=sizes[i];box.style.width=s+'px';box.style.height=s+'px';box.style.fontSize=(i>3?9:12)+'px';box.textContent=labels[i];
+    cap.textContent='fits in '+g.fits;fits.textContent=g.fits;speed.textContent=g.speed;cost.textContent=costs[i];
+  }
+  slider.addEventListener('input',()=>show(+slider.value));
+  show(0);
+})();
+
+/* 08a NAME THAT GENERATION */
+(function genGame(){
+  const clues=[
+    {c:'Vacuum tubes · ENIAC filled a room',a:0},
+    {c:'Transistors replaced the tubes',a:1},
+    {c:'Integrated circuits · IBM System/360',a:2},
+    {c:'The microprocessor · the first PCs',a:3},
+    {c:'AI, machine learning & massive parallelism',a:4},
+    {c:'UNIVAC I · machine language · punch cards',a:0},
+    {c:'FORTRAN and COBOL first appear',a:1},
+    {c:'Intel 4004 · Apple II · IBM PC',a:3}
+  ];
+  const clueEl=$('#genClue'),opts=$('#genOpts'),fb=$('#genFb'),score=$('#genScore');let cur,solved=0;
+  ['I','II','III','IV','V'].forEach((r,i)=>{const b=document.createElement('button');b.className='opt-btn';b.textContent='Gen '+r;b.dataset.i=i;b.addEventListener('click',()=>pick(i,b));opts.appendChild(b);});
+  function pick(i,b){
+    if(opts.dataset.done)return;
+    if(i===cur.a){b.classList.add('correct');fb.className='feedback ok';fb.textContent='✓ Correct — that\'s Generation '+['I','II','III','IV','V'][cur.a]+'.';solved++;score.textContent='solved: '+solved;}
+    else{b.classList.add('wrong');$$('.opt-btn',opts)[cur.a].classList.add('correct');fb.className='feedback no';fb.textContent='Not quite — it\'s Generation '+['I','II','III','IV','V'][cur.a]+'.';}
+    opts.dataset.done='1';
+  }
+  function next(){cur=clues[Math.floor(Math.random()*clues.length)];clueEl.textContent=cur.c;fb.className='feedback';fb.textContent='Which generation is it?';opts.removeAttribute('data-done');$$('.opt-btn',opts).forEach(b=>b.className='opt-btn');}
+  $('#genNew').addEventListener('click',next);next();
+})();
+
+/* 08b FACT OR MYTH */
+(function tf(){
+  const items=[
+    {s:'A computer never gets tired or bored, no matter how many times it repeats a task.',a:true,e:'True — that\'s the characteristic called diligence.'},
+    {s:'If a computer gives a wrong answer, it usually means the CPU made a random error.',a:false,e:'False — almost always it\'s GIGO: wrong input or logic, not the machine.'},
+    {s:'First-generation computers used transistors.',a:false,e:'False — Gen I used vacuum tubes. Transistors came in Gen II.'},
+    {s:'A single computer can run completely different kinds of tasks just by changing its program.',a:true,e:'True — that\'s versatility.'},
+    {s:'Moore\'s Law says computers get physically bigger over time.',a:false,e:'False — it\'s about transistor count doubling; chips get denser, not bigger.'},
+    {s:'A computer can decide on its own what problem it should solve.',a:false,e:'False — it has no goals of its own; humans define the task.'},
+    {s:'Accuracy is a property of the machine, not of the data you give it.',a:true,e:'True — the machine is exact; the data may not be.'}
+  ];
+  const stmt=$('#tfStmt'),fb=$('#tfFb'),bT=$('#tfTrue'),bF=$('#tfFalse');let cur,done=false;
+  function next(){cur=items[Math.floor(Math.random()*items.length)];stmt.textContent=cur.s;fb.className='feedback';fb.textContent='';done=false;bT.className='opt-btn';bF.className='opt-btn';}
+  function answer(val,btn){if(done)return;done=true;if(val===cur.a){btn.classList.add('correct');fb.className='feedback ok';fb.textContent='✓ '+cur.e;}else{btn.classList.add('wrong');(val?bF:bT);fb.className='feedback no';fb.textContent='✗ '+cur.e;}}
+  bT.addEventListener('click',()=>answer(true,bT));bF.addEventListener('click',()=>answer(false,bF));$('#tfNext').addEventListener('click',next);next();
+})();
+
+/* 08c QUIZ */
+(function quiz(){
+  const Q=[
+    {q:'"GIGO" tells us that…',o:['the CPU makes random errors','wrong input gives wrong output','computers are slow','storage is limited'],a:1,e:'Garbage In, Garbage Out — the machine is accurate; the data or logic was not.'},
+    {q:'First-generation computers were built with…',o:['transistors','integrated circuits','vacuum tubes','microprocessors'],a:2,e:'Gen I = vacuum tubes (e.g. ENIAC). Later generations shrank the switch.'},
+    {q:'The technology that defines the fourth generation is the…',o:['transistor','microprocessor','vacuum tube','relay'],a:1,e:'A whole CPU on one chip — the microprocessor — launched the personal computer era.'},
+    {q:"Moore's Law says roughly that…",o:['chips get bigger every year','transistor count doubles about every 2 years','computers get slower','memory halves each year'],a:1,e:'Exponential growth: ~2× transistors every couple of years.'},
+    {q:'Which is NOT a characteristic of a computer?',o:['Speed','Accuracy','Common sense','Diligence'],a:2,e:'Common sense is a limitation, not a strength — computers have none.'}
+  ];
+  const box=$('#quiz'),scoreEl=$('#quizScore');let answered=0,correct=0;
+  Q.forEach((item,qi)=>{
+    const d=document.createElement('div');d.className='q';
+    d.innerHTML=`<div class="qt"><span class="n">Q${qi+1}</span>${item.q}</div><div class="opts"></div><div class="exp">${item.e}</div>`;
+    const opts=$('.opts',d);
+    item.o.forEach((txt,oi)=>{const b=document.createElement('button');b.className='opt';b.textContent=txt;b.addEventListener('click',()=>{if(d.classList.contains('answered'))return;d.classList.add('answered');answered++;if(oi===item.a){b.classList.add('correct');correct++;}else{b.classList.add('wrong');$$('.opt',opts)[item.a].classList.add('correct');}$$('.opt',opts).forEach(x=>x.disabled=true);scoreEl.textContent=`Score: ${correct} / ${answered}`+(answered===Q.length?' — all done!':'');});opts.appendChild(b);});
+    box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

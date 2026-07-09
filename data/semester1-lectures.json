@@ -14,15 +14,16 @@
   },
   {
     "number": "02",
-    "title": "Characteristics of Computers",
+    "title": "Characteristics & Evolution of Computers",
     "section": "Section I: Introduction to Computers",
-    "description": "Speed, accuracy, storage, diligence, versatility, and limitations of computers.",
+    "description": "Interactive lecture on key characteristics of computers and how computers evolved over time.",
     "ppt": "#",
     "notes": "#",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
-    "status": "Coming Soon"
+    "status": "Available",
+    "lecture": "downloads/semester1/lectures/lecture-02-characteristics-evolution.html"
   },
   {
     "number": "03",
