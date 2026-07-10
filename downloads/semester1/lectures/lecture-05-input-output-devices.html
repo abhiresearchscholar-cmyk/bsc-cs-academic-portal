@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 05 — Input & Output Devices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#090D18; --bg-2:#0C1120; --panel:#111A2E; --panel-2:#16203a;
+    --line:#22304d; --line-soft:#1a2540;
+    --ink:#EAF0FA; --ink-dim:#8593ad; --ink-faint:#5b6785;
+    --one:#FFB020; --one-soft:#4a3a1a; --one-glow:rgba(255,176,32,.45);
+    --zero:#4C74D0; --zero-soft:#1e2c4d;
+    --human:#B892FF; --human-glow:rgba(184,146,255,.4);
+    --ok:#4ade80; --no:#f87171;
+    --r:16px; --r-sm:10px; --maxw:1080px;
+    --f-display:'Space Grotesk',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--one);color:#1a1205}
+  a{color:var(--one);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  .layer + .layer{border-top:1px solid var(--line-soft)}
+  .rail{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:12px}
+  .rail button{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;transition:color .3s}
+  .rail .dot{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid var(--line);transition:all .3s;flex:none}
+  .rail button:hover{color:var(--ink-dim)}
+  .rail button.active{color:var(--one)}
+  .rail button.active .dot{background:var(--one);box-shadow:0 0 0 4px var(--one-glow);border-color:var(--one)}
+  .rail .label{opacity:0;transform:translateX(-4px);transition:all .3s;white-space:nowrap}
+  .rail button:hover .label,.rail button.active .label{opacity:1;transform:none}
+  @media(max-width:1300px){.rail{display:none}}
+  .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--one);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .num{font-weight:700;color:var(--bg);background:var(--one);padding:2px 8px;border-radius:6px;letter-spacing:.02em}
+  h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,46px);margin-bottom:20px}
+  h3{font-size:22px;margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-dim);max-width:60ch}
+  p{max-width:65ch;color:var(--ink-dim)}
+  strong{color:var(--ink);font-weight:600}
+  .amber{color:var(--one)} .blue{color:var(--zero)} .violet{color:var(--human)} .mono{font-family:var(--f-mono)}
+  .hero{padding:0;height:100vh;min-height:660px;display:flex;align-items:center;position:relative;overflow:hidden}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 42%,transparent 38%,var(--bg) 100%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--one);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+  .hero-tag .pill{background:var(--one);color:var(--bg);padding:3px 9px;border-radius:6px;font-weight:700}
+  .hero h1{font-size:clamp(36px,7vw,80px);margin-bottom:24px}
+  .hero h1 .flip{color:var(--one)}
+  .hero .lede{font-size:clamp(18px,2.3vw,23px);max-width:56ch}
+  .hero-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-hint .arrow{width:1px;height:26px;background:linear-gradient(var(--ink-faint),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(-6px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+  .objectives{padding:60px 0;background:var(--bg-2);border-bottom:1px solid var(--line-soft)}
+  .obj-head{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:22px}
+  .obj-head b{color:var(--one)}
+  .obj-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.obj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.obj-grid{grid-template-columns:repeat(5,1fr)}}
+  .obj{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .obj .on{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-bottom:8px}
+  .obj p{font-size:13.5px;color:var(--ink-dim)}
+  .stage{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:34px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .stage-title{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .readout{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)} .readout b{color:var(--one)}
+  .btn{font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .btn:hover{border-color:var(--one);color:var(--one)}
+  .btn.primary{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .recap{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);margin-top:26px;padding-left:14px;border-left:2px solid var(--one)}
+  .callout{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--human);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(184,146,255,.05);max-width:65ch}
+  .callout .ic{font-size:16px;flex:none} .callout .tx{font-size:14px;color:var(--ink-dim)} .callout .tx b{color:var(--human)}
+
+  table.dt{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  table.dt th,table.dt td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  table.dt th{background:var(--panel-2);color:var(--ink);font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  table.dt td{color:var(--ink-dim)}
+  table.dt tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+  .wrap-scroll{overflow-x:auto}
+
+  /* IO sorter */
+  .io-board{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:700px){.io-board{grid-template-columns:1fr 1fr}}
+  .io-col{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--bg);min-height:180px}
+  .io-col .ch{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:12px;display:flex;justify-content:space-between}
+  .io-col.input .ch{color:var(--one)} .io-col.output .ch{color:var(--human)}
+  .io-slot{min-height:44px;border:1px dashed var(--line);border-radius:8px;margin-bottom:8px;display:flex;align-items:center;padding:0 10px;font-family:var(--f-mono);font-size:12px;color:var(--ink-faint)}
+  .io-pool{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .io-chip{font-family:var(--f-mono);font-size:12.5px;padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);cursor:grab;transition:all .15s}
+  .io-chip:hover{border-color:var(--one)}
+  .io-chip.placed{opacity:.35;cursor:default}
+  .io-msg{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);margin-top:12px;min-height:18px}
+
+  /* keyboard */
+  .kb-wrap{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:820px){.kb-wrap{grid-template-columns:1.3fr 1fr}}
+  .kb-key{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);font-family:var(--f-mono);font-size:12px;margin:2px;color:var(--ink-dim);transition:all .1s}
+  .kb-key.wide{min-width:70px}
+  .kb-key.active{background:var(--one);color:#1a1205;border-color:var(--one);transform:translateY(2px)}
+  .kb-row{display:flex;justify-content:center;flex-wrap:wrap}
+  .kb-flow{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);display:flex;flex-direction:column;gap:10px}
+  .kb-flow .step{border:1px solid var(--line-soft);border-radius:8px;padding:10px 12px;background:var(--bg)}
+  .kb-flow .step b{color:var(--one)}
+  .kb-input{width:100%;font-family:var(--f-mono);font-size:16px;padding:12px 14px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--ink);margin-top:16px}
+  .kb-input:focus{outline:none;border-color:var(--one)}
+
+  /* mouse */
+  .mouse-wrap{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:820px){.mouse-wrap{grid-template-columns:1fr 1fr}}
+  .mouse-pad{position:relative;height:260px;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 50%,#131d34,#0a0f1c);overflow:hidden;cursor:crosshair}
+  .mouse-dot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--one);box-shadow:0 0 12px var(--one-glow);transform:translate(-50%,-50%);transition:background .15s}
+  .mouse-dot.click{background:#fff}
+  .mouse-trail{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--one);opacity:.35;transform:translate(-50%,-50%)}
+  .mouse-read{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);margin-top:10px}
+  .mouse-read b{color:var(--one)}
+
+  /* touchscreen */
+  .touch-pad{position:relative;height:240px;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 50%,#131d34,#0a0f1c);overflow:hidden}
+  .touch-ripple{position:absolute;border:2px solid var(--one);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;animation:ripple .6s ease-out forwards}
+  @keyframes ripple{from{width:10px;height:10px;opacity:1}to{width:90px;height:90px;opacity:0}}
+  .touch-msg{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);text-align:center;margin-top:10px;min-height:18px}
+
+  /* tabs shared (types) */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:11px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .2s}
+  .tab:hover{border-color:var(--one)} .tab.active{background:var(--one);color:#1a1205;border-color:var(--one)}
+  .tab-body{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+  @media(min-width:760px){.tab-body{grid-template-columns:.9fr 1.1fr}}
+  .glyph-box{height:190px;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 45%,#131d34,#0a0f1c);display:flex;align-items:center;justify-content:center}
+  .glyph-box svg{width:100%;height:150px}
+  .tmeta .tt{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.08em;text-transform:uppercase}
+  .tmeta h3{font-size:24px;margin:6px 0 10px}
+  .tmeta .td{font-size:14.5px;color:var(--ink-dim);margin-bottom:12px}
+  .tmeta .rows{display:flex;flex-direction:column;gap:8px}
+  .trow{display:flex;gap:12px;font-size:13.5px;border-top:1px solid var(--line-soft);padding-top:8px}
+  .trow .k{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;width:96px;flex:none}
+  .trow .v{color:var(--ink-dim)}
+
+  /* monitor backlight demo */
+  .mon-wrap{display:grid;grid-template-columns:1fr;gap:22px;align-items:center}
+  @media(min-width:820px){.mon-wrap{grid-template-columns:1fr 1fr}}
+  .mon-screen{position:relative;height:180px;border:3px solid #2c3a5a;border-radius:8px;overflow:hidden;background:#000}
+  .mon-pixels{position:absolute;inset:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(4,1fr)}
+  .mon-px{border:1px solid rgba(255,255,255,.03);transition:background .3s}
+  .mon-backlight{position:absolute;inset:0;background:#000;opacity:0;transition:opacity .4s;pointer-events:none}
+  .mon-label{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-align:center;margin-top:8px}
+
+  /* printer animation */
+  .printer-wrap{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:860px){.printer-wrap{grid-template-columns:1.2fr 1fr}}
+  .printer-svg{width:100%;height:auto}
+  .printer-info{border:1px solid var(--line);border-radius:var(--r-sm);padding:20px;background:var(--bg);min-height:150px}
+  .printer-info .t{font-family:var(--f-display);font-size:18px;font-weight:600;margin-bottom:8px;color:var(--one)}
+  .printer-info p{font-size:14px}
+  .printer-step{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);margin-top:14px;min-height:34px}
+  .printer-step b{color:var(--one)}
+
+  /* activities + quiz */
+  .act-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:780px){.act-grid{grid-template-columns:1fr 1fr}}
+  .act{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .act h3{font-size:19px;margin-bottom:6px}
+  .act .prompt{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+  .clue{border:1px solid var(--one);border-radius:var(--r-sm);padding:16px;background:var(--one-soft);color:var(--one);font-family:var(--f-mono);font-size:14px;text-align:center;margin-bottom:14px}
+  .opt-row{display:flex;gap:8px;flex-wrap:wrap}
+  .opt-btn{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--ink);transition:all .18s}
+  .opt-btn:hover:not(:disabled){border-color:var(--one)}
+  .opt-btn.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .opt-btn.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .feedback{font-family:var(--f-mono);font-size:13px;margin-top:14px;min-height:20px;color:var(--ink-faint)}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--no)}
+  .score{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+  .quiz{margin-top:28px}
+  .quiz-h{font-family:var(--f-display);font-size:22px;margin-bottom:16px}
+  .q{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);margin-bottom:14px}
+  .q .qt{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .q .qt .n{font-family:var(--f-mono);color:var(--one);margin-right:8px}
+  .q .opts{display:flex;flex-direction:column;gap:8px}
+  .q .opt{text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink-dim);background:var(--panel);transition:all .18s}
+  .q .opt:hover:not(:disabled){border-color:var(--one);color:var(--ink)}
+  .q .opt.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .q .opt.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .q .exp{font-size:13px;color:var(--ink-faint);margin-top:10px;display:none}
+  .q.answered .exp{display:block}
+  .quiz-score{font-family:var(--f-mono);font-size:14px;color:var(--one);margin-top:10px}
+  .why{background:linear-gradient(180deg,var(--bg),#070a12)}
+  .why h2{max-width:18ch}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:34px}
+  @media(min-width:680px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .card .k{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .card p{font-size:15px}
+  .hw{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel);margin-top:30px}
+  .hw .k{font-family:var(--f-mono);font-size:12px;color:var(--human);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+  .hw ol{margin:0 0 0 18px;color:var(--ink-dim);font-size:15px}
+  .hw li{margin-bottom:10px} .hw li b{color:var(--ink)}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line-soft);text-align:center}
+  footer .m{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  @media(max-width:520px){section{padding:70px 0}.stage{padding:20px}}
+</style>
+</head>
+<body>
+<nav class="rail" id="rail" aria-label="Lecture navigation"></nav>
+
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner"><div class="wrap">
+    <div class="hero-tag"><span class="pill">Lecture 05</span> Input &amp; Output Devices · BSc Computer Science</div>
+    <h1>How you <span class="flip">talk</span> to it,<br>and how it <span class="flip">talks</span> back.</h1>
+    <p class="lede">Every keystroke, click and tap is a translation into the 1s and 0s from Lecture 01. Every pixel and printed page is that binary translated back into something you can see. Today: the devices at both ends of that conversation.</p>
+  </div></div>
+  <div class="hero-hint"><span>scroll to begin</span><span class="arrow"></span></div>
+</header>
+
+<section class="objectives" id="obj">
+  <div class="wrap">
+    <div class="obj-head">By the end of this session you will be able to — <b>five things</b></div>
+    <div class="obj-grid">
+      <div class="obj"><div class="on">01</div><p>Classify a device as <em>input</em> or <em>output</em> and explain why.</p></div>
+      <div class="obj"><div class="on">02</div><p>Explain how a <em>keyboard</em> and <em>mouse</em> turn actions into data.</p></div>
+      <div class="obj"><div class="on">03</div><p>Describe how a <em>touchscreen</em> senses a touch.</p></div>
+      <div class="obj"><div class="on">04</div><p>Compare <em>LCD</em> and <em>LED</em> monitor technology.</p></div>
+      <div class="obj"><div class="on">05</div><p>Compare <em>inkjet</em> and <em>laser</em> printing.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 00 INPUT VS OUTPUT -->
+<section class="layer" id="s0" data-title="Input vs Output">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">00</span> Two directions of the conversation</div>
+    <h2>Everything a computer touches is either coming in, or going out.</h2>
+    <p>Back in Lecture 01's block diagram, two units sat at the edges: the <strong>Input Unit</strong> (accepts data from the world, converts it to binary) and the <strong>Output Unit</strong> (converts binary results back into something we can sense). Every device we meet today is one or the other. <strong>Drag each device</strong> into the correct column.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · sort input vs output</span></div>
+      <div class="io-board">
+        <div class="io-col input"><div class="ch"><span>Input</span><span>→ binary</span></div><div id="inputSlots"></div></div>
+        <div class="io-col output"><div class="ch"><span>Output</span><span>binary →</span></div><div id="outputSlots"></div></div>
+      </div>
+      <div class="io-pool" id="ioPool"></div>
+      <div class="io-msg" id="ioMsg">Click a device below, then click the column it belongs in.</div>
+      <div class="btn-row"><button class="btn ghost" id="ioReset">Reset</button></div>
+    </div>
+    <div class="recap">TAKEAWAY · Input devices convert the real world into binary; output devices convert binary back into something we can see, hear or touch.</div>
+  </div>
+</section>
+
+<!-- 01 KEYBOARD -->
+<section class="layer" id="s1" data-title="Keyboard">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">01</span> The keyboard</div>
+    <h2>Every keystroke is a tiny switch closing.</h2>
+    <p>Under each key sits a switch, just like the transistor from Lecture 01. Pressing a key closes that switch; the keyboard's own tiny controller notices which one, and sends a code for it. <strong>Type below</strong> and watch a keystroke become a scan code, then an ASCII byte.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · from keypress to binary</span></div>
+      <div class="kb-wrap">
+        <div>
+          <div id="kbRows"></div>
+          <input class="kb-input" id="kbInput" placeholder="Type here…" maxlength="14" spellcheck="false">
+        </div>
+        <div class="kb-flow" id="kbFlow">
+          <div class="step"><b>1. Press</b><br>waiting for a key…</div>
+          <div class="step"><b>2. Scan code</b><br>—</div>
+          <div class="step"><b>3. Character</b><br>—</div>
+          <div class="step"><b>4. ASCII byte</b><br>—</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>Link back:</b> Step 4 is exactly the ASCII encoding from Lecture 01 — the keyboard is simply the fastest way humans feed that code into a computer.</div></div>
+    <div class="recap">TAKEAWAY · Keypress → scan code (which key) → character → ASCII binary. The keyboard is a switch-and-encode machine.</div>
+  </div>
+</section>
+
+<!-- 02 MOUSE -->
+<section class="layer" id="s2" data-title="Mouse">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">02</span> The mouse</div>
+    <h2>A mouse doesn't send a picture — it sends coordinates.</h2>
+    <p>A modern <strong>optical mouse</strong> uses a tiny camera and LED underneath to photograph the surface thousands of times a second, comparing frames to work out how far and which way it moved. That movement becomes <strong>x, y coordinates</strong> and <strong>button states</strong> sent to the computer — nothing more. <strong>Move and click</strong> in the pad below.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · tracking movement &amp; clicks</span></div>
+      <div class="mouse-wrap">
+        <div>
+          <div class="mouse-pad" id="mousePad"><div class="mouse-dot" id="mouseDot" style="left:50%;top:50%"></div></div>
+        </div>
+        <div>
+          <div class="mouse-read">Position: <b id="mPos">x: 0, y: 0</b></div>
+          <div class="mouse-read">Left button: <b id="mLeft">up</b></div>
+          <div class="mouse-read">Clicks registered: <b id="mClicks">0</b></div>
+          <div class="mouse-read" style="margin-top:14px">Data sent to the computer, every update:<br><span class="mono" id="mPacket" style="color:var(--one)">Δx:0 Δy:0 btn:0</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · An optical mouse tracks relative movement using a tiny camera + LED, sending Δx, Δy and button state — the OS turns that into cursor movement on screen.</div>
+  </div>
+</section>
+
+<!-- 03 TOUCHSCREEN -->
+<section class="layer" id="s3" data-title="Touchscreen">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">03</span> The touchscreen</div>
+    <h2>Input and output, sharing the exact same glass.</h2>
+    <p>A touchscreen is special: it is an <strong>input</strong> device (senses your touch) laid directly over an <strong>output</strong> device (the display). Two common technologies detect the touch:</p>
+    <div class="wrap-scroll"><table class="dt">
+      <tr><th>Technology</th><th>How it senses touch</th><th>Traits</th></tr>
+      <tr><td><b>Resistive</b></td><td>Two flexible layers pressed together at the touch point complete a circuit</td><td>Works with any object (finger, gloved hand, stylus) but needs firm pressure; less crisp, cheaper.</td></tr>
+      <tr><td><b>Capacitive</b></td><td>Senses the electrical charge of a fingertip touching a glass layer coated with a conductive film</td><td>Very responsive to light touch and supports multi-touch (pinch/zoom); needs a conductive touch (bare finger), used in nearly all smartphones.</td></tr>
+    </table></div>
+    <div class="stage" style="margin-top:24px">
+      <div class="stage-head"><span class="stage-title">Interactive · tap to sense a touch</span></div>
+      <div class="touch-pad" id="touchPad"></div>
+      <div class="touch-msg" id="touchMsg">Tap anywhere on the pad above.</div>
+    </div>
+    <div class="recap">TAKEAWAY · Resistive = pressure on two layers; Capacitive = senses your finger's electrical charge, enabling multi-touch.</div>
+  </div>
+</section>
+
+<!-- 04 MONITORS -->
+<section class="layer" id="s4" data-title="Monitors">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">04</span> Monitors: LCD &amp; LED</div>
+    <h2>The screen doesn't make its own light — most need a lamp behind it.</h2>
+    <p>An <strong>LCD (Liquid Crystal Display)</strong> works by twisting liquid crystals to block or let through light from a <strong>backlight</strong>, with colour filters giving each pixel its red, green or blue. On its own, an LCD panel is just a light valve — it needs that backlight to be visible at all. An <strong>LED monitor</strong> is not a different picture technology; it is simply an <strong>LCD that uses LEDs as its backlight</strong>, instead of the older fluorescent (CCFL) tubes. LEDs are slimmer, cooler and more energy-efficient. <strong>Toggle the backlight</strong> and watch.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · why a backlight matters</span></div>
+      <div class="mon-wrap">
+        <div>
+          <div class="mon-screen"><div class="mon-pixels" id="monPixels"></div><div class="mon-backlight" id="monBacklight"></div></div>
+          <div class="mon-label" id="monLabel">Backlight: ON — the picture is visible</div>
+        </div>
+        <div>
+          <div class="btn-row" style="margin-top:0"><button class="btn primary" id="monToggle">Turn backlight OFF</button></div>
+          <p style="margin-top:16px;font-size:14px">Notice: the liquid-crystal layer is still holding the exact same little face, pixel for pixel, whether the backlight is on or off — but with no backlight, no light gets through, so all you see is black. This is exactly what an LED monitor improves: a better, more efficient backlight, not a different picture layer.</p>
+        </div>
+      </div>
+    </div>
+    <div class="wrap-scroll"><table class="dt">
+      <tr><th></th><th>LCD (with CCFL backlight)</th><th>LED (LCD with LED backlight)</th></tr>
+      <tr><td>Backlight type</td><td>Fluorescent (CCFL) tubes</td><td>Light-Emitting Diodes</td></tr>
+      <tr><td>Thickness</td><td>Thicker</td><td>Slimmer</td></tr>
+      <tr><td>Energy use</td><td>Higher</td><td>Lower</td></tr>
+      <tr><td>Contrast/brightness</td><td>Good</td><td>Usually better</td></tr>
+      <tr><td>Relationship</td><td colspan="2" style="text-align:center">An LED monitor <i>is</i> an LCD — just with an LED backlight instead of CCFL.</td></tr>
+    </table></div>
+    <div class="recap">TAKEAWAY · LCD = liquid crystals + colour filters + a backlight. LED monitor = an LCD using LEDs (not CCFL tubes) as that backlight.</div>
+  </div>
+</section>
+
+<!-- 05 PRINTERS -->
+<section class="layer" id="s5" data-title="Printers">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">05</span> Printers: inkjet &amp; laser</div>
+    <h2>Two very different ways to put binary onto paper.</h2>
+    <p>Printers turn the page's bits — of text or an image — back into something physical. The two dominant technologies work in completely different ways. <strong>Pick one and press "Print a page"</strong> to see how it works.</p>
+    <div class="stage">
+      <div class="tabs" id="printTabs"></div>
+      <div class="printer-wrap">
+        <div><svg class="printer-svg" viewBox="0 0 420 220" id="printerSvg" role="img" aria-label="Printer mechanism diagram"></svg></div>
+        <div>
+          <div class="printer-info" id="printerInfo"><div class="t" id="printT">Inkjet</div><p id="printP"></p></div>
+          <div class="printer-step" id="printStep"></div>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="printRun">Print a page</button><button class="btn ghost" id="printReset">Reset</button></div>
+    </div>
+    <div class="wrap-scroll"><table class="dt">
+      <tr><th>Feature</th><th>Inkjet</th><th>Laser</th></tr>
+      <tr><td>Method</td><td>Sprays tiny droplets of liquid ink onto paper</td><td>Uses a laser to draw a static image on a drum, which attracts powdered toner, fused by heat</td></tr>
+      <tr><td>Speed</td><td>Slower</td><td>Fast, especially for text</td></tr>
+      <tr><td>Cost per page</td><td>Higher (ink cartridges)</td><td>Lower for high volumes</td></tr>
+      <tr><td>Best for</td><td>Photos, colour-rich documents, home use</td><td>Bulk text documents, offices</td></tr>
+      <tr><td>Output quality</td><td>Excellent for photos</td><td>Crisp, sharp text</td></tr>
+    </table></div>
+    <div class="recap">TAKEAWAY · Inkjet sprays liquid ink droplets. Laser uses static electricity, a laser beam and heat to fuse toner powder. Laser is faster for text; inkjet is better for photos.</div>
+  </div>
+</section>
+
+<!-- 06 ACTIVITIES -->
+<section class="layer" id="s6" data-title="Activities">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">06</span> Check yourself</div>
+    <h2>Your turn. Two challenges, then a graded quiz.</h2>
+    <p>Great for the projector — everything you need is on the slides above.</p>
+    <div class="act-grid">
+      <div class="act">
+        <h3>① Input or output?</h3>
+        <div class="prompt">Read the device and classify it.</div>
+        <div class="clue" id="ioClue">—</div>
+        <div class="opt-row"><button class="opt-btn" id="ioIn">INPUT</button><button class="opt-btn" id="ioOut">OUTPUT</button><button class="btn ghost" id="ioNext" style="margin-left:auto">Next</button></div>
+        <div class="feedback" id="ioFb"></div>
+      </div>
+      <div class="act">
+        <h3>② Which technology?</h3>
+        <div class="prompt">Read the clue and pick the correct technology.</div>
+        <div class="clue" id="techClue">—</div>
+        <div class="opt-row" id="techOpts"></div>
+        <div class="feedback" id="techFb">Choose one.</div>
+        <div class="btn-row"><button class="btn" id="techNew">New clue</button><span class="score" id="techScore" style="align-self:center">solved: 0</span></div>
+      </div>
+    </div>
+    <div class="quiz">
+      <div class="quiz-h">③ Quick quiz</div>
+      <div id="quiz"></div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 WHY -->
+<section class="why layer" id="s7" data-title="Why & recap">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">07</span> Why it matters</div>
+    <h2>Every device you touch is a translator, at the very edge of the machine.</h2>
+    <p>Input and output devices are where the abstraction stack from Lecture 01 meets the physical world — a fingertip's charge, a spray of ink, a beam of light. Understanding how each device senses or displays information helps you choose the right hardware, debug when input misbehaves, and appreciate just how much translation happens between you and a chip.</p>
+    <div class="cards">
+      <div class="card"><div class="k">Choose the right device</div><p>A laser printer for a busy office, an inkjet for photos, a capacitive screen for multi-touch — knowing the tech means knowing the trade-off.</p></div>
+      <div class="card"><div class="k">Debug with confidence</div><p>Cursor lag, a dead pixel, a smudged print — knowing the mechanism tells you where to look first.</p></div>
+      <div class="card"><div class="k">Exam gold</div><p>"Compare LCD and LED" and "explain inkjet vs laser" are classic questions — you now have both, in detail.</p></div>
+    </div>
+    <div class="hw">
+      <div class="k">Homework · before Lecture 06</div>
+      <ol>
+        <li><b>Classify ten devices:</b> list ten input/output devices from home or college and label each input or output — some may be both.</li>
+        <li><b>Keyboard path:</b> in your own words, trace what happens from pressing the letter 'S' to it appearing on screen.</li>
+        <li><b>LCD vs LED:</b> explain in a paragraph why "LED monitor" is really just a special kind of LCD.</li>
+        <li><b>Printer comparison:</b> make a table comparing inkjet and laser on speed, cost, and best use case.</li>
+        <li><b>Stretch:</b> research one more input device (e.g. scanner, webcam, joystick) and explain how it converts the real world into binary.</li>
+      </ol>
+    </div>
+    <p class="recap" style="margin-top:34px">THE WHOLE STORY · input devices turn the world into binary (keyboard, mouse, touchscreen) · output devices turn binary back into the world (LCD/LED monitors, inkjet/laser printers). That's the conversation between you and the machine.</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="m">Lecture 05 · Input &amp; Output Devices · an interactive teaching aid — press any widget to explore</div></div></footer>
+
+<script>
+"use strict";
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const wait=ms=>new Promise(r=>setTimeout(r,reduced?0:ms));
+
+/* RAIL */
+const nav=[
+  {id:'top',n:'—',t:'Cover'},{id:'s0',n:'00',t:'Input vs Output'},{id:'s1',n:'01',t:'Keyboard'},
+  {id:'s2',n:'02',t:'Mouse'},{id:'s3',n:'03',t:'Touchscreen'},{id:'s4',n:'04',t:'Monitors'},
+  {id:'s5',n:'05',t:'Printers'},{id:'s6',n:'06',t:'Activities'},{id:'s7',n:'07',t:'Why & recap'}
+];
+const rail=$('#rail');
+nav.forEach(s=>{const el=document.getElementById(s.id);const b=document.createElement('button');b.innerHTML=`<span class="dot"></span><span class="label">${s.n==='—'?'top':s.n} · ${s.t}</span>`;b.dataset.for=s.id;b.addEventListener('click',()=>el&&el.scrollIntoView({behavior:reduced?'auto':'smooth'}));rail.appendChild(b);});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.for===e.target.id));}),{rootMargin:'-45% 0px -45% 0px'});
+nav.forEach(s=>{const el=document.getElementById(s.id);if(el)spy.observe(el);});
+
+/* HERO */
+(function heroGrid(){
+  const cv=$('#heroCanvas'),ctx=cv.getContext('2d');
+  let cols,rows,gap=26,size=6,t=0,mouse={x:-999,y:-999};
+  const AMBER='#FFB020',BLUE='#26385f';
+  function resize(){cv.width=cv.offsetWidth*devicePixelRatio;cv.height=cv.offsetHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cols=Math.ceil(cv.offsetWidth/gap)+1;rows=Math.ceil(cv.offsetHeight/gap)+1;}
+  resize();addEventListener('resize',resize);
+  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
+  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-999;});
+  function draw(){const W=cv.offsetWidth,H=cv.offsetHeight;ctx.clearRect(0,0,W,H);const wave=(t*0.9)%(W+H+400)-200;for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const px=x*gap+14,py=y*gap+14,diag=px+py,dw=Math.abs(diag-wave);const onWave=dw<60?1-(dw/60):0;const dx=px-mouse.x,dy=py-mouse.y,md=Math.hypot(dx,dy),onMouse=md<90?1-(md/90):0;const heat=Math.max(onWave,onMouse);if(heat>0.05){ctx.fillStyle=AMBER;ctx.globalAlpha=0.15+heat*0.85;const s=size+heat*4;ctx.fillRect(px-s/2,py-s/2,s,s);}else{ctx.fillStyle=BLUE;ctx.globalAlpha=0.5;ctx.fillRect(px-size/2,py-size/2,size,size);}}ctx.globalAlpha=1;}
+  if(reduced){draw();return;}
+  (function loop(){t+=2.4;draw();requestAnimationFrame(loop);})();
+})();
+
+/* 00 INPUT/OUTPUT SORTER */
+(function ioSort(){
+  const items=[
+    {n:'Keyboard',t:'input'},{n:'Mouse',t:'input'},{n:'Scanner',t:'input'},{n:'Microphone',t:'input'},{n:'Webcam',t:'input'},
+    {n:'Monitor',t:'output'},{n:'Printer',t:'output'},{n:'Speaker',t:'output'},{n:'Projector',t:'output'},{n:'Touchscreen',t:'both'}
+  ];
+  const pool=$('#ioPool'),inSlots=$('#inputSlots'),outSlots=$('#outputSlots'),msg=$('#ioMsg');
+  let selected=null,placed=0;
+  items.forEach((it,i)=>{
+    const chip=document.createElement('button');chip.className='io-chip';chip.textContent=it.n;chip.dataset.i=i;
+    chip.addEventListener('click',()=>{
+      if(chip.classList.contains('placed'))return;
+      $$('.io-chip',pool).forEach(c=>c.style.outline='');
+      selected=i;chip.style.outline='2px solid var(--one)';
+      msg.textContent='Now click Input or Output for "'+it.n+'".';
+    });
+    pool.appendChild(chip);
+  });
+  function place(colType){
+    if(selected===null){msg.textContent='Pick a device chip first.';return;}
+    const it=items[selected],chip=$$('.io-chip',pool)[selected];
+    const correct = it.t==='both' ? true : it.t===colType;
+    const slot=document.createElement('div');slot.className='io-slot';
+    slot.style.borderStyle='solid';
+    slot.style.borderColor=correct?'var(--ok)':'var(--no)';
+    slot.style.color=correct?'var(--ok)':'var(--no)';
+    slot.textContent=it.n+(correct?' ✓':' — try the other column')+(it.t==='both'?' (it is actually both!)':'');
+    (colType==='input'?inSlots:outSlots).appendChild(slot);
+    chip.classList.add('placed');chip.style.outline='';
+    placed++;selected=null;
+    msg.textContent=correct?'Correct.':'Not quite — a touchscreen is both, but for a pure classification, check your reasoning.';
+    if(placed>=items.length)msg.textContent='All devices sorted! Review the columns above.';
+  }
+  $('#inputSlots').parentElement.querySelector('.ch');
+  $('.io-col.input').addEventListener('click',(e)=>{if(e.target.closest('.io-slot'))return;place('input');});
+  $('.io-col.output').addEventListener('click',(e)=>{if(e.target.closest('.io-slot'))return;place('output');});
+  $('#ioReset').addEventListener('click',()=>{
+    inSlots.innerHTML='';outSlots.innerHTML='';selected=null;placed=0;
+    $$('.io-chip',pool).forEach(c=>{c.classList.remove('placed');c.style.outline='';});
+    msg.textContent='Click a device below, then click the column it belongs in.';
+  });
+})();
+
+/* 01 KEYBOARD */
+(function keyboard(){
+  const rowsData=[
+    "1 2 3 4 5 6 7 8 9 0".split(' '),
+    "Q W E R T Y U I O P".split(' '),
+    "A S D F G H J K L".split(' '),
+    "Z X C V B N M".split(' ')
+  ];
+  const rowsEl=$('#kbRows');
+  const keyEls={};
+  rowsData.forEach(r=>{
+    const row=document.createElement('div');row.className='kb-row';
+    r.forEach(k=>{const el=document.createElement('span');el.className='kb-key';el.textContent=k;row.appendChild(el);keyEls[k.toUpperCase()]=el;});
+    rowsEl.appendChild(row);
+  });
+  const spaceRow=document.createElement('div');spaceRow.className='kb-row';
+  const spaceKey=document.createElement('span');spaceKey.className='kb-key wide';spaceKey.textContent='space';spaceRow.appendChild(spaceKey);rowsEl.appendChild(spaceRow);
+  keyEls[' ']=spaceKey;
+  const scan={'A':30,'B':48,'C':46,'D':32,'E':18,'F':33,'G':34,'H':35,'I':23,'J':36,'K':37,'L':38,'M':50,'N':49,'O':24,'P':25,'Q':16,'R':19,'S':31,'T':20,'U':22,'V':47,'W':17,'X':45,'Y':21,'Z':44,'1':2,'2':3,'3':4,'4':5,'5':6,'6':7,'7':8,'8':9,'9':10,'0':11,' ':57};
+  const flowSteps=$$('.step',$('#kbFlow'));
+  const input=$('#kbInput');
+  let lastTimer=null;
+  input.addEventListener('input',e=>{
+    const val=e.target.value;
+    const ch=val.length?val[val.length-1]:null;
+    Object.values(keyEls).forEach(el=>el.classList.remove('active'));
+    if(!ch){flowSteps[0].innerHTML='<b>1. Press</b><br>waiting for a key…';flowSteps[1].innerHTML='<b>2. Scan code</b><br>—';flowSteps[2].innerHTML='<b>3. Character</b><br>—';flowSteps[3].innerHTML='<b>4. ASCII byte</b><br>—';return;}
+    const up=ch.toUpperCase();
+    if(keyEls[up]){keyEls[up].classList.add('active');clearTimeout(lastTimer);lastTimer=setTimeout(()=>keyEls[up].classList.remove('active'),reduced?0:250);}
+    const sc=scan[up]!==undefined?scan[up]:'—';
+    const code=ch.charCodeAt(0);
+    const bin=code.toString(2).padStart(8,'0');
+    flowSteps[0].innerHTML='<b>1. Press</b><br>key "'+ (ch===' '?'space':ch) +'" physically closes a switch';
+    flowSteps[1].innerHTML='<b>2. Scan code</b><br>keyboard controller reports scan code '+sc;
+    flowSteps[2].innerHTML='<b>3. Character</b><br>the OS maps it to the character "'+(ch===' '?'space':ch)+'"';
+    flowSteps[3].innerHTML='<b>4. ASCII byte</b><br>stored as '+code+' → <span style="color:var(--one)">'+bin+'</span>';
+  });
+})();
+
+/* 02 MOUSE */
+(function mouse(){
+  const pad=$('#mousePad'),dot=$('#mouseDot'),posEl=$('#mPos'),leftEl=$('#mLeft'),clickEl=$('#mClicks'),pktEl=$('#mPacket');
+  let lastX=null,lastY=null,clicks=0,trails=[];
+  function setPos(clientX,clientY){
+    const r=pad.getBoundingClientRect();
+    let x=clientX-r.left,y=clientY-r.top;
+    x=Math.max(0,Math.min(r.width,x));y=Math.max(0,Math.min(r.height,y));
+    dot.style.left=x+'px';dot.style.top=y+'px';
+    const dx=lastX===null?0:Math.round(x-lastX),dy=lastY===null?0:Math.round(y-lastY);
+    lastX=x;lastY=y;
+    posEl.textContent='x: '+Math.round(x)+', y: '+Math.round(y);
+    pktEl.textContent='\u0394x:'+dx+' \u0394y:'+dy+' btn:'+(dot.classList.contains('click')?1:0);
+    if(!reduced){
+      const tr=document.createElement('div');tr.className='mouse-trail';tr.style.left=x+'px';tr.style.top=y+'px';pad.appendChild(tr);
+      trails.push(tr);if(trails.length>18){const old=trails.shift();old.remove();}
+      setTimeout(()=>{tr.style.opacity='0';},250);
+    }
+  }
+  pad.addEventListener('mousemove',e=>setPos(e.clientX,e.clientY));
+  pad.addEventListener('mousedown',e=>{dot.classList.add('click');leftEl.textContent='down';clicks++;clickEl.textContent=clicks;setPos(e.clientX,e.clientY);});
+  pad.addEventListener('mouseup',e=>{dot.classList.remove('click');leftEl.textContent='up';setPos(e.clientX,e.clientY);});
+  pad.addEventListener('touchmove',e=>{const t=e.touches[0];setPos(t.clientX,t.clientY);e.preventDefault();},{passive:false});
+})();
+
+/* 03 TOUCHSCREEN */
+(function touch(){
+  const pad=$('#touchPad'),msg=$('#touchMsg');
+  let count=0;
+  function ripple(x,y){
+    const r=document.createElement('div');r.className='touch-ripple';r.style.left=x+'px';r.style.top=y+'px';pad.appendChild(r);
+    setTimeout(()=>r.remove(),reduced?0:650);
+  }
+  function handle(clientX,clientY){
+    const rect=pad.getBoundingClientRect();
+    const x=clientX-rect.left,y=clientY-rect.top;
+    ripple(x,y);count++;
+    msg.innerHTML='Touch #'+count+' sensed at ('+Math.round(x)+', '+Math.round(y)+') — a <b style="color:var(--one)">capacitive</b> screen would detect the charge from your finger right here.';
+  }
+  pad.addEventListener('click',e=>handle(e.clientX,e.clientY));
+  pad.addEventListener('touchstart',e=>{const t=e.touches[0];handle(t.clientX,t.clientY);},{passive:true});
+})();
+
+/* 04 MONITOR BACKLIGHT */
+(function monitor(){
+  const pixels=$('#monPixels'),backlight=$('#monBacklight'),label=$('#monLabel'),btn=$('#monToggle');
+  const W=20,H=16,cx=9.5,cy=6.6,R=6.3;
+  const FACE='#FFB020',EYE='#1a1205',TONGUE='#ff6b81',MOUTH='#3a2600',BG='#0a0f1c',OUTLINE='#c98a1a';
+  pixels.style.gridTemplateColumns='repeat('+W+',1fr)';
+  pixels.style.gridTemplateRows='repeat('+H+',1fr)';
+  function colorFor(x,y){
+    const dx=x-cx,dy=y-cy,dist=Math.hypot(dx,dy);
+    // eyes: two happy closed-eye arcs (small dark blocks)
+    if((y===4||y===5) && (Math.abs(x-6.5)<=1 || Math.abs(x-12.5)<=1)) return EYE;
+    // tongue: tapers as it extends below the face outline
+    if(y>=10 && y<=13){
+      const half=2.6-(y-10)*0.7;
+      if(Math.abs(x-cx)<=half) return TONGUE;
+    }
+    // open mouth interior (dark gap the tongue pokes out of)
+    if(y>=8 && y<=9.4 && Math.abs(x-cx)<=3.2 && dist<=R) return MOUTH;
+    if(dist<=R) return dist>R-0.9 ? OUTLINE : FACE;
+    return BG;
+  }
+  for(let y=0;y<H;y++){
+    for(let x=0;x<W;x++){
+      const d=document.createElement('div');d.className='mon-px';d.style.background=colorFor(x+0.5,y+0.5);
+      pixels.appendChild(d);
+    }
+  }
+  let on=true;
+  btn.addEventListener('click',()=>{
+    on=!on;
+    backlight.style.opacity=on?'0':'1';
+    label.textContent=on?'Backlight: ON — the picture is visible':'Backlight: OFF — the exact same pixels are still "set" underneath, but with no light passing through, you see only black';
+    btn.textContent=on?'Turn backlight OFF':'Turn backlight ON';
+  });
+})();
+
+/* 05 PRINTERS */
+(function printer(){
+  const data={
+    inkjet:{
+      name:'Inkjet printer',
+      desc:'A print head moves across the page, spraying thousands of microscopic droplets of liquid ink (cyan, magenta, yellow, black) directly onto the paper to build up text and images.',
+      steps:['1. The print head lines up over the paper.','2. Tiny nozzles spray precise droplets of ink onto the page.','3. The paper advances and the head sweeps again, line by line.','Done — vivid colour, ideal for photos.']
+    },
+    laser:{
+      name:'Laser printer',
+      desc:'A laser beam draws the page as a pattern of electrical charge on a rotating drum. Charged powder toner sticks only to that pattern, which is then pressed and heat-fused onto the paper.',
+      steps:['1. A laser charges the image pattern onto a rotating drum.','2. Charged toner powder clings to the charged areas of the drum.','3. The drum presses the toner onto the paper.','4. Heated rollers fuse the toner permanently — done, fast and crisp text.']
+    }
+  };
+  const tabs=$('#printTabs'),svg=$('#printerSvg'),T=$('#printT'),P=$('#printP'),step=$('#printStep');
+  let cur='inkjet',running=false;
+  ['Inkjet','Laser'].forEach((label,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.textContent=label;b.addEventListener('click',()=>{cur=label.toLowerCase();$$('.tab',tabs).forEach((x,xi)=>x.classList.toggle('active',xi===i));render();});tabs.appendChild(b);});
+  function drawInkjet(progress){
+    const headX=40+progress*300;
+    return `<rect x="20" y="150" width="380" height="14" rx="4" fill="#1a2540" stroke="#2c3a5a"/>
+    <rect x="20" y="60" width="380" height="90" rx="6" fill="none" stroke="#2c3a5a" stroke-width="2"/>
+    <rect x="${headX}" y="70" width="26" height="40" rx="4" fill="#FFB020" opacity="0.9"/>
+    ${progress>0?`<g fill="#FFB020" opacity="0.7">${Array.from({length:6}).map((_,i)=>`<circle cx="${headX+8+ (i%3)*6}" cy="${115+Math.floor(i/3)*8}" r="1.6"/>`).join('')}</g>`:''}
+    <rect x="40" y="120" width="${Math.max(0,progress*300-20)}" height="26" fill="#0e1526" stroke="#2c3a5a"/>
+    <text x="210" y="185" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#8593ad">print head sweeps left → right, spraying ink</text>`;
+  }
+  function drawLaser(progress){
+    const angle=progress*360;
+    return `<circle cx="210" cy="110" r="55" fill="none" stroke="#2c3a5a" stroke-width="3"/>
+    <circle cx="210" cy="110" r="55" fill="none" stroke="#FFB020" stroke-width="3" stroke-dasharray="${2*Math.PI*55}" stroke-dashoffset="${2*Math.PI*55*(1-progress)}" transform="rotate(-90 210 110)"/>
+    <text x="210" y="115" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#FFB020">drum</text>
+    <line x1="150" y1="40" x2="190" y2="80" stroke="#FFB020" stroke-width="2" opacity="${progress<1?0.9:0.1}"/>
+    <rect x="150" y="185" width="120" height="16" fill="#1a2540" stroke="#2c3a5a"/>
+    <rect x="150" y="185" width="${120*progress}" height="16" fill="#FFB020" opacity="0.85"/>
+    <text x="210" y="215" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#8593ad">laser charges drum → toner sticks → heat fuses onto paper</text>`;
+  }
+  function render(){
+    T.textContent=data[cur].name;P.textContent=data[cur].desc;
+    svg.innerHTML=cur==='inkjet'?drawInkjet(0):drawLaser(0);
+    step.textContent='';
+  }
+  async function run(){
+    if(running)return;running=true;
+    const stepsArr=data[cur].steps;
+    for(let i=0;i<=10;i++){
+      const p=i/10;
+      svg.innerHTML=cur==='inkjet'?drawInkjet(p):drawLaser(p);
+      const si=Math.min(stepsArr.length-1,Math.floor(p*stepsArr.length));
+      step.innerHTML='<b>'+stepsArr[si]+'</b>';
+      await wait(120);
+    }
+    step.innerHTML='<b>'+stepsArr[stepsArr.length-1]+'</b>';
+    running=false;
+  }
+  $('#printRun').addEventListener('click',run);
+  $('#printReset').addEventListener('click',()=>{if(running)return;render();});
+  render();
+})();
+
+/* 06a INPUT/OUTPUT GAME */
+(function ioGame(){
+  const items=[['Keyboard','input'],['Mouse','input'],['Monitor','output'],['Printer','output'],['Scanner','input'],['Speaker','output'],['Microphone','input'],['Projector','output'],['Webcam','input'],['Plotter','output']];
+  const clue=$('#ioClue'),fb=$('#ioFb'),bI=$('#ioIn'),bO=$('#ioOut');let cur,done=false;
+  function next(){cur=items[Math.floor(Math.random()*items.length)];clue.textContent=cur[0];fb.className='feedback';fb.textContent='';done=false;bI.className='opt-btn';bO.className='opt-btn';}
+  function ans(val,btn){if(done)return;done=true;const correct=(val===cur[1]);btn.classList.add(correct?'correct':'wrong');fb.className='feedback '+(correct?'ok':'no');fb.textContent=(correct?'✓ ':'✗ ')+cur[0]+' is an '+cur[1].toUpperCase()+' device.';}
+  bI.addEventListener('click',()=>ans('input',bI));bO.addEventListener('click',()=>ans('output',bO));$('#ioNext').addEventListener('click',next);next();
+})();
+
+/* 06b TECHNOLOGY GAME */
+(function techGame(){
+  const clues=[
+    {c:'Senses the electrical charge of your finger; supports multi-touch',o:'Capacitive'},
+    {c:'Two flexible layers pressed together to complete a circuit',o:'Resistive'},
+    {c:'Sprays microscopic droplets of liquid ink',o:'Inkjet'},
+    {c:'Uses a laser, a charged drum, and heat-fused toner',o:'Laser'},
+    {c:'Uses LEDs instead of CCFL tubes as the backlight',o:'LED monitor'},
+    {c:'Uses a tiny camera and LED to track surface movement',o:'Optical mouse'},
+    {c:'Best for bulk, fast, crisp text printing in an office',o:'Laser'},
+    {c:'Best for vivid photo printing at home',o:'Inkjet'}
+  ];
+  const OPTS=['Capacitive','Resistive','Inkjet','Laser','LED monitor','Optical mouse'];
+  const clueEl=$('#techClue'),opts=$('#techOpts'),fb=$('#techFb'),score=$('#techScore');let cur,solved=0;
+  function build(){opts.innerHTML='';const set=new Set([cur.o]);while(set.size<4)set.add(OPTS[Math.floor(Math.random()*OPTS.length)]);[...set].sort(()=>Math.random()-0.5).forEach(o=>{const b=document.createElement('button');b.className='opt-btn';b.textContent=o;b.addEventListener('click',()=>pick(o,b));opts.appendChild(b);});}
+  function pick(o,b){if(opts.dataset.done)return;if(o===cur.o){b.classList.add('correct');fb.className='feedback ok';fb.textContent='✓ Correct!';solved++;score.textContent='solved: '+solved;}else{b.classList.add('wrong');$$('.opt-btn',opts).forEach(x=>{if(x.textContent===cur.o)x.classList.add('correct');});fb.className='feedback no';fb.textContent='It\'s '+cur.o+'.';}opts.dataset.done='1';}
+  function next(){cur=clues[Math.floor(Math.random()*clues.length)];clueEl.textContent=cur.c;fb.className='feedback';fb.textContent='Choose one.';opts.removeAttribute('data-done');build();}
+  $('#techNew').addEventListener('click',next);next();
+})();
+
+/* 06c QUIZ */
+(function quiz(){
+  const Q=[
+    {q:'Which of these is purely an output device?',o:['Keyboard','Monitor','Mouse','Scanner'],a:1,e:'A monitor only displays results; it does not send data into the computer.'},
+    {q:'A touchscreen is best described as…',o:['input only','output only','both input and output','neither'],a:2,e:'A touchscreen senses touch (input) while also displaying the picture (output) on the same surface.'},
+    {q:'A capacitive touchscreen detects a touch by sensing…',o:['pressure between two layers','the electrical charge of a finger','sound waves','light reflection'],a:1,e:'Capacitive screens sense the electrical charge from a bare finger, enabling multi-touch.'},
+    {q:'An LED monitor is best described as…',o:['a completely different display technology from LCD','an LCD that uses LEDs as its backlight','a screen with no backlight at all','a type of printer'],a:1,e:'LED monitors are LCDs — the only difference is using LEDs instead of CCFL tubes for the backlight.'},
+    {q:'Which printer type is generally faster and cheaper per page for bulk text?',o:['Inkjet','Laser','Dot matrix','Plotter'],a:1,e:'Laser printers are fast and economical for high-volume text printing.'}
+  ];
+  const box=$('#quiz'),scoreEl=$('#quizScore');let answered=0,correct=0;
+  Q.forEach((item,qi)=>{const d=document.createElement('div');d.className='q';d.innerHTML=`<div class="qt"><span class="n">Q${qi+1}</span>${item.q}</div><div class="opts"></div><div class="exp">${item.e}</div>`;const opts=$('.opts',d);item.o.forEach((txt,oi)=>{const b=document.createElement('button');b.className='opt';b.textContent=txt;b.addEventListener('click',()=>{if(d.classList.contains('answered'))return;d.classList.add('answered');answered++;if(oi===item.a){b.classList.add('correct');correct++;}else{b.classList.add('wrong');$$('.opt',opts)[item.a].classList.add('correct');}$$('.opt',opts).forEach(x=>x.disabled=true);scoreEl.textContent=`Score: ${correct} / ${answered}`+(answered===Q.length?' — all done!':'');});opts.appendChild(b);});box.appendChild(d);});
+})();
+</script>
+</body>
+</html>

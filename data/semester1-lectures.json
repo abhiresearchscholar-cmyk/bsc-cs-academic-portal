@@ -53,15 +53,16 @@
   },
   {
     "number": "05",
-    "title": "Block Diagram of a Computer",
+    "title": "Input & Output Devices",
     "section": "Section I: Introduction to Computers",
-    "description": "Input unit, CPU, memory, output unit, control unit, and arithmetic logic unit.",
+    "description": "Interactive lecture explaining common input devices, output devices, and how users communicate with computers.",
     "ppt": "#",
     "notes": "#",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
-    "status": "Coming Soon"
+    "status": "Available",
+    "lecture": "downloads/semester1/lectures/lecture-05-input-output-devices.html"
   },
   {
     "number": "06",
