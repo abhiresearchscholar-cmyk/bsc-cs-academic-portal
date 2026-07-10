@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 04 — Memory & Storage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#090D18; --bg-2:#0C1120; --panel:#111A2E; --panel-2:#16203a;
+    --line:#22304d; --line-soft:#1a2540;
+    --ink:#EAF0FA; --ink-dim:#8593ad; --ink-faint:#5b6785;
+    --one:#FFB020; --one-soft:#4a3a1a; --one-glow:rgba(255,176,32,.45);
+    --zero:#4C74D0; --zero-soft:#1e2c4d;
+    --human:#B892FF; --human-glow:rgba(184,146,255,.4);
+    --ok:#4ade80; --no:#f87171;
+    --r:16px; --r-sm:10px; --maxw:1080px;
+    --f-display:'Space Grotesk',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--one);color:#1a1205}
+  a{color:var(--one);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  .layer + .layer{border-top:1px solid var(--line-soft)}
+  .rail{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:12px}
+  .rail button{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;transition:color .3s}
+  .rail .dot{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid var(--line);transition:all .3s;flex:none}
+  .rail button:hover{color:var(--ink-dim)}
+  .rail button.active{color:var(--one)}
+  .rail button.active .dot{background:var(--one);box-shadow:0 0 0 4px var(--one-glow);border-color:var(--one)}
+  .rail .label{opacity:0;transform:translateX(-4px);transition:all .3s;white-space:nowrap}
+  .rail button:hover .label,.rail button.active .label{opacity:1;transform:none}
+  @media(max-width:1300px){.rail{display:none}}
+  .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--one);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .num{font-weight:700;color:var(--bg);background:var(--one);padding:2px 8px;border-radius:6px;letter-spacing:.02em}
+  h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,46px);margin-bottom:20px}
+  h3{font-size:22px;margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-dim);max-width:60ch}
+  p{max-width:65ch;color:var(--ink-dim)}
+  strong{color:var(--ink);font-weight:600}
+  .amber{color:var(--one)} .blue{color:var(--zero)} .violet{color:var(--human)} .mono{font-family:var(--f-mono)}
+  .hero{padding:0;height:100vh;min-height:660px;display:flex;align-items:center;position:relative;overflow:hidden}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 42%,transparent 38%,var(--bg) 100%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--one);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+  .hero-tag .pill{background:var(--one);color:var(--bg);padding:3px 9px;border-radius:6px;font-weight:700}
+  .hero h1{font-size:clamp(36px,7vw,80px);margin-bottom:24px}
+  .hero h1 .flip{color:var(--one)}
+  .hero .lede{font-size:clamp(18px,2.3vw,23px);max-width:56ch}
+  .hero-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-hint .arrow{width:1px;height:26px;background:linear-gradient(var(--ink-faint),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(-6px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+  .objectives{padding:60px 0;background:var(--bg-2);border-bottom:1px solid var(--line-soft)}
+  .obj-head{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:22px}
+  .obj-head b{color:var(--one)}
+  .obj-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.obj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.obj-grid{grid-template-columns:repeat(5,1fr)}}
+  .obj{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .obj .on{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-bottom:8px}
+  .obj p{font-size:13.5px;color:var(--ink-dim)}
+  .stage{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:34px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .stage-title{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .readout{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)} .readout b{color:var(--one)}
+  .btn{font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .btn:hover{border-color:var(--one);color:var(--one)}
+  .btn.primary{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn.danger{border-color:var(--no);color:var(--no)} .btn.danger:hover{background:rgba(248,113,113,.1)}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .recap{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);margin-top:26px;padding-left:14px;border-left:2px solid var(--one)}
+  .callout{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--human);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(184,146,255,.05);max-width:65ch}
+  .callout .ic{font-size:16px;flex:none} .callout .tx{font-size:14px;color:var(--ink-dim)} .callout .tx b{color:var(--human)}
+
+  /* dark table */
+  table.dt{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  table.dt th,table.dt td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  table.dt th{background:var(--panel-2);color:var(--ink);font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  table.dt td{color:var(--ink-dim)}
+  table.dt tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+  .wrap-scroll{overflow-x:auto}
+
+  /* hierarchy */
+  .hier-wrap{display:grid;grid-template-columns:1fr;gap:22px;align-items:center}
+  @media(min-width:900px){.hier-wrap{grid-template-columns:1.4fr 1fr}}
+  .hier-svg{width:100%;height:auto}
+  .hier-svg .lvl polygon{transition:all .25s;cursor:pointer}
+  .hier-svg .lvl:hover polygon{stroke:var(--one)}
+  .hier-svg .lvl.sel polygon{stroke:var(--one);stroke-width:3}
+  .hier-svg text{pointer-events:none}
+  .hier-info{border:1px solid var(--line);border-radius:var(--r-sm);padding:20px;background:var(--bg);min-height:170px}
+  .hier-info .t{font-family:var(--f-display);font-size:20px;font-weight:600;margin-bottom:10px;color:var(--one)}
+  .hier-info .rows{display:flex;flex-direction:column;gap:7px}
+  .hrow{display:flex;gap:12px;font-size:13.5px;border-top:1px solid var(--line-soft);padding-top:7px}
+  .hrow .k{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;width:84px;flex:none}
+  .hrow .v{color:var(--ink-dim)}
+
+  /* memory cells (RAM/ROM) */
+  .mem-panel{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:680px){.mem-panel.two{grid-template-columns:1fr 1fr}}
+  .mem-box{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--bg)}
+  .mem-box .mh{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:12px;display:flex;justify-content:space-between}
+  .cells{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .cell{height:44px;border-radius:8px;border:1px solid #2c4272;background:var(--zero-soft);display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);transition:all .4s;text-align:center;padding:2px}
+  .cell.filled{background:var(--one-soft);border-color:var(--one);color:var(--one)}
+  .cell.rom{background:rgba(184,146,255,.12);border-color:var(--human);color:var(--human)}
+  .power-state{font-family:var(--f-mono);font-size:13px;margin-top:16px;min-height:20px;text-align:center}
+  .power-state.on{color:var(--ok)} .power-state.off{color:var(--no)}
+
+  /* cache */
+  .cache-wrap{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:820px){.cache-wrap{grid-template-columns:1.1fr .9fr}}
+  .tier{border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;background:var(--bg);margin-bottom:12px}
+  .tier .th{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;display:flex;justify-content:space-between}
+  .slots{display:flex;gap:8px;flex-wrap:wrap}
+  .slot{width:52px;height:52px;border-radius:8px;border:1px dashed #2c4272;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:700;font-size:18px;color:var(--ink-faint);background:var(--panel-2);transition:all .25s}
+  .slot.full{border-style:solid;border-color:var(--one);background:var(--one-soft);color:var(--one)}
+  .slot.hit{border-color:var(--ok);background:rgba(74,222,128,.15);color:var(--ok);box-shadow:0 0 0 2px rgba(74,222,128,.3)}
+  .slot.miss{border-color:var(--no);background:rgba(248,113,113,.15);color:var(--no)}
+  .ram-items{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .ritem{height:46px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:700;color:var(--ink);transition:all .18s}
+  .ritem:hover{border-color:var(--one);color:var(--one)}
+  .ritem.pull{border-color:var(--no);background:rgba(248,113,113,.12)}
+  .cache-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .cstat{flex:1;border:1px solid var(--line-soft);border-radius:var(--r-sm);padding:10px 12px;background:var(--bg);min-width:90px}
+  .cstat .ck{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em}
+  .cstat .cv{font-family:var(--f-display);font-weight:700;font-size:22px;color:var(--ink)}
+  .cache-msg{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);margin-top:14px;min-height:20px}
+  .cache-msg b.hit{color:var(--ok)} .cache-msg b.miss{color:var(--no)}
+
+  /* storage tabs (shared) */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:11px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .2s}
+  .tab:hover{border-color:var(--one)} .tab.active{background:var(--one);color:#1a1205;border-color:var(--one)}
+  .tab-body{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+  @media(min-width:760px){.tab-body{grid-template-columns:.9fr 1.1fr}}
+  .glyph-box{height:190px;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 45%,#131d34,#0a0f1c);display:flex;align-items:center;justify-content:center}
+  .glyph-box svg{width:100%;height:150px}
+  .tmeta .tt{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.08em;text-transform:uppercase}
+  .tmeta h3{font-size:24px;margin:6px 0 10px}
+  .tmeta .td{font-size:14.5px;color:var(--ink-dim);margin-bottom:12px}
+  .tmeta .rows{display:flex;flex-direction:column;gap:8px}
+  .trow{display:flex;gap:12px;font-size:13.5px;border-top:1px solid var(--line-soft);padding-top:8px}
+  .trow .k{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;width:96px;flex:none}
+  .trow .v{color:var(--ink-dim)}
+
+  /* units scale */
+  .units{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+  @media(min-width:620px){.units{grid-template-columns:repeat(2,1fr)}}
+  .unit{display:flex;gap:14px;align-items:baseline;border:1px solid var(--line-soft);border-radius:var(--r-sm);padding:12px 14px;background:var(--bg)}
+  .unit .uu{font-family:var(--f-mono);font-weight:700;color:var(--one);width:120px;flex:none}
+  .unit .ux{font-size:13px;color:var(--ink-dim)}
+
+  /* activities + quiz */
+  .act-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:780px){.act-grid{grid-template-columns:1fr 1fr}}
+  .act{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .act h3{font-size:19px;margin-bottom:6px}
+  .act .prompt{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+  .clue{border:1px solid var(--one);border-radius:var(--r-sm);padding:16px;background:var(--one-soft);color:var(--one);font-family:var(--f-mono);font-size:14px;text-align:center;margin-bottom:14px}
+  .opt-row{display:flex;gap:8px;flex-wrap:wrap}
+  .opt-btn{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--ink);transition:all .18s}
+  .opt-btn:hover:not(:disabled){border-color:var(--one)}
+  .opt-btn.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .opt-btn.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .feedback{font-family:var(--f-mono);font-size:13px;margin-top:14px;min-height:20px;color:var(--ink-faint)}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--no)}
+  .score{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+  .quiz{margin-top:28px}
+  .quiz-h{font-family:var(--f-display);font-size:22px;margin-bottom:16px}
+  .q{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);margin-bottom:14px}
+  .q .qt{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .q .qt .n{font-family:var(--f-mono);color:var(--one);margin-right:8px}
+  .q .opts{display:flex;flex-direction:column;gap:8px}
+  .q .opt{text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink-dim);background:var(--panel);transition:all .18s}
+  .q .opt:hover:not(:disabled){border-color:var(--one);color:var(--ink)}
+  .q .opt.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .q .opt.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .q .exp{font-size:13px;color:var(--ink-faint);margin-top:10px;display:none}
+  .q.answered .exp{display:block}
+  .quiz-score{font-family:var(--f-mono);font-size:14px;color:var(--one);margin-top:10px}
+  .why{background:linear-gradient(180deg,var(--bg),#070a12)}
+  .why h2{max-width:18ch}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:34px}
+  @media(min-width:680px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .card .k{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .card p{font-size:15px}
+  .hw{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel);margin-top:30px}
+  .hw .k{font-family:var(--f-mono);font-size:12px;color:var(--human);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+  .hw ol{margin:0 0 0 18px;color:var(--ink-dim);font-size:15px}
+  .hw li{margin-bottom:10px} .hw li b{color:var(--ink)}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line-soft);text-align:center}
+  footer .m{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  @media(max-width:520px){section{padding:70px 0}.stage{padding:20px}.cells,.ram-items{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<nav class="rail" id="rail" aria-label="Lecture navigation"></nav>
+
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner"><div class="wrap">
+    <div class="hero-tag"><span class="pill">Lecture 04</span> Memory &amp; Storage · BSc Computer Science</div>
+    <h1>Where the computer<br>keeps its <span class="flip">thoughts</span><br>and its memories.</h1>
+    <p class="lede">A CPU is useless without somewhere to hold data. But not all memory is equal — some is lightning-fast and forgetful, some is slow and permanent. Today we climb the memory hierarchy: RAM, ROM, cache, SSDs, USB drives, and the cloud.</p>
+  </div></div>
+  <div class="hero-hint"><span>scroll to begin</span><span class="arrow"></span></div>
+</header>
+
+<section class="objectives" id="obj">
+  <div class="wrap">
+    <div class="obj-head">By the end of this session you will be able to — <b>five things</b></div>
+    <div class="obj-grid">
+      <div class="obj"><div class="on">01</div><p>Explain the <em>memory hierarchy</em> and the speed/size/cost trade-off.</p></div>
+      <div class="obj"><div class="on">02</div><p>Distinguish <em>RAM vs ROM</em> and <em>volatile vs non-volatile</em>.</p></div>
+      <div class="obj"><div class="on">03</div><p>Explain what <em>cache memory</em> is and how a hit/miss works.</p></div>
+      <div class="obj"><div class="on">04</div><p>Compare <em>HDD, SSD, USB drives</em> and <em>cloud storage</em>.</p></div>
+      <div class="obj"><div class="on">05</div><p>Use the <em>units of capacity</em> from bit to terabyte.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 00 HIERARCHY -->
+<section class="layer" id="s0" data-title="Memory hierarchy">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">00</span> Memory vs storage</div>
+    <h2>Fast and forgetful, or slow and permanent — you can't have both.</h2>
+    <p>First, a key distinction. <strong>Memory</strong> (primary) is fast, works directly with the CPU, and is mostly temporary. <strong>Storage</strong> (secondary) is slower, larger, cheaper and permanent. In fact every kind of memory sits on a ladder — the <strong>memory hierarchy</strong> — trading speed against size and cost. As you go up it gets faster, smaller and pricier; as you go down, bigger, cheaper and slower. <strong>Click a level</strong> to explore it.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · the memory hierarchy</span></div>
+      <div class="hier-wrap">
+        <div>
+          <svg class="hier-svg" viewBox="0 0 520 380" id="hierSvg" role="img" aria-label="The memory hierarchy pyramid"></svg>
+        </div>
+        <div class="hier-info" id="hierInfo">
+          <div class="t" id="hierT">Tap a level to explore</div>
+          <div class="rows" id="hierRows"><p style="font-size:14px;color:var(--ink-dim)">The higher a level sits, the faster and costlier it is — and the less of it you get. Registers at the very top are inside the CPU; the cloud at the bottom is effectively unlimited but far away.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>In class:</b> think of it like a desk. Registers/cache are what's in your hand; RAM is the desktop; the SSD is your drawer; the cloud is a warehouse across town. Closer = faster, but smaller.</div></div>
+    <div class="recap">TAKEAWAY · Up the hierarchy: faster, smaller, costlier (registers → cache → RAM). Down: bigger, cheaper, slower (SSD → cloud).</div>
+  </div>
+</section>
+
+<!-- 01 RAM -->
+<section class="layer" id="s1" data-title="RAM">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">01</span> RAM — working memory</div>
+    <h2>RAM is the computer's desk: fast, roomy — and wiped when the lights go out.</h2>
+    <p><strong>RAM (Random Access Memory)</strong> is the main working memory. When you open a program, it's copied from storage into RAM so the CPU can reach it quickly. It's called <em>random access</em> because the CPU can read any location just as fast as any other. Crucially, RAM is <strong>volatile</strong> — it needs power to hold data. Cut the power and everything in it vanishes. <strong>Open some apps, then cut the power</strong> and watch.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · loading &amp; losing RAM</span><span class="readout">used: <b id="ramUsed">0</b> / 12</span></div>
+      <div class="mem-box">
+        <div class="mh"><span>RAM (main memory)</span><span id="ramPwr" style="color:var(--ok)">power: ON</span></div>
+        <div class="cells" id="ramCells"></div>
+      </div>
+      <div class="power-state on" id="ramMsg">Open an app to load it into RAM.</div>
+      <div class="btn-row"><button class="btn primary" id="ramOpen">Open an app</button><button class="btn danger" id="ramCut">Cut the power</button><button class="btn ghost" id="ramRestore">Restore power</button></div>
+    </div>
+    <div class="recap">TAKEAWAY · RAM = fast, temporary, volatile working memory. Programs run from RAM; losing power wipes it. Main type: DRAM.</div>
+  </div>
+</section>
+
+<!-- 02 ROM -->
+<section class="layer" id="s2" data-title="ROM">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">02</span> ROM — permanent memory</div>
+    <h2>ROM never forgets — even with the power off.</h2>
+    <p><strong>ROM (Read Only Memory)</strong> is <strong>non-volatile</strong>: it keeps its contents without power. It's written once (at manufacture or by special means) and mainly <em>read</em> afterwards. ROM stores the permanent instructions a computer needs to start up — the <strong>BIOS/firmware</strong> and the bootstrap program. Variants include <span class="mono">PROM</span>, <span class="mono">EPROM</span> and <span class="mono">EEPROM</span> (which can be erased and rewritten electrically). <strong>Cut the power below</strong> and compare what survives.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · volatile vs non-volatile</span><span class="readout" id="romPwr" style="color:var(--ok)">power: ON</span></div>
+      <div class="mem-panel two">
+        <div class="mem-box"><div class="mh"><span>RAM · volatile</span></div><div class="cells" id="romRam"></div></div>
+        <div class="mem-box"><div class="mh"><span>ROM · non-volatile</span></div><div class="cells" id="romRom"></div></div>
+      </div>
+      <div class="power-state on" id="romMsg">Both hold data while powered. Now cut the power…</div>
+      <div class="btn-row"><button class="btn danger" id="romCut">Cut the power</button><button class="btn ghost" id="romRestore">Restore power</button></div>
+    </div>
+    <div class="wrap-scroll"><table class="dt">
+      <tr><th>Feature</th><th>RAM</th><th>ROM</th></tr>
+      <tr><td>Full form</td><td>Random Access Memory</td><td>Read Only Memory</td></tr>
+      <tr><td>Volatility</td><td>Volatile (needs power)</td><td>Non-volatile (keeps data)</td></tr>
+      <tr><td>Operation</td><td>Read &amp; write</td><td>Mainly read</td></tr>
+      <tr><td>Purpose</td><td>Temporary working memory for running programs</td><td>Permanent start-up instructions (BIOS/firmware)</td></tr>
+      <tr><td>Contents on power-off</td><td>Erased</td><td>Retained</td></tr>
+    </table></div>
+    <div class="recap">TAKEAWAY · ROM = non-volatile, read-mostly, permanent. Holds firmware/BIOS so the machine can boot. RAM works, ROM remembers how to start.</div>
+  </div>
+</section>
+
+<!-- 03 CACHE -->
+<section class="layer" id="s3" data-title="Cache">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">03</span> Cache memory</div>
+    <h2>A tiny, ultra-fast memory that keeps the CPU from waiting on RAM.</h2>
+    <p>Even RAM is slow compared to the CPU. So a small, very fast memory called <strong>cache</strong> sits between them, holding the data the CPU is most likely to need next. When the CPU wants something: if it's in cache that's a <strong class="mono">HIT</strong> (fast); if not, a <strong class="mono">MISS</strong> — it must fetch from slow RAM (and copy it into cache for next time). Cache comes in levels <span class="mono">L1</span> (smallest, fastest), <span class="mono">L2</span>, and <span class="mono">L3</span>. <strong>Request some items</strong> and watch hits and misses.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · cache hit vs miss</span><span class="readout">request an item below ↓</span></div>
+      <div class="cache-wrap">
+        <div>
+          <div class="tier"><div class="th"><span>CPU cache · 4 slots</span><span style="color:var(--one)">fast</span></div><div class="slots" id="cacheSlots"></div></div>
+          <div class="tier"><div class="th"><span>Main memory (RAM) · click to request</span><span style="color:var(--zero)">slow</span></div><div class="ram-items" id="ramItems"></div></div>
+        </div>
+        <div>
+          <div class="cache-stats">
+            <div class="cstat"><div class="ck">Hits</div><div class="cv" id="cHits" style="color:var(--ok)">0</div></div>
+            <div class="cstat"><div class="ck">Misses</div><div class="cv" id="cMiss" style="color:var(--no)">0</div></div>
+            <div class="cstat"><div class="ck">Hit rate</div><div class="cv" id="cRate">—</div></div>
+          </div>
+          <div class="cache-msg" id="cacheMsg">Ask for the same items repeatedly — the cache learns to keep them ready.</div>
+          <div class="btn-row"><button class="btn ghost" id="cacheReset">Reset</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>Why it works:</b> programs reuse the same data and nearby data over and over (called <b>locality of reference</b>). Keeping recently-used items in cache means most requests become fast hits.</div></div>
+    <div class="recap">TAKEAWAY · Cache = small, very fast memory between CPU and RAM. HIT = found in cache (fast); MISS = fetch from RAM (slow). Levels L1/L2/L3.</div>
+  </div>
+</section>
+
+<!-- 04 STORAGE DEVICES -->
+<section class="layer" id="s4" data-title="Storage devices">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">04</span> Secondary &amp; external storage</div>
+    <h2>The permanent stuff: disks, drives, and the cloud.</h2>
+    <p>Everything so far was primary memory. <strong>Secondary storage</strong> keeps your files permanently — bigger, cheaper and slower than RAM, and not accessed directly by the CPU. <strong>Compare the four you'll meet most.</strong></p>
+    <div class="stage">
+      <div class="tabs" id="stTabs"></div>
+      <div class="tab-body">
+        <div class="glyph-box" id="stGlyph"></div>
+        <div class="tmeta">
+          <div class="tt" id="stTt"></div>
+          <h3 id="stName"></h3>
+          <div class="td" id="stDesc"></div>
+          <div class="rows" id="stRows"></div>
+        </div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · HDD = magnetic, moving parts, cheap/large · SSD = flash, no moving parts, fast · USB = portable flash · Cloud = remote, over the internet.</div>
+  </div>
+</section>
+
+<!-- 05 UNITS + MASTER TABLE -->
+<section class="layer" id="s5" data-title="Units & summary">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">05</span> Units &amp; the big picture</div>
+    <h2>How we measure it, and how it all compares.</h2>
+    <p>Storage and memory are measured in the same units, each 1024× the one before (often rounded to 1000× in everyday use).</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Units of capacity</span></div>
+      <div class="units" id="unitsGrid"></div>
+    </div>
+    <h3 style="margin-top:40px">Everything at a glance</h3>
+    <div class="wrap-scroll"><table class="dt" id="masterTable"></table></div>
+    <div class="recap">TAKEAWAY · 8 bits = 1 byte; then KB → MB → GB → TB → PB, each ~1024× larger. Primary memory is fast &amp; small; secondary storage is large &amp; permanent.</div>
+  </div>
+</section>
+
+<!-- 06 ACTIVITIES -->
+<section class="layer" id="s6" data-title="Activities">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">06</span> Check yourself</div>
+    <h2>Your turn. Two challenges, then a graded quiz.</h2>
+    <p>Great for the projector — everything you need is on the slides above.</p>
+    <div class="act-grid">
+      <div class="act">
+        <h3>① Volatile or non-volatile?</h3>
+        <div class="prompt">Does this memory keep its data when the power is off?</div>
+        <div class="clue" id="volClue">—</div>
+        <div class="opt-row"><button class="opt-btn" id="volV">VOLATILE</button><button class="opt-btn" id="volN">NON-VOLATILE</button><button class="btn ghost" id="volNext" style="margin-left:auto">Next</button></div>
+        <div class="feedback" id="volFb"></div>
+      </div>
+      <div class="act">
+        <h3>② Which memory or storage?</h3>
+        <div class="prompt">Read the clue and pick the right type.</div>
+        <div class="clue" id="memClue">—</div>
+        <div class="opt-row" id="memOpts"></div>
+        <div class="feedback" id="memFb">Choose one.</div>
+        <div class="btn-row"><button class="btn" id="memNew">New clue</button><span class="score" id="memScore" style="align-self:center">solved: 0</span></div>
+      </div>
+    </div>
+    <div class="quiz">
+      <div class="quiz-h">③ Quick quiz</div>
+      <div id="quiz"></div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 WHY -->
+<section class="why layer" id="s7" data-title="Why & recap">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">07</span> Why it matters</div>
+    <h2>The whole hierarchy exists to hide one problem: memory can't be fast, big and cheap at once.</h2>
+    <p>Every computer you'll ever build juggles this trade-off. Understanding the hierarchy tells you why your programs feel fast or slow, why more RAM helps multitasking, why an SSD boots quicker than a hard disk, and why the cloud is convenient but never instant.</p>
+    <div class="cards">
+      <div class="card"><div class="k">Faster programs</div><p>Knowing about cache and locality helps you write code that the hardware can keep fast.</p></div>
+      <div class="card"><div class="k">Smart choices</div><p>RAM for speed, SSD for daily storage, cloud for backup and sharing — pick the right tool.</p></div>
+      <div class="card"><div class="k">Exam gold</div><p>"Compare RAM and ROM" and "explain the memory hierarchy" are classic questions. You've got them.</p></div>
+    </div>
+    <div class="hw">
+      <div class="k">Homework · before Lecture 05</div>
+      <ol>
+        <li><b>Draw the pyramid:</b> reproduce the memory hierarchy from memory, labelling speed, size and cost at each level.</li>
+        <li><b>Compare table:</b> make a table comparing RAM vs ROM on volatility, operation, purpose and power-off behaviour.</li>
+        <li><b>Hit &amp; miss:</b> in your own words, explain a cache hit, a cache miss, and why locality of reference makes cache effective.</li>
+        <li><b>Storage picks:</b> for each — editing a video, carrying files to college, backing up photos — say which storage you'd use and why.</li>
+        <li><b>Units:</b> how many megabytes are in 4 GB? How many bits in 1 byte? Show your working.</li>
+      </ol>
+    </div>
+    <p class="recap" style="margin-top:34px">THE WHOLE STORY · a hierarchy trading speed for size · RAM (volatile) vs ROM (non-volatile) · cache for speed · SSD/USB/Cloud for permanence. That's where a computer keeps everything.</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="m">Lecture 04 · Memory &amp; Storage · an interactive teaching aid — press any widget to explore</div></div></footer>
+
+<script>
+"use strict";
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* RAIL */
+const nav=[
+  {id:'top',n:'—',t:'Cover'},{id:'s0',n:'00',t:'Memory hierarchy'},{id:'s1',n:'01',t:'RAM'},
+  {id:'s2',n:'02',t:'ROM'},{id:'s3',n:'03',t:'Cache'},{id:'s4',n:'04',t:'Storage devices'},
+  {id:'s5',n:'05',t:'Units & summary'},{id:'s6',n:'06',t:'Activities'},{id:'s7',n:'07',t:'Why & recap'}
+];
+const rail=$('#rail');
+nav.forEach(s=>{const el=document.getElementById(s.id);const b=document.createElement('button');b.innerHTML=`<span class="dot"></span><span class="label">${s.n==='—'?'top':s.n} · ${s.t}</span>`;b.dataset.for=s.id;b.addEventListener('click',()=>el&&el.scrollIntoView({behavior:reduced?'auto':'smooth'}));rail.appendChild(b);});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.for===e.target.id));}),{rootMargin:'-45% 0px -45% 0px'});
+nav.forEach(s=>{const el=document.getElementById(s.id);if(el)spy.observe(el);});
+
+/* HERO */
+(function heroGrid(){
+  const cv=$('#heroCanvas'),ctx=cv.getContext('2d');
+  let cols,rows,gap=26,size=6,t=0,mouse={x:-999,y:-999};
+  const AMBER='#FFB020',BLUE='#26385f';
+  function resize(){cv.width=cv.offsetWidth*devicePixelRatio;cv.height=cv.offsetHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cols=Math.ceil(cv.offsetWidth/gap)+1;rows=Math.ceil(cv.offsetHeight/gap)+1;}
+  resize();addEventListener('resize',resize);
+  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
+  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-999;});
+  function draw(){const W=cv.offsetWidth,H=cv.offsetHeight;ctx.clearRect(0,0,W,H);const wave=(t*0.9)%(W+H+400)-200;for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const px=x*gap+14,py=y*gap+14,diag=px+py,dw=Math.abs(diag-wave);const onWave=dw<60?1-(dw/60):0;const dx=px-mouse.x,dy=py-mouse.y,md=Math.hypot(dx,dy),onMouse=md<90?1-(md/90):0;const heat=Math.max(onWave,onMouse);if(heat>0.05){ctx.fillStyle=AMBER;ctx.globalAlpha=0.15+heat*0.85;const s=size+heat*4;ctx.fillRect(px-s/2,py-s/2,s,s);}else{ctx.fillStyle=BLUE;ctx.globalAlpha=0.5;ctx.fillRect(px-size/2,py-size/2,size,size);}}ctx.globalAlpha=1;}
+  if(reduced){draw();return;}
+  (function loop(){t+=2.4;draw();requestAnimationFrame(loop);})();
+})();
+
+/* 00 HIERARCHY PYRAMID */
+(function hier(){
+  const data=[
+    {k:'reg',t:'Registers',speed:'~1 ns (fastest)',cap:'a few bytes',cost:'highest',vol:'Volatile',loc:'Inside the CPU',d:'The tiniest, fastest storage of all, holding the values the CPU is working on this instant.'},
+    {k:'cache',t:'Cache (L1/L2/L3)',speed:'~1–10 ns',cap:'KB to tens of MB',cost:'very high',vol:'Volatile',loc:'On/near the CPU',d:'A small, ultra-fast buffer that keeps recently used data close to the CPU.'},
+    {k:'ram',t:'RAM (main memory)',speed:'~50–100 ns',cap:'a few to tens of GB',cost:'moderate',vol:'Volatile',loc:'On the motherboard',d:'The working memory that holds running programs and their data.'},
+    {k:'ssd',t:'SSD / HDD',speed:'µs to ms',cap:'hundreds of GB to TB',cost:'low',vol:'Non-volatile',loc:'Secondary storage',d:'Permanent storage for your files and programs, kept when the power is off.'},
+    {k:'cloud',t:'Cloud / External',speed:'network delay (ms+)',cap:'virtually unlimited',cost:'pay-as-you-go',vol:'Non-volatile',loc:'Remote, over the internet',d:'Storage on distant servers you reach over the internet — huge, but the slowest to reach.'}
+  ];
+  const svg=$('#hierSvg'),T=$('#hierT'),rows=$('#hierRows');
+  const cx=245,topY=24,botY=324,H=botY-topY,topHalf=42,botHalf=210;
+  const halfAt=y=>topHalf+(y-topY)/H*(botHalf-topHalf);
+  let g='';
+  data.forEach((d,i)=>{
+    const yT=topY+i*(H/5),yB=topY+(i+1)*(H/5),hT=halfAt(yT),hB=halfAt(yB),my=(yT+yB)/2;
+    const fill=['#5a4a1e','#4a3f22','#3a3526','#20304e','#182742'][i];
+    g+=`<g class="lvl" data-key="${d.k}"><polygon points="${cx-hT},${yT} ${cx+hT},${yT} ${cx+hB},${yB} ${cx-hB},${yB}" fill="${fill}" stroke="#4a5a7a" stroke-width="1.5"/>`;
+    g+=`<text x="${cx}" y="${my+4}" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="${i===0?11:13}" fill="#eaf0fa">${d.t}</text></g>`;
+  });
+  // side annotations
+  g+=`<text x="500" y="60" text-anchor="end" font-family="'JetBrains Mono'" font-size="10" fill="#FFB020">faster ↑</text>`;
+  g+=`<text x="500" y="76" text-anchor="end" font-family="'JetBrains Mono'" font-size="10" fill="#FFB020">smaller ↑</text>`;
+  g+=`<text x="500" y="92" text-anchor="end" font-family="'JetBrains Mono'" font-size="10" fill="#FFB020">costlier ↑</text>`;
+  g+=`<text x="500" y="300" text-anchor="end" font-family="'JetBrains Mono'" font-size="10" fill="#4C74D0">bigger ↓</text>`;
+  g+=`<text x="500" y="316" text-anchor="end" font-family="'JetBrains Mono'" font-size="10" fill="#4C74D0">cheaper ↓</text>`;
+  g+=`<text x="500" y="332" text-anchor="end" font-family="'JetBrains Mono'" font-size="10" fill="#4C74D0">slower ↓</text>`;
+  svg.innerHTML=g;
+  $$('.lvl',svg).forEach(el=>el.addEventListener('click',()=>{
+    const d=data.find(x=>x.k===el.dataset.key);
+    $$('.lvl',svg).forEach(l=>l.classList.remove('sel'));el.classList.add('sel');
+    T.textContent=d.t;
+    rows.innerHTML=[['What',d.d],['Speed',d.speed],['Capacity',d.cap],['Cost',d.cost],['Volatility',d.vol],['Where',d.loc]]
+      .map(r=>`<div class="hrow"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');
+  }));
+})();
+
+/* 01 RAM */
+(function ram(){
+  const N=12,apps=['Browser','Music','Editor','Game','Chat','Video','Slides','Photos','Mail','Maps','Notes','Code'];
+  const cellsEl=$('#ramCells'),usedEl=$('#ramUsed'),msg=$('#ramMsg'),pwrEl=$('#ramPwr');
+  let filled=0,power=true;
+  for(let i=0;i<N;i++){const c=document.createElement('div');c.className='cell';c.textContent='empty';cellsEl.appendChild(c);}
+  const cells=$$('.cell',cellsEl);
+  function render(){usedEl.textContent=filled;}
+  $('#ramOpen').addEventListener('click',()=>{
+    if(!power){msg.className='power-state off';msg.textContent='No power — restore power first.';return;}
+    if(filled>=N){msg.className='power-state';msg.style.color='var(--one)';msg.textContent='RAM is full! Close something or add more RAM.';return;}
+    cells[filled].classList.add('filled');cells[filled].textContent=apps[filled];filled++;render();
+    msg.className='power-state on';msg.textContent=filled+' app'+(filled>1?'s':'')+' loaded into RAM and running.';
+  });
+  $('#ramCut').addEventListener('click',()=>{
+    power=false;pwrEl.textContent='power: OFF';pwrEl.style.color='var(--no)';
+    cells.forEach((c,i)=>setTimeout(()=>{c.classList.remove('filled');c.textContent='—';},reduced?0:i*45));
+    setTimeout(()=>{filled=0;render();msg.className='power-state off';msg.innerHTML='⚡ Power lost → <b style="color:var(--no)">RAM wiped</b>. Everything was volatile.';},reduced?0:N*45);
+  });
+  $('#ramRestore').addEventListener('click',()=>{
+    power=true;pwrEl.textContent='power: ON';pwrEl.style.color='var(--ok)';
+    cells.forEach(c=>{c.classList.remove('filled');c.textContent='empty';});filled=0;render();
+    msg.className='power-state on';msg.textContent='Power back — but RAM starts empty. Programs must reload from storage.';
+  });
+  render();
+})();
+
+/* 02 ROM compare */
+(function romc(){
+  const ramEl=$('#romRam'),romEl=$('#romRom'),msg=$('#romMsg'),pwr=$('#romPwr');
+  const ramData=['Doc','Sheet','Photo','Song','Chat','Tab','—','—'];
+  const romData=['BIOS','Boot','Firmware','Config','—','—','—','—'];
+  function build(el,arr,cls){el.innerHTML='';arr.forEach(v=>{const c=document.createElement('div');c.className='cell'+(v!=='—'?(' '+cls):'');c.textContent=v==='—'?'':v;el.appendChild(c);});}
+  function powered(){build(ramEl,ramData,'filled');build(romEl,romData,'rom');}
+  powered();
+  $('#romCut').addEventListener('click',()=>{
+    pwr.textContent='power: OFF';pwr.style.color='var(--no)';
+    build(ramEl,['—','—','—','—','—','—','—','—'],'filled');
+    build(romEl,romData,'rom');
+    msg.className='power-state off';msg.innerHTML='RAM is <b style="color:var(--no)">wiped</b> (volatile) · ROM is <b style="color:var(--human)">retained</b> (non-volatile).';
+  });
+  $('#romRestore').addEventListener('click',()=>{
+    pwr.textContent='power: ON';pwr.style.color='var(--ok)';powered();
+    msg.className='power-state on';msg.textContent='Both hold data while powered. Now cut the power…';
+  });
+})();
+
+/* 03 CACHE */
+(function cache(){
+  const CN=4,RN=8;
+  const slotsEl=$('#cacheSlots'),itemsEl=$('#ramItems'),msg=$('#cacheMsg');
+  const hEl=$('#cHits'),mEl=$('#cMiss'),rEl=$('#cRate');
+  let cache=[],order=[],hits=0,miss=0;
+  for(let i=0;i<CN;i++){const s=document.createElement('div');s.className='slot';s.textContent='·';slotsEl.appendChild(s);}
+  const slots=$$('.slot',slotsEl);
+  for(let i=0;i<RN;i++){const it=document.createElement('button');it.className='ritem';it.textContent=i;it.dataset.i=i;it.addEventListener('click',()=>request(i,it));itemsEl.appendChild(it);}
+  function renderCache(flashIdx,type){
+    slots.forEach((s,i)=>{const v=cache[i];s.className='slot'+(v!==undefined?' full':'');s.textContent=v!==undefined?v:'·';if(i===flashIdx&&type){s.classList.add(type);setTimeout(()=>s.classList.remove(type),reduced?0:500);}});
+  }
+  function stats(){hEl.textContent=hits;mEl.textContent=miss;const tot=hits+miss;rEl.textContent=tot?Math.round(hits/tot*100)+'%':'—';}
+  function request(v,el){
+    const idx=cache.indexOf(v);
+    if(idx>=0){hits++;order=order.filter(x=>x!==v);order.push(v);renderCache(idx,'hit');msg.innerHTML=`Requested <b>${v}</b> → <b class="hit">HIT</b> · found in cache, no trip to RAM.`;}
+    else{miss++;el.classList.add('pull');setTimeout(()=>el.classList.remove('pull'),reduced?0:500);
+      let slot;
+      if(cache.length<CN){slot=cache.length;cache.push(v);}
+      else{const lru=order.shift();slot=cache.indexOf(lru);cache[slot]=v;}
+      order.push(v);renderCache(slot,'miss');
+      msg.innerHTML=`Requested <b>${v}</b> → <b class="miss">MISS</b> · fetched from RAM and copied into cache (slot ${slot+1}).`;}
+    stats();
+  }
+  $('#cacheReset').addEventListener('click',()=>{cache=[];order=[];hits=0;miss=0;renderCache();stats();msg.textContent='Ask for the same items repeatedly — the cache learns to keep them ready.';});
+  renderCache();stats();
+})();
+
+/* 04 STORAGE TABS */
+(function storage(){
+  const glyphs={
+    hdd:`<svg viewBox="0 0 160 150"><rect x="30" y="30" width="100" height="90" rx="8" fill="none" stroke="#FFB020" stroke-width="2.5"/><circle cx="80" cy="75" r="34" fill="none" stroke="#FFB020" stroke-width="2"/><circle cx="80" cy="75" r="6" fill="#FFB020"/><line x1="80" y1="75" x2="112" y2="52" stroke="#FFB020" stroke-width="2.5"/></svg>`,
+    ssd:`<svg viewBox="0 0 160 150"><rect x="34" y="40" width="92" height="70" rx="8" fill="none" stroke="#FFB020" stroke-width="2.5"/><g fill="#FFB020" opacity="0.85">${[0,1,2].map(r=>[0,1,2,3].map(c=>`<rect x="${48+c*16}" y="${54+r*16}" width="9" height="9" rx="2"/>`).join('')).join('')}</g></svg>`,
+    usb:`<svg viewBox="0 0 160 150"><rect x="50" y="30" width="60" height="66" rx="8" fill="none" stroke="#FFB020" stroke-width="2.5"/><rect x="66" y="96" width="28" height="26" fill="none" stroke="#FFB020" stroke-width="2.5"/><g fill="#FFB020"><rect x="62" y="46" width="36" height="6" rx="2"/><rect x="62" y="58" width="36" height="6" rx="2"/></g></svg>`,
+    cloud:`<svg viewBox="0 0 170 150"><path d="M50 96 a24 24 0 0 1 4 -47 a30 30 0 0 1 57 6 a20 20 0 0 1 -3 41 z" fill="none" stroke="#FFB020" stroke-width="2.5"/><g stroke="#FFB020" stroke-width="2.5" stroke-linecap="round"><line x1="70" y1="104" x2="70" y2="124"/><line x1="85" y1="104" x2="85" y2="128"/><line x1="100" y1="104" x2="100" y2="124"/></g></svg>`
+  };
+  const data=[
+    {k:'hdd',tt:'magnetic · moving parts',n:'Hard Disk Drive (HDD)',d:'Stores data magnetically on spinning platters read by a moving arm. Cheap and high-capacity, but slower and fragile due to moving parts.',rows:[['Stores data','Magnetically on spinning disks'],['Speed','Slower (mechanical)'],['Capacity','Very large, low cost per GB'],['Portability','Internal / external'],['Volatility','Non-volatile']]},
+    {k:'ssd',tt:'flash · no moving parts',n:'Solid State Drive (SSD)',d:'Stores data in flash memory chips with no moving parts. Much faster, quieter and more durable than an HDD, so modern computers boot from SSDs.',rows:[['Stores data','In flash memory chips'],['Speed','Very fast'],['Capacity','Large (pricier per GB than HDD)'],['Portability','Internal / external'],['Volatility','Non-volatile']]},
+    {k:'usb',tt:'portable flash',n:'USB Flash Drive',d:'A small, portable flash-memory stick that plugs into a USB port. Perfect for carrying files between computers. Also called a pen drive.',rows:[['Stores data','In flash memory'],['Speed','Moderate'],['Capacity','GBs (small–medium)'],['Portability','Highly portable'],['Volatility','Non-volatile']]},
+    {k:'cloud',tt:'remote · over the internet',n:'Cloud Storage',d:'Your files are stored on remote servers run by a provider and accessed over the internet. Great for backup and sharing across devices, but needs a connection and its speed depends on the network.',rows:[['Stores data','On remote data-centre servers'],['Speed','Depends on internet speed'],['Capacity','Virtually unlimited (paid)'],['Portability','Access from anywhere'],['Volatility','Non-volatile']]}
+  ];
+  const tabs=$('#stTabs'),glyph=$('#stGlyph'),tt=$('#stTt'),name=$('#stName'),desc=$('#stDesc'),rows=$('#stRows');
+  data.forEach((d,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.textContent=d.n.split(' ')[0]==='Hard'?'HDD':d.n.split(' ')[0]==='Solid'?'SSD':d.n.split(' ')[0]==='USB'?'USB':'Cloud';b.addEventListener('click',()=>show(i));tabs.appendChild(b);});
+  function show(i){const d=data[i];$$('.tab',tabs).forEach((b,bi)=>b.classList.toggle('active',bi===i));glyph.innerHTML=glyphs[d.k];tt.textContent=d.tt;name.textContent=d.n;desc.textContent=d.d;rows.innerHTML=d.rows.map(r=>`<div class="trow"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');}
+  show(0);
+})();
+
+/* 05 UNITS + MASTER TABLE */
+(function units(){
+  const u=[
+    ['1 bit','a single 0 or 1'],
+    ['1 byte = 8 bits','one character, e.g. "A"'],
+    ['1 KB ≈ 1,024 bytes','a short paragraph of text'],
+    ['1 MB ≈ 1,024 KB','a small photo or a minute of music'],
+    ['1 GB ≈ 1,024 MB','about 250 songs / a short HD film'],
+    ['1 TB ≈ 1,024 GB','hundreds of thousands of photos'],
+    ['1 PB ≈ 1,024 TB','data-centre / big-data scale']
+  ];
+  $('#unitsGrid').innerHTML=u.map(x=>`<div class="unit"><span class="uu">${x[0]}</span><span class="ux">${x[1]}</span></div>`).join('');
+  const rows=[
+    ['Type','Primary/Secondary','Volatile?','Speed','Typical size','Purpose'],
+    ['Registers','Primary (in CPU)','Volatile','Fastest','Bytes','Values in use right now'],
+    ['Cache','Primary (in/near CPU)','Volatile','Very fast','KB–tens of MB','Recently used data'],
+    ['RAM','Primary','Volatile','Fast','GBs','Running programs &amp; data'],
+    ['ROM','Primary','Non-volatile','Fast (read)','KB–MB','Start-up firmware / BIOS'],
+    ['SSD','Secondary','Non-volatile','Fast','Hundreds of GB–TB','Permanent files (modern)'],
+    ['HDD','Secondary','Non-volatile','Slower','TBs','Permanent files (cheap, large)'],
+    ['USB drive','Secondary (external)','Non-volatile','Moderate','GBs','Portable file transfer'],
+    ['Cloud','External (remote)','Non-volatile','Network-dependent','Unlimited','Backup &amp; sharing']
+  ];
+  const t=$('#masterTable');
+  t.innerHTML='<tr>'+rows[0].map(h=>`<th>${h}</th>`).join('')+'</tr>'+rows.slice(1).map(r=>'<tr>'+r.map((c,ci)=>ci===0?`<td><strong style="color:var(--ink)">${c}</strong></td>`:`<td>${c}</td>`).join('')+'</tr>').join('');
+})();
+
+/* 06a VOLATILE GAME */
+(function vol(){
+  const items=[['RAM',true],['ROM',false],['Cache memory',true],['CPU registers',true],['SSD',false],['USB flash drive',false],['Hard disk (HDD)',false],['Cloud storage',false]];
+  const clue=$('#volClue'),fb=$('#volFb'),bV=$('#volV'),bN=$('#volN');let cur,done=false;
+  function next(){cur=items[Math.floor(Math.random()*items.length)];clue.textContent=cur[0];fb.className='feedback';fb.textContent='';done=false;bV.className='opt-btn';bN.className='opt-btn';}
+  function ans(val,btn){if(done)return;done=true;const correct=(val===cur[1]);btn.classList.add(correct?'correct':'wrong');fb.className='feedback '+(correct?'ok':'no');fb.textContent=(correct?'✓ ':'✗ ')+cur[0]+' is '+(cur[1]?'VOLATILE — loses data without power.':'NON-VOLATILE — keeps data without power.');}
+  bV.addEventListener('click',()=>ans(true,bV));bN.addEventListener('click',()=>ans(false,bN));$('#volNext').addEventListener('click',next);next();
+})();
+
+/* 06b WHICH MEMORY GAME */
+(function memGame(){
+  const clues=[
+    {c:'Holds the program you are running right now',o:'RAM'},
+    {c:'Keeps the BIOS so the computer can boot',o:'ROM'},
+    {c:'Tiny, ultra-fast memory between CPU and RAM',o:'Cache'},
+    {c:'Fast, permanent storage with no moving parts',o:'SSD'},
+    {c:'A pen drive to carry files to college',o:'USB drive'},
+    {c:'Backs up your photos over the internet',o:'Cloud'},
+    {c:'Loses everything when the power is cut',o:'RAM'},
+    {c:'Cheapest way to store many terabytes',o:'HDD'}
+  ];
+  const OPTS=['RAM','ROM','Cache','SSD','USB drive','Cloud','HDD'];
+  const clueEl=$('#memClue'),opts=$('#memOpts'),fb=$('#memFb'),score=$('#memScore');let cur,solved=0;
+  function build(){opts.innerHTML='';const set=new Set([cur.o]);while(set.size<4)set.add(OPTS[Math.floor(Math.random()*OPTS.length)]);[...set].sort(()=>Math.random()-0.5).forEach(o=>{const b=document.createElement('button');b.className='opt-btn';b.textContent=o;b.addEventListener('click',()=>pick(o,b));opts.appendChild(b);});}
+  function pick(o,b){if(opts.dataset.done)return;if(o===cur.o){b.classList.add('correct');fb.className='feedback ok';fb.textContent='✓ Correct!';solved++;score.textContent='solved: '+solved;}else{b.classList.add('wrong');$$('.opt-btn',opts).forEach(x=>{if(x.textContent===cur.o)x.classList.add('correct');});fb.className='feedback no';fb.textContent='It\'s '+cur.o+'.';}opts.dataset.done='1';}
+  function next(){cur=clues[Math.floor(Math.random()*clues.length)];clueEl.textContent=cur.c;fb.className='feedback';fb.textContent='Choose one.';opts.removeAttribute('data-done');build();}
+  $('#memNew').addEventListener('click',next);next();
+})();
+
+/* 06c QUIZ */
+(function quiz(){
+  const Q=[
+    {q:'Which memory is volatile (loses data when power is off)?',o:['ROM','RAM','SSD','USB drive'],a:1,e:'RAM is volatile — it needs power to hold its contents.'},
+    {q:'What does ROM mainly store?',o:['Running programs','The BIOS / start-up firmware','Temporary results','Your documents'],a:1,e:'ROM is non-volatile and holds the permanent start-up instructions.'},
+    {q:'A request found in the cache is called a…',o:['miss','hit','fault','swap'],a:1,e:'A hit means the data was found in the fast cache; a miss means going to slow RAM.'},
+    {q:'Which storage has NO moving parts and is faster than a hard disk?',o:['HDD','SSD','Magnetic tape','Floppy disk'],a:1,e:'An SSD uses flash memory chips — no moving parts, much faster than an HDD.'},
+    {q:'Cloud storage keeps your files…',o:['inside the CPU','on remote servers accessed over the internet','in RAM','on the cache'],a:1,e:'Cloud storage lives on remote data-centre servers you reach over the internet.'}
+  ];
+  const box=$('#quiz'),scoreEl=$('#quizScore');let answered=0,correct=0;
+  Q.forEach((item,qi)=>{const d=document.createElement('div');d.className='q';d.innerHTML=`<div class="qt"><span class="n">Q${qi+1}</span>${item.q}</div><div class="opts"></div><div class="exp">${item.e}</div>`;const opts=$('.opts',d);item.o.forEach((txt,oi)=>{const b=document.createElement('button');b.className='opt';b.textContent=txt;b.addEventListener('click',()=>{if(d.classList.contains('answered'))return;d.classList.add('answered');answered++;if(oi===item.a){b.classList.add('correct');correct++;}else{b.classList.add('wrong');$$('.opt',opts)[item.a].classList.add('correct');}$$('.opt',opts).forEach(x=>x.disabled=true);scoreEl.textContent=`Score: ${correct} / ${answered}`+(answered===Q.length?' — all done!':'');});opts.appendChild(b);});box.appendChild(d);});
+})();
+</script>
+</body>
+</html>

@@ -40,15 +40,16 @@
   },
   {
     "number": "04",
-    "title": "Types of Computers",
+    "title": "Memory & Storage",
     "section": "Section I: Introduction to Computers",
-    "description": "Microcomputers, minicomputers, mainframes, supercomputers, and embedded computers.",
+    "description": "Interactive lecture explaining RAM, ROM, storage devices, files, and why memory matters.",
     "ppt": "#",
     "notes": "#",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
-    "status": "Coming Soon"
+    "status": "Available",
+    "lecture": "downloads/semester1/lectures/lecture-04-memory-storage.html"
   },
   {
     "number": "05",
