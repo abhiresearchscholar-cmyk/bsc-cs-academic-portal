@@ -6,7 +6,7 @@
     "description": "Interactive lecture explaining how input, processing, memory, storage, and output work together.",
     "lecture": "downloads/semester1/lectures/lecture-01-how-computers-work.html",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-01-notes.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
@@ -18,7 +18,7 @@
     "section": "Section I: Introduction to Computers",
     "description": "Interactive lecture on key characteristics of computers and how computers evolved over time.",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-02-notes.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
@@ -27,15 +27,16 @@
   },
   {
     "number": "03",
-    "title": "Evolution of Computers",
+    "title": "Types of Computers & The Block Diagram",
     "section": "Section I: Introduction to Computers",
-    "description": "Early calculating devices and the development of computer generations.",
+    "description": "Interactive lecture covering types of computers and the basic block diagram of a computer system.",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-03-notes.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
-    "status": "Coming Soon"
+    "status": "Available",
+    "lecture": "downloads/semester1/lectures/lecture-03-types-block-diagram.html"
   },
   {
     "number": "04",

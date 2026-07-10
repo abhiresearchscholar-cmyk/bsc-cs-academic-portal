@@ -1,6 +1,6 @@
 async function loadJson(path) {
   const separator = path.includes("?") ? "&" : "?";
-  const response = await fetch(path + separator + "v=20260709-lecture02");
+  const response = await fetch(path + separator + "v=20260710-lecture03-pdfs");
   if (!response.ok) {
     throw new Error("Could not load " + path);
   }
@@ -100,6 +100,7 @@ async function renderLectures() {
         <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
         <div class="card-actions">
           ${lecture.lecture ? linkButton(lecture.lecture, "Open Lecture", "button small") : linkButton("#", "Lecture Coming Soon", "button small")}
+          ${lecture.notes && lecture.notes !== "#" ? linkButton(lecture.notes, "PDF Notes", "button small secondary") : ""}
         </div>
       </article>
     `;

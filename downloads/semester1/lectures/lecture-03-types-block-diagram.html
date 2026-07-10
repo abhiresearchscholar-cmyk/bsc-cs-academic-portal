@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 03 — Types of Computers & The Block Diagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#090D18; --bg-2:#0C1120; --panel:#111A2E; --panel-2:#16203a;
+    --line:#22304d; --line-soft:#1a2540;
+    --ink:#EAF0FA; --ink-dim:#8593ad; --ink-faint:#5b6785;
+    --one:#FFB020; --one-soft:#4a3a1a; --one-glow:rgba(255,176,32,.45);
+    --zero:#4C74D0; --zero-soft:#1e2c4d;
+    --human:#B892FF; --human-glow:rgba(184,146,255,.4);
+    --ok:#4ade80; --no:#f87171;
+    --r:16px; --r-sm:10px; --maxw:1080px;
+    --f-display:'Space Grotesk',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--one);color:#1a1205}
+  a{color:var(--one);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  .layer + .layer{border-top:1px solid var(--line-soft)}
+  .rail{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:12px}
+  .rail button{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;transition:color .3s}
+  .rail .dot{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid var(--line);transition:all .3s;flex:none}
+  .rail button:hover{color:var(--ink-dim)}
+  .rail button.active{color:var(--one)}
+  .rail button.active .dot{background:var(--one);box-shadow:0 0 0 4px var(--one-glow);border-color:var(--one)}
+  .rail .label{opacity:0;transform:translateX(-4px);transition:all .3s;white-space:nowrap}
+  .rail button:hover .label,.rail button.active .label{opacity:1;transform:none}
+  @media(max-width:1300px){.rail{display:none}}
+  .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--one);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .num{font-weight:700;color:var(--bg);background:var(--one);padding:2px 8px;border-radius:6px;letter-spacing:.02em}
+  h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,46px);margin-bottom:20px}
+  h3{font-size:22px;margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-dim);max-width:60ch}
+  p{max-width:65ch;color:var(--ink-dim)}
+  strong{color:var(--ink);font-weight:600}
+  .amber{color:var(--one)} .blue{color:var(--zero)} .violet{color:var(--human)} .mono{font-family:var(--f-mono)}
+  .hero{padding:0;height:100vh;min-height:660px;display:flex;align-items:center;position:relative;overflow:hidden}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 42%,transparent 38%,var(--bg) 100%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--one);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+  .hero-tag .pill{background:var(--one);color:var(--bg);padding:3px 9px;border-radius:6px;font-weight:700}
+  .hero h1{font-size:clamp(36px,7vw,80px);margin-bottom:24px}
+  .hero h1 .flip{color:var(--one)}
+  .hero .lede{font-size:clamp(18px,2.3vw,23px);max-width:56ch}
+  .hero-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-hint .arrow{width:1px;height:26px;background:linear-gradient(var(--ink-faint),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(-6px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+  .objectives{padding:60px 0;background:var(--bg-2);border-bottom:1px solid var(--line-soft)}
+  .obj-head{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:22px}
+  .obj-head b{color:var(--one)}
+  .obj-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.obj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.obj-grid{grid-template-columns:repeat(5,1fr)}}
+  .obj{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .obj .on{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-bottom:8px}
+  .obj p{font-size:13.5px;color:var(--ink-dim)}
+  .stage{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:34px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .stage-title{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .readout{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)} .readout b{color:var(--one)}
+  .btn{font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .btn:hover{border-color:var(--one);color:var(--one)}
+  .btn.primary{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .recap{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);margin-top:26px;padding-left:14px;border-left:2px solid var(--one)}
+  .callout{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--human);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(184,146,255,.05);max-width:65ch}
+  .callout .ic{font-size:16px;flex:none} .callout .tx{font-size:14px;color:var(--ink-dim)} .callout .tx b{color:var(--human)}
+
+  /* classification tree */
+  .tree{display:grid;grid-template-columns:1fr;gap:16px;margin-top:8px}
+  @media(min-width:820px){.tree{grid-template-columns:repeat(3,1fr)}}
+  .branch{border:1px solid var(--line);border-radius:var(--r-sm);padding:20px;background:var(--bg)}
+  .branch .bh{font-family:var(--f-mono);font-size:11px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+  .branch h3{font-size:18px;margin-bottom:14px}
+  .chip{display:inline-block;font-family:var(--f-mono);font-size:12.5px;color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:6px 12px;margin:0 6px 8px 0;background:var(--panel-2)}
+  .branch p{font-size:13px;margin-top:6px}
+
+  /* tabs shared */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:11px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .2s}
+  .tab:hover{border-color:var(--one)} .tab.active{background:var(--one);color:#1a1205;border-color:var(--one)}
+  .tab-body{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+  @media(min-width:760px){.tab-body{grid-template-columns:.9fr 1.1fr}}
+  .glyph-box{height:190px;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 45%,#131d34,#0a0f1c);display:flex;align-items:center;justify-content:center}
+  .glyph-box svg{width:100%;height:150px}
+  .tmeta .tt{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.08em;text-transform:uppercase}
+  .tmeta h3{font-size:24px;margin:6px 0 10px}
+  .tmeta .td{font-size:14.5px;color:var(--ink-dim);margin-bottom:12px}
+  .tmeta .rows{display:flex;flex-direction:column;gap:8px}
+  .trow{display:flex;gap:12px;font-size:13.5px;border-top:1px solid var(--line-soft);padding-top:8px}
+  .trow .k{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;width:90px;flex:none}
+  .trow .v{color:var(--ink-dim)}
+  .power-bar{margin-top:14px}
+  .power-bar .pl{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;display:flex;justify-content:space-between}
+  .power-track{height:12px;background:var(--zero-soft);border-radius:6px;overflow:hidden}
+  .power-fill{height:100%;background:linear-gradient(90deg,var(--one),#ff7a45);border-radius:6px;transition:width .5s ease}
+
+  /* two-card purpose */
+  .two{display:grid;grid-template-columns:1fr;gap:16px;margin-top:8px}
+  @media(min-width:680px){.two{grid-template-columns:1fr 1fr}}
+  .pcard{border:1px solid var(--line);border-radius:var(--r-sm);padding:22px;background:var(--panel)}
+  .pcard h3{font-size:19px;margin-bottom:8px}
+  .pcard .ex{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-top:12px}
+
+  /* modern grid */
+  .mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+  @media(min-width:680px){.mod-grid{grid-template-columns:repeat(4,1fr)}}
+  .mod{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--bg);text-align:center}
+  .mod .mi{font-size:26px;margin-bottom:8px}
+  .mod .mn{font-family:var(--f-display);font-weight:600;font-size:15px;margin-bottom:4px}
+  .mod p{font-size:12px}
+
+  /* block diagram */
+  .bd-wrap{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:920px){.bd-wrap{grid-template-columns:1.6fr 1fr}}
+  .bd-svg{width:100%;height:auto}
+  .bd-svg .blk rect{transition:all .25s;cursor:pointer}
+  .bd-svg .blk:hover rect{stroke:var(--one)}
+  .bd-svg .blk.sel rect{stroke:var(--one);stroke-width:2.5}
+  .bd-svg .blk.flash rect{fill:var(--one-soft);stroke:var(--one)}
+  .bd-svg text{pointer-events:none}
+  .ctrl-line{stroke:var(--zero);stroke-width:1.6;stroke-dasharray:5 5;opacity:.75}
+  .bd-info{border:1px solid var(--line);border-radius:var(--r-sm);padding:20px;background:var(--bg);min-height:150px}
+  .bd-info .t{font-family:var(--f-display);font-size:20px;font-weight:600;margin-bottom:8px;color:var(--one)}
+  .bd-info p{font-size:14px}
+  .bd-step{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);margin-top:14px;min-height:18px}
+  .bd-step b{color:var(--one)}
+  .legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:8px;font-family:var(--f-mono);font-size:12px;color:var(--ink-dim)}
+  .legend span{display:flex;align-items:center;gap:8px}
+  .legend .sw{width:26px;height:0;border-top:3px solid var(--one)}
+  .legend .sw.dash{border-top:2px dashed var(--zero)}
+
+  /* activities + quiz */
+  .act-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:780px){.act-grid{grid-template-columns:1fr 1fr}}
+  .act{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .act h3{font-size:19px;margin-bottom:6px}
+  .act .prompt{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+  .clue{border:1px solid var(--one);border-radius:var(--r-sm);padding:16px;background:var(--one-soft);color:var(--one);font-family:var(--f-mono);font-size:14px;text-align:center;margin-bottom:14px}
+  .opt-row{display:flex;gap:8px;flex-wrap:wrap}
+  .opt-btn{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--ink);transition:all .18s}
+  .opt-btn:hover:not(:disabled){border-color:var(--one)}
+  .opt-btn.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .opt-btn.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .feedback{font-family:var(--f-mono);font-size:13px;margin-top:14px;min-height:20px;color:var(--ink-faint)}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--no)}
+  .score{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+  .quiz{margin-top:28px}
+  .quiz-h{font-family:var(--f-display);font-size:22px;margin-bottom:16px}
+  .q{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);margin-bottom:14px}
+  .q .qt{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .q .qt .n{font-family:var(--f-mono);color:var(--one);margin-right:8px}
+  .q .opts{display:flex;flex-direction:column;gap:8px}
+  .q .opt{text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink-dim);background:var(--panel);transition:all .18s}
+  .q .opt:hover:not(:disabled){border-color:var(--one);color:var(--ink)}
+  .q .opt.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .q .opt.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .q .exp{font-size:13px;color:var(--ink-faint);margin-top:10px;display:none}
+  .q.answered .exp{display:block}
+  .quiz-score{font-family:var(--f-mono);font-size:14px;color:var(--one);margin-top:10px}
+  .why{background:linear-gradient(180deg,var(--bg),#070a12)}
+  .why h2{max-width:18ch}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:34px}
+  @media(min-width:680px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .card .k{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .card p{font-size:15px}
+  .hw{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel);margin-top:30px}
+  .hw .k{font-family:var(--f-mono);font-size:12px;color:var(--human);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+  .hw ol{margin:0 0 0 18px;color:var(--ink-dim);font-size:15px}
+  .hw li{margin-bottom:10px} .hw li b{color:var(--ink)}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line-soft);text-align:center}
+  footer .m{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  @media(max-width:520px){section{padding:70px 0}.stage{padding:20px}}
+</style>
+</head>
+<body>
+<nav class="rail" id="rail" aria-label="Lecture navigation"></nav>
+
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner"><div class="wrap">
+    <div class="hero-tag"><span class="pill">Lecture 03</span> Types &amp; Block Diagram · BSc Computer Science</div>
+    <h1>Not all computers<br>are the <span class="flip">same</span> — and<br>they all share one plan.</h1>
+    <p class="lede">From a supercomputer forecasting monsoons to the chip in a washing machine, computers come in many types. Yet every one of them is built from the same five functional blocks. Today: how we classify them, and the block diagram they all obey.</p>
+  </div></div>
+  <div class="hero-hint"><span>scroll to begin</span><span class="arrow"></span></div>
+</header>
+
+<section class="objectives" id="obj">
+  <div class="wrap">
+    <div class="obj-head">By the end of this session you will be able to — <b>five things</b></div>
+    <div class="obj-grid">
+      <div class="obj"><div class="on">01</div><p>Classify computers three ways: by <em>data</em>, <em>purpose</em>, and <em>size</em>.</p></div>
+      <div class="obj"><div class="on">02</div><p>Distinguish <em>analog</em>, <em>digital</em>, and <em>hybrid</em> computers.</p></div>
+      <div class="obj"><div class="on">03</div><p>Compare <em>super, mainframe, mini</em> and <em>micro</em> computers.</p></div>
+      <div class="obj"><div class="on">04</div><p>Draw and label the <em>block diagram</em> of a computer.</p></div>
+      <div class="obj"><div class="on">05</div><p>Explain each <em>functional unit</em> and how data &amp; control flow.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 00 CLASSIFICATION -->
+<section class="layer" id="s0" data-title="Classification">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">00</span> Three ways to classify</div>
+    <h2>"Computer" is one word for a whole family of machines.</h2>
+    <p>Before we sort them, notice there isn't one single list — computers are grouped in <strong>three different ways</strong> depending on what you care about: how they handle data, what job they're built for, or how big and powerful they are. Here's the map for the whole lecture.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">The classification map</span></div>
+      <div class="tree">
+        <div class="branch"><div class="bh">by the data they handle</div><h3>Analog · Digital · Hybrid</h3><span class="chip">Analog</span><span class="chip">Digital</span><span class="chip">Hybrid</span><p>Do they measure continuous signals, count discrete 0s and 1s, or both?</p></div>
+        <div class="branch"><div class="bh">by their purpose</div><h3>General · Special</h3><span class="chip">General-purpose</span><span class="chip">Special-purpose</span><p>Can they do many tasks, or are they built for exactly one job?</p></div>
+        <div class="branch"><div class="bh">by size &amp; power</div><h3>Super → Micro</h3><span class="chip">Supercomputer</span><span class="chip">Mainframe</span><span class="chip">Mini</span><span class="chip">Micro</span><p>From nation-scale machines down to the one in your pocket.</p></div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · Three lenses: by DATA (analog/digital/hybrid), by PURPOSE (general/special), by SIZE (super/mainframe/mini/micro).</div>
+  </div>
+</section>
+
+<!-- 01 ANALOG DIGITAL HYBRID -->
+<section class="layer" id="s1" data-title="Analog · Digital · Hybrid">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">01</span> By the data they handle</div>
+    <h2>Measure, count, or both?</h2>
+    <p>The oldest split: does the machine work with <strong>continuous</strong> quantities that it <em>measures</em>, or <strong>discrete</strong> digits that it <em>counts</em>? <strong>Pick a type</strong> and watch how it represents a signal.</p>
+    <div class="stage">
+      <div class="tabs" id="adhTabs"></div>
+      <div class="tab-body">
+        <div class="glyph-box" id="adhGlyph"></div>
+        <div class="tmeta">
+          <div class="tt" id="adhTt">Analog</div>
+          <h3 id="adhName">Analog computer</h3>
+          <div class="td" id="adhDesc"></div>
+          <div class="rows" id="adhRows"></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>In class:</b> A mercury thermometer is analog (the column moves smoothly); a digital fever thermometer counts and shows a number. Same job, two philosophies.</div></div>
+    <div class="recap">TAKEAWAY · Analog measures continuous signals · Digital counts discrete 0/1 · Hybrid takes analog input but processes it digitally.</div>
+  </div>
+</section>
+
+<!-- 02 PURPOSE -->
+<section class="layer" id="s2" data-title="By purpose">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">02</span> By their purpose</div>
+    <h2>A jack-of-all-trades, or a specialist?</h2>
+    <p>The second lens is simple but important, and examiners love it.</p>
+    <div class="two">
+      <div class="pcard"><h3 class="amber">General-purpose</h3><p>Designed to handle a wide variety of tasks by simply loading different programs — word processing, gaming, browsing, coding. Flexible but not the fastest at any single job.</p><div class="ex">e.g. your laptop, desktop PC, smartphone</div></div>
+      <div class="pcard"><h3 class="amber">Special-purpose</h3><p>Built and programmed for one specific task. It cannot be reprogrammed for other jobs, but it does its one job extremely efficiently.</p><div class="ex">e.g. washing-machine controller, ATM, traffic-signal control, aircraft autopilot</div></div>
+    </div>
+    <div class="recap">TAKEAWAY · General-purpose = many tasks via different programs · Special-purpose = one dedicated task, highly efficient.</div>
+  </div>
+</section>
+
+<!-- 03 SIZE -->
+<section class="layer" id="s3" data-title="By size">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">03</span> By size &amp; power</div>
+    <h2>From a nation's supercomputer to the one in your hand.</h2>
+    <p>The most common classification. As we go from super down to micro, machines get smaller, cheaper, and serve fewer users at once. <strong>Step through the four classes.</strong></p>
+    <div class="stage">
+      <div class="tabs" id="sizeTabs"></div>
+      <div class="tab-body">
+        <div class="glyph-box" id="sizeGlyph"></div>
+        <div class="tmeta">
+          <div class="tt" id="sizeTt"></div>
+          <h3 id="sizeName"></h3>
+          <div class="td" id="sizeDesc"></div>
+          <div class="rows" id="sizeRows"></div>
+          <div class="power-bar"><div class="pl"><span>Relative power</span><span id="sizePwrLbl"></span></div><div class="power-track"><div class="power-fill" id="sizePwr"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><span class="ic">🇮🇳</span><div class="tx"><b>Indian example:</b> the <b style="color:var(--human)">PARAM</b> series (developed by C-DAC) are India's own supercomputers — used for weather forecasting, research and simulations.</div></div>
+    <div class="recap">TAKEAWAY · Supercomputer (fastest, science) → Mainframe (big orgs, many users) → Mini/midrange → Microcomputer (personal, single-user).</div>
+  </div>
+</section>
+
+<!-- 04 MODERN -->
+<section class="layer" id="s4" data-title="Everyday computers">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">04</span> Microcomputers around you</div>
+    <h2>Most "computers" you meet are microcomputers.</h2>
+    <p>The microcomputer category has exploded into many familiar forms — all single-user machines built around one microprocessor.</p>
+    <div class="mod-grid" id="modGrid"></div>
+    <div class="recap">TAKEAWAY · Desktop, laptop, tablet, smartphone, server, workstation, embedded and wearable devices are all microcomputers.</div>
+  </div>
+</section>
+
+<!-- 05 BLOCK DIAGRAM -->
+<section class="layer" id="s5" data-title="Block diagram">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">05</span> The block diagram</div>
+    <h2>Every computer, super to micro, shares this one plan.</h2>
+    <p>No matter the type, a computer is built from <strong>five functional units</strong>: Input, Memory, the CPU (which contains the ALU and the Control Unit), and Output — with Secondary Storage alongside. <strong>Solid amber arrows</strong> carry data; <strong>dashed blue arrows</strong> carry control signals from the Control Unit. <strong>Click a block</strong> to learn its job, or press <strong>Trace the data</strong> to watch information flow through.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · functional block diagram</span></div>
+      <div class="bd-wrap">
+        <div>
+          <svg class="bd-svg" viewBox="0 0 760 460" id="bdSvg" role="img" aria-label="Block diagram of a computer">
+            <defs>
+              <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#FFB020"/></marker>
+              <marker id="arB" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#4C74D0"/></marker>
+            </defs>
+            <!-- data arrows (solid amber) -->
+            <g fill="none" stroke="#FFB020" stroke-width="3" marker-end="url(#ar)">
+              <path d="M162 176 L232 176 L232 74 L286 74"/>
+              <path d="M474 74 L540 74 L540 176 L598 176"/>
+              <path d="M380 108 L380 176"/>
+              <path d="M380 340 L380 320"/>
+            </g>
+            <path d="M380 176 L380 108" fill="none" stroke="#FFB020" stroke-width="3" marker-end="url(#ar)"/>
+            <!-- control lines (dashed blue) -->
+            <g class="ctrl-line" fill="none" marker-end="url(#arB)">
+              <path d="M336 258 L336 300 L120 300 L120 206"/>
+              <path d="M420 236 L444 236"/>
+              <path d="M336 214 L336 120 L372 120"/>
+              <path d="M336 258 L336 340 L620 340 L620 206"/>
+            </g>
+            <!-- blocks -->
+            <g class="blk" data-key="input"><rect x="42" y="150" width="120" height="54" rx="9" fill="#111a2e" stroke="#2c3a5a" stroke-width="2"/><text x="102" y="182" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="14" fill="#eaf0fa">Input Unit</text></g>
+            <g class="blk" data-key="output"><rect x="598" y="150" width="120" height="54" rx="9" fill="#111a2e" stroke="#2c3a5a" stroke-width="2"/><text x="658" y="182" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="14" fill="#eaf0fa">Output Unit</text></g>
+            <g class="blk" data-key="memory"><rect x="290" y="44" width="180" height="60" rx="10" fill="#111a2e" stroke="#2c3a5a" stroke-width="2"/><text x="380" y="72" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="14" fill="#eaf0fa">Memory Unit</text><text x="380" y="90" text-anchor="middle" font-family="'JetBrains Mono'" font-size="9" fill="#5b6785">primary memory</text></g>
+            <g class="blk" data-key="secondary"><rect x="290" y="344" width="180" height="54" rx="10" fill="#111a2e" stroke="#2c3a5a" stroke-width="2"/><text x="380" y="368" text-anchor="middle" font-family="'Space Grotesk'" font-weight="600" font-size="13" fill="#eaf0fa">Secondary Storage</text><text x="380" y="385" text-anchor="middle" font-family="'JetBrains Mono'" font-size="9" fill="#5b6785">disk / SSD</text></g>
+            <!-- CPU -->
+            <rect x="276" y="180" width="208" height="150" rx="12" fill="#0e1526" stroke="#2c3a5a" stroke-width="2"/>
+            <text x="380" y="200" text-anchor="middle" font-family="'JetBrains Mono'" font-size="11" fill="#8593ad" letter-spacing="2">CPU</text>
+            <g class="blk" data-key="cu"><rect x="290" y="214" width="90" height="44" rx="8" fill="#111a2e" stroke="#2c3a5a" stroke-width="1.5"/><text x="335" y="241" text-anchor="middle" font-family="'IBM Plex Sans'" font-size="12" fill="#eaf0fa">Control</text></g>
+            <g class="blk" data-key="alu"><rect x="388" y="214" width="82" height="44" rx="8" fill="#111a2e" stroke="#2c3a5a" stroke-width="1.5"/><text x="429" y="241" text-anchor="middle" font-family="'IBM Plex Sans'" font-size="12" fill="#eaf0fa">ALU</text></g>
+            <g class="blk" data-key="reg"><rect x="290" y="272" width="180" height="40" rx="8" fill="#111a2e" stroke="#2c3a5a" stroke-width="1.5"/><text x="380" y="297" text-anchor="middle" font-family="'IBM Plex Sans'" font-size="12" fill="#eaf0fa">Registers</text></g>
+            <circle id="bdPacket" r="7" fill="#FFB020" opacity="0" style="filter:drop-shadow(0 0 6px #FFB020)"/>
+          </svg>
+          <div class="legend"><span><span class="sw"></span> data / instruction flow</span><span><span class="sw dash"></span> control signals (from CU)</span></div>
+        </div>
+        <div>
+          <div class="bd-info" id="bdInfo"><div class="t" id="bdT">Tap a block to explore</div><p id="bdP">Five units, one plan. Data rides the amber arrows; the Control Unit conducts everything with the dashed blue signals. Click a block, or press Trace the data.</p></div>
+          <div class="bd-step" id="bdStep"></div>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="bdRun">Trace the data</button><button class="btn ghost" id="bdReset">Clear</button></div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>Exam tip:</b> a 14-mark "block diagram" answer needs the labelled diagram <em>plus</em> a paragraph on each unit and the difference between data flow and control flow. This widget is your diagram.</div></div>
+    <div class="recap">TAKEAWAY · Input → Memory → CPU (ALU+CU) → Memory → Output, with Secondary Storage for permanence. CU controls all; ALU processes; data and control flows are separate.</div>
+  </div>
+</section>
+
+<!-- 06 ACTIVITIES -->
+<section class="layer" id="s6" data-title="Activities">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">06</span> Check yourself</div>
+    <h2>Your turn. Two challenges, then a graded quiz.</h2>
+    <p>Perfect for the projector — everything you need is on the slides above.</p>
+    <div class="act-grid">
+      <div class="act">
+        <h3>① Which type is it?</h3>
+        <div class="prompt">Read the example and pick the correct type.</div>
+        <div class="clue" id="typeClue">—</div>
+        <div class="opt-row" id="typeOpts"></div>
+        <div class="feedback" id="typeFb">Choose one.</div>
+        <div class="btn-row"><button class="btn" id="typeNew">New example</button><span class="score" id="typeScore" style="align-self:center">solved: 0</span></div>
+      </div>
+      <div class="act">
+        <h3>② Which unit does that?</h3>
+        <div class="prompt">Match the job to the correct functional unit.</div>
+        <div class="clue" id="unitClue">—</div>
+        <div class="opt-row" id="unitOpts"></div>
+        <div class="feedback" id="unitFb">Which block is responsible?</div>
+        <div class="btn-row"><button class="btn" id="unitNew">New job</button><span class="score" id="unitScore" style="align-self:center">solved: 0</span></div>
+      </div>
+    </div>
+    <div class="quiz">
+      <div class="quiz-h">③ Quick quiz</div>
+      <div id="quiz"></div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 WHY -->
+<section class="why layer" id="s7" data-title="Why & recap">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">07</span> Why it matters</div>
+    <h2>One plan explains every machine you'll ever use.</h2>
+    <p>The block diagram is the single most important picture in your first year. Every later topic — memory hierarchy, operating systems, computer organisation — is a zoom-in on one of these blocks. Learn to draw it from memory and you have a map for the whole degree.</p>
+    <div class="cards">
+      <div class="card"><div class="k">Pick the right tool</div><p>Knowing the types lets you match a machine to a job — you don't buy a mainframe to check email.</p></div>
+      <div class="card"><div class="k">A mental model</div><p>The five blocks are a lens for debugging: is the problem in input, memory, processing, or output?</p></div>
+      <div class="card"><div class="k">Exam gold</div><p>"Draw and explain the block diagram" is one of the most common 14-mark questions. Nail it here.</p></div>
+    </div>
+    <div class="hw">
+      <div class="k">Homework · before Lecture 04</div>
+      <ol>
+        <li><b>Draw from memory:</b> reproduce the labelled block diagram on paper, showing data flow and control flow with different arrows.</li>
+        <li><b>Classify five devices:</b> list five machines at home and classify each by data, purpose, and size.</li>
+        <li><b>Compare table:</b> make a table comparing supercomputer / mainframe / mini / micro on size, users, speed and use.</li>
+        <li><b>Analog vs digital:</b> give two real examples of each and one hybrid, and say why.</li>
+        <li><b>Stretch:</b> explain in a paragraph why the Control Unit is called the "nervous system" of the computer.</li>
+      </ol>
+    </div>
+    <p class="recap" style="margin-top:34px">THE WHOLE STORY · three classifications · analog/digital/hybrid · super→micro · and the five-block plan every computer obeys. That's the family of computers, and the blueprint they share.</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="m">Lecture 03 · Types of Computers &amp; The Block Diagram · an interactive teaching aid — press any widget to explore</div></div></footer>
+
+<script>
+"use strict";
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const wait=ms=>new Promise(r=>setTimeout(r,reduced?0:ms));
+
+/* RAIL */
+const nav=[
+  {id:'top',n:'—',t:'Cover'},{id:'s0',n:'00',t:'Classification'},{id:'s1',n:'01',t:'Analog·Digital·Hybrid'},
+  {id:'s2',n:'02',t:'By purpose'},{id:'s3',n:'03',t:'By size'},{id:'s4',n:'04',t:'Everyday computers'},
+  {id:'s5',n:'05',t:'Block diagram'},{id:'s6',n:'06',t:'Activities'},{id:'s7',n:'07',t:'Why & recap'}
+];
+const rail=$('#rail');
+nav.forEach(s=>{const el=document.getElementById(s.id);const b=document.createElement('button');b.innerHTML=`<span class="dot"></span><span class="label">${s.n==='—'?'top':s.n} · ${s.t}</span>`;b.dataset.for=s.id;b.addEventListener('click',()=>el&&el.scrollIntoView({behavior:reduced?'auto':'smooth'}));rail.appendChild(b);});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.for===e.target.id));}),{rootMargin:'-45% 0px -45% 0px'});
+nav.forEach(s=>{const el=document.getElementById(s.id);if(el)spy.observe(el);});
+
+/* HERO */
+(function heroGrid(){
+  const cv=$('#heroCanvas'),ctx=cv.getContext('2d');
+  let cols,rows,gap=26,size=6,t=0,mouse={x:-999,y:-999};
+  const AMBER='#FFB020',BLUE='#26385f';
+  function resize(){cv.width=cv.offsetWidth*devicePixelRatio;cv.height=cv.offsetHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cols=Math.ceil(cv.offsetWidth/gap)+1;rows=Math.ceil(cv.offsetHeight/gap)+1;}
+  resize();addEventListener('resize',resize);
+  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
+  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-999;});
+  function draw(){const W=cv.offsetWidth,H=cv.offsetHeight;ctx.clearRect(0,0,W,H);const wave=(t*0.9)%(W+H+400)-200;for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const px=x*gap+14,py=y*gap+14,diag=px+py,dw=Math.abs(diag-wave);const onWave=dw<60?1-(dw/60):0;const dx=px-mouse.x,dy=py-mouse.y,md=Math.hypot(dx,dy),onMouse=md<90?1-(md/90):0;const heat=Math.max(onWave,onMouse);if(heat>0.05){ctx.fillStyle=AMBER;ctx.globalAlpha=0.15+heat*0.85;const s=size+heat*4;ctx.fillRect(px-s/2,py-s/2,s,s);}else{ctx.fillStyle=BLUE;ctx.globalAlpha=0.5;ctx.fillRect(px-size/2,py-size/2,size,size);}}ctx.globalAlpha=1;}
+  if(reduced){draw();return;}
+  (function loop(){t+=2.4;draw();requestAnimationFrame(loop);})();
+})();
+
+/* 01 ANALOG / DIGITAL / HYBRID */
+(function adh(){
+  const glyphs=[
+    `<svg viewBox="0 0 300 150"><path d="M10 75 Q40 20 70 75 T130 75 T190 75 T250 75 T310 75" fill="none" stroke="#FFB020" stroke-width="3"/><text x="150" y="130" text-anchor="middle" font-family="'JetBrains Mono'" font-size="11" fill="#5b6785">continuous · smooth</text></svg>`,
+    `<svg viewBox="0 0 300 150"><polyline points="10,100 55,100 55,50 100,50 100,100 145,100 145,40 190,40 190,90 235,90 235,55 280,55" fill="none" stroke="#FFB020" stroke-width="3"/><text x="150" y="135" text-anchor="middle" font-family="'JetBrains Mono'" font-size="11" fill="#5b6785">discrete · 0s and 1s</text></svg>`,
+    `<svg viewBox="0 0 300 150"><path d="M10 60 Q35 25 60 60 T110 60" fill="none" stroke="#B892FF" stroke-width="3"/><polyline points="110,60 130,60 130,95 160,95 160,55 190,55 190,90 220,90 220,60 250,60" fill="none" stroke="#FFB020" stroke-width="3"/><text x="150" y="135" text-anchor="middle" font-family="'JetBrains Mono'" font-size="11" fill="#5b6785">analog in → digital out</text></svg>`
+  ];
+  const data=[
+    {tt:'Analog',n:'Analog computer',d:'Works with continuous physical quantities (voltage, temperature, pressure) which it measures. Results are approximate and read off a scale.',rows:[['Handles','Continuous data'],['Action','Measures'],['Accuracy','Approximate'],['Examples','Speedometer, mercury thermometer, seismograph, analog clock']]},
+    {tt:'Digital',n:'Digital computer',d:'Works with discrete data — binary digits, 0 and 1. It counts, giving exact results. Almost every computer today is digital.',rows:[['Handles','Discrete data (0/1)'],['Action','Counts'],['Accuracy','Exact'],['Examples','PCs, laptops, smartphones, calculators']]},
+    {tt:'Hybrid',n:'Hybrid computer',d:'Combines both: it takes analog measurements as input and processes them digitally, giving the speed of analog with the accuracy of digital.',rows:[['Handles','Both continuous & discrete'],['Action','Measures then counts'],['Accuracy','Fast + exact'],['Examples','ICU patient monitors, petrol pumps, industrial control']]}
+  ];
+  const tabs=$('#adhTabs'),glyph=$('#adhGlyph'),tt=$('#adhTt'),name=$('#adhName'),desc=$('#adhDesc'),rows=$('#adhRows');
+  data.forEach((d,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.textContent=d.tt;b.addEventListener('click',()=>show(i));tabs.appendChild(b);});
+  function show(i){const d=data[i];$$('.tab',tabs).forEach((b,bi)=>b.classList.toggle('active',bi===i));glyph.innerHTML=glyphs[i];tt.textContent=d.tt;name.textContent=d.n;desc.textContent=d.d;rows.innerHTML=d.rows.map(r=>`<div class="trow"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');}
+  show(0);
+})();
+
+/* 03 SIZE */
+(function size(){
+  const icons=[
+    `<svg viewBox="0 0 120 120"><g stroke="#FFB020" stroke-width="2" fill="none">${[0,1,2,3].map(k=>`<rect x="${18+k*24}" y="30" width="18" height="60" rx="2" fill="#FFB020" opacity="0.12"/><line x1="${21+k*24}" y1="38" x2="${33+k*24}" y2="38"/><line x1="${21+k*24}" y1="48" x2="${33+k*24}" y2="48"/><line x1="${21+k*24}" y1="58" x2="${33+k*24}" y2="58"/>`).join('')}</g></svg>`,
+    `<svg viewBox="0 0 120 120"><rect x="40" y="24" width="40" height="72" rx="4" fill="#FFB020" opacity="0.12" stroke="#FFB020" stroke-width="2.5"/><g stroke="#FFB020" stroke-width="2">${[0,1,2,3,4].map(k=>`<line x1="48" y1="${34+k*12}" x2="72" y2="${34+k*12}"/>`).join('')}</g></svg>`,
+    `<svg viewBox="0 0 120 120"><rect x="34" y="40" width="52" height="40" rx="4" fill="#FFB020" opacity="0.12" stroke="#FFB020" stroke-width="2.5"/><rect x="46" y="80" width="28" height="10" fill="none" stroke="#FFB020" stroke-width="2.5"/></svg>`,
+    `<svg viewBox="0 0 120 120"><rect x="34" y="34" width="52" height="38" rx="3" fill="#FFB020" opacity="0.12" stroke="#FFB020" stroke-width="2.5"/><path d="M30 84 h60 l-8 -12 h-44 z" fill="none" stroke="#FFB020" stroke-width="2.5"/></svg>`
+  ];
+  const data=[
+    {tt:'largest & fastest',n:'Supercomputer',d:'The most powerful class. Uses massive parallel processing for enormously complex tasks — weather forecasting, nuclear simulation, molecular research.',pwr:100,rows:[['Users','Huge parallel workloads'],['Speed','Petaflops+ (fastest)'],['Cost','Extremely high'],['Examples','PARAM (India), Cray, Fugaku, Summit']]},
+    {tt:'large organisations',n:'Mainframe',d:'Large, powerful machines that serve thousands of users at once with great reliability. The backbone of banks, airlines and government.',pwr:72,rows:[['Users','Thousands, simultaneously'],['Speed','Very high'],['Cost','High'],['Examples','IBM Z series']]},
+    {tt:'mid-range',n:'Minicomputer',d:'Medium-sized machines (midrange servers) for a department or mid-size business — more than a PC, less than a mainframe. Serve tens to hundreds of users.',pwr:44,rows:[['Users','Tens–hundreds'],['Speed','Moderate–high'],['Cost','Moderate'],['Examples','PDP-11 (classic), modern midrange servers']]},
+    {tt:'personal',n:'Microcomputer',d:'A single-user computer built around one microprocessor. By far the most common type — this is the computer most people mean.',pwr:22,rows:[['Users','One (single-user)'],['Speed','Ample for personal work'],['Cost','Low'],['Examples','Desktop, laptop, tablet, smartphone']]}
+  ];
+  const tabs=$('#sizeTabs'),glyph=$('#sizeGlyph'),tt=$('#sizeTt'),name=$('#sizeName'),desc=$('#sizeDesc'),rows=$('#sizeRows'),pwr=$('#sizePwr'),pwrl=$('#sizePwrLbl');
+  ['Super','Mainframe','Mini','Micro'].forEach((r,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.textContent=r;b.addEventListener('click',()=>show(i));tabs.appendChild(b);});
+  function show(i){const d=data[i];$$('.tab',tabs).forEach((b,bi)=>b.classList.toggle('active',bi===i));glyph.innerHTML=icons[i];tt.textContent=d.tt;name.textContent=d.n;desc.textContent=d.d;rows.innerHTML=d.rows.map(r=>`<div class="trow"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');pwr.style.width=d.pwr+'%';pwrl.textContent=d.pwr+'%';}
+  show(0);
+})();
+
+/* 04 MODERN */
+(function modern(){
+  const items=[
+    {i:'🖥️',n:'Desktop',d:'A stationary personal computer for home or office.'},
+    {i:'💻',n:'Laptop',d:'A portable, battery-powered personal computer.'},
+    {i:'📱',n:'Smartphone',d:'A pocket computer with calling and sensors.'},
+    {i:'📟',n:'Tablet',d:'A touchscreen computer between phone and laptop.'},
+    {i:'🖧',n:'Server',d:'Provides data and services to many other computers.'},
+    {i:'🎛️',n:'Workstation',d:'A high-power PC for engineering, design or research.'},
+    {i:'⚙️',n:'Embedded',d:'A computer built inside another device (car, TV, washing machine).'},
+    {i:'⌚',n:'Wearable',d:'A tiny computer worn on the body, like a smartwatch.'}
+  ];
+  $('#modGrid').innerHTML=items.map(m=>`<div class="mod"><div class="mi">${m.i}</div><div class="mn">${m.n}</div><p>${m.d}</p></div>`).join('');
+})();
+
+/* 05 BLOCK DIAGRAM */
+(function block(){
+  const info={
+    input:['Input Unit','Accepts data and instructions from the outside world and converts them into binary form the computer can understand. Examples: keyboard, mouse, scanner, microphone.'],
+    output:['Output Unit','Takes the binary results from the computer and converts them into a human-readable form. Examples: monitor, printer, speaker.'],
+    memory:['Memory Unit (Primary)','Temporarily stores the data, instructions and intermediate results the CPU is currently using. Fast and directly accessible by the CPU. Made of RAM (temporary) and ROM (permanent start-up).'],
+    secondary:['Secondary Storage','Permanent storage for programs and files, kept even when the power is off. Larger, cheaper and slower than main memory, and not accessed directly by the CPU. Examples: hard disk, SSD, pen drive.'],
+    cu:['Control Unit (CU)','The manager of the CPU. It fetches instructions, decodes them, and directs every other unit using control signals. It does not process data itself — it conducts the whole orchestra.'],
+    alu:['Arithmetic Logic Unit (ALU)','The part of the CPU that does the actual work: arithmetic (add, subtract, multiply, divide) and logic (compare, AND, OR, NOT). Built from the logic gates from Lecture 01.'],
+    reg:['Registers','Very small, very fast storage locations inside the CPU that hold the data and instructions being worked on at this instant.']
+  };
+  const svg=$('#bdSvg'),T=$('#bdT'),P=$('#bdP'),step=$('#bdStep'),packet=$('#bdPacket');
+  let running=false;
+  $$('.blk',svg).forEach(g=>g.addEventListener('click',()=>{if(running)return;const k=g.dataset.key;if(!info[k])return;$$('.blk',svg).forEach(c=>c.classList.remove('sel'));g.classList.add('sel');T.textContent=info[k][0];P.textContent=info[k][1];}));
+  function blk(k){return svg.querySelector(`.blk[data-key="${k}"]`);}
+  function flash(keys){$$('.blk',svg).forEach(c=>c.classList.remove('flash'));keys.forEach(k=>{const c=blk(k);if(c)c.classList.add('flash');});}
+  function move(points,dur){return new Promise(res=>{packet.setAttribute('opacity','1');let segs=[],total=0;for(let i=0;i<points.length-1;i++){const a=points[i],b=points[i+1],len=Math.hypot(b[0]-a[0],b[1]-a[1]);segs.push({a,b,len});total+=len;}let start=null;function frame(ts){if(start===null)start=ts;let t=reduced?1:(ts-start)/dur;if(t>1)t=1;let dist=t*total,acc=0,x=points[0][0],y=points[0][1];for(const s of segs){if(dist<=acc+s.len){const f=s.len?(dist-acc)/s.len:1;x=s.a[0]+(s.b[0]-s.a[0])*f;y=s.a[1]+(s.b[1]-s.a[1])*f;break;}acc+=s.len;x=s.b[0];y=s.b[1];}packet.setAttribute('cx',x);packet.setAttribute('cy',y);if(t<1)requestAnimationFrame(frame);else res();}requestAnimationFrame(frame);});}
+  const P1=[[162,176],[232,176],[232,74],[290,74]];               // input -> memory
+  const P2=[[380,104],[380,180],[429,214],[429,236]];             // memory -> ALU
+  const P3=[[429,236],[429,180],[380,104]];                       // ALU -> memory
+  const P4=[[470,74],[540,74],[540,176],[598,176]];               // memory -> output
+  async function run(){
+    if(running)return;running=true;$$('.blk',svg).forEach(c=>c.classList.remove('sel'));
+    step.innerHTML='<b>1.</b> Input Unit sends data & instructions to Memory.';flash(['input','memory']);await move(P1,1000);
+    step.innerHTML='<b>2.</b> CPU fetches from Memory; the ALU processes it (CU directs).';flash(['memory','alu','cu']);await move(P2,1100);
+    step.innerHTML='<b>3.</b> The result is written back to Memory.';flash(['alu','memory']);await move(P3,900);
+    step.innerHTML='<b>4.</b> Memory sends the result to the Output Unit.';flash(['memory','output']);await move(P4,1000);
+    step.innerHTML='<b>Done.</b> Throughout, the Control Unit (dashed lines) directed every step.';packet.setAttribute('opacity','0');flash([]);running=false;
+  }
+  $('#bdRun').addEventListener('click',run);
+  $('#bdReset').addEventListener('click',()=>{if(running)return;$$('.blk',svg).forEach(c=>c.classList.remove('sel','flash'));packet.setAttribute('opacity','0');step.textContent='';T.textContent='Tap a block to explore';P.textContent='Five units, one plan. Click a block, or press Trace the data.';});
+})();
+
+/* 06a WHICH TYPE */
+(function typeGame(){
+  const clues=[
+    {c:'A mercury thermometer that rises smoothly',o:'Analog'},
+    {c:'A calculator working in 0s and 1s',o:'Digital'},
+    {c:'An ICU monitor: measures signals, shows digital numbers',o:'Hybrid'},
+    {c:'PARAM, forecasting the monsoon',o:'Supercomputer'},
+    {c:"A bank's central machine serving thousands of users",o:'Mainframe'},
+    {c:'The washing-machine controller that does one job',o:'Special-purpose'},
+    {c:'Your laptop running many different programs',o:'General-purpose'},
+    {c:'A smartphone in your pocket',o:'Microcomputer'}
+  ];
+  const OPTS=['Analog','Digital','Hybrid','Supercomputer','Mainframe','Special-purpose','General-purpose','Microcomputer'];
+  const clueEl=$('#typeClue'),opts=$('#typeOpts'),fb=$('#typeFb'),score=$('#typeScore');let cur,solved=0;
+  function build(){opts.innerHTML='';const set=new Set([cur.o]);while(set.size<4)set.add(OPTS[Math.floor(Math.random()*OPTS.length)]);const arr=[...set].sort(()=>Math.random()-0.5);arr.forEach(o=>{const b=document.createElement('button');b.className='opt-btn';b.textContent=o;b.addEventListener('click',()=>pick(o,b));opts.appendChild(b);});}
+  function pick(o,b){if(opts.dataset.done)return;if(o===cur.o){b.classList.add('correct');fb.className='feedback ok';fb.textContent='✓ Correct!';solved++;score.textContent='solved: '+solved;}else{b.classList.add('wrong');$$('.opt-btn',opts).forEach(x=>{if(x.textContent===cur.o)x.classList.add('correct');});fb.className='feedback no';fb.textContent='It\'s '+cur.o+'.';}opts.dataset.done='1';}
+  function next(){cur=clues[Math.floor(Math.random()*clues.length)];clueEl.textContent=cur.c;fb.className='feedback';fb.textContent='Choose one.';opts.removeAttribute('data-done');build();}
+  $('#typeNew').addEventListener('click',next);next();
+})();
+
+/* 06b WHICH UNIT */
+(function unitGame(){
+  const clues=[
+    {c:'Converts keystrokes into binary for the computer',o:'Input Unit'},
+    {c:'Performs addition and comparison',o:'ALU'},
+    {c:'Directs all other units with control signals',o:'Control Unit'},
+    {c:'Temporarily holds the program being run',o:'Memory Unit'},
+    {c:'Shows the result on screen',o:'Output Unit'},
+    {c:'Stores your files even when powered off',o:'Secondary Storage'}
+  ];
+  const OPTS=['Input Unit','Output Unit','ALU','Control Unit','Memory Unit','Secondary Storage'];
+  const clueEl=$('#unitClue'),opts=$('#unitOpts'),fb=$('#unitFb'),score=$('#unitScore');let cur,solved=0;
+  function build(){opts.innerHTML='';const set=new Set([cur.o]);while(set.size<4)set.add(OPTS[Math.floor(Math.random()*OPTS.length)]);const arr=[...set].sort(()=>Math.random()-0.5);arr.forEach(o=>{const b=document.createElement('button');b.className='opt-btn';b.textContent=o;b.addEventListener('click',()=>pick(o,b));opts.appendChild(b);});}
+  function pick(o,b){if(opts.dataset.done)return;if(o===cur.o){b.classList.add('correct');fb.className='feedback ok';fb.textContent='✓ Correct!';solved++;score.textContent='solved: '+solved;}else{b.classList.add('wrong');$$('.opt-btn',opts).forEach(x=>{if(x.textContent===cur.o)x.classList.add('correct');});fb.className='feedback no';fb.textContent='It\'s the '+cur.o+'.';}opts.dataset.done='1';}
+  function next(){cur=clues[Math.floor(Math.random()*clues.length)];clueEl.textContent=cur.c;fb.className='feedback';fb.textContent='Which block is responsible?';opts.removeAttribute('data-done');build();}
+  $('#unitNew').addEventListener('click',next);next();
+})();
+
+/* 06c QUIZ */
+(function quiz(){
+  const Q=[
+    {q:'A computer that measures continuous data such as voltage is a…',o:['digital computer','analog computer','hybrid computer','microcomputer'],a:1,e:'Analog computers measure continuous physical quantities.'},
+    {q:'Which type serves thousands of users in a bank or airline?',o:['Microcomputer','Minicomputer','Mainframe','Analog computer'],a:2,e:'Mainframes are built for very high reliability and many simultaneous users.'},
+    {q:'Inside the CPU, which unit performs arithmetic and logic?',o:['Control Unit','ALU','Memory Unit','Input Unit'],a:1,e:'The ALU (Arithmetic Logic Unit) does the actual calculations and comparisons.'},
+    {q:'Which unit directs all others but does not process data itself?',o:['ALU','Registers','Control Unit','Output Unit'],a:2,e:'The Control Unit manages and coordinates; it issues control signals.'},
+    {q:'A washing-machine controller built for one job only is a…',o:['general-purpose computer','special-purpose computer','supercomputer','mainframe'],a:1,e:'It is dedicated to a single task — special-purpose.'}
+  ];
+  const box=$('#quiz'),scoreEl=$('#quizScore');let answered=0,correct=0;
+  Q.forEach((item,qi)=>{const d=document.createElement('div');d.className='q';d.innerHTML=`<div class="qt"><span class="n">Q${qi+1}</span>${item.q}</div><div class="opts"></div><div class="exp">${item.e}</div>`;const opts=$('.opts',d);item.o.forEach((txt,oi)=>{const b=document.createElement('button');b.className='opt';b.textContent=txt;b.addEventListener('click',()=>{if(d.classList.contains('answered'))return;d.classList.add('answered');answered++;if(oi===item.a){b.classList.add('correct');correct++;}else{b.classList.add('wrong');$$('.opt',opts)[item.a].classList.add('correct');}$$('.opt',opts).forEach(x=>x.disabled=true);scoreEl.textContent=`Score: ${correct} / ${answered}`+(answered===Q.length?' — all done!':'');});opts.appendChild(b);});box.appendChild(d);});
+})();
+</script>
+</body>
+</html>
