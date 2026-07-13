@@ -79,15 +79,16 @@
   },
   {
     "number": "07",
-    "title": "Input and Output Devices",
+    "title": "Machine, Assembly & High-Level Languages",
     "section": "Section I: Introduction to Computers",
-    "description": "Keyboard, mouse, scanner, monitor, printer, speakers, and other common devices.",
+    "description": "Interactive lecture explaining machine language, assembly language, high-level languages, compilers, and interpreters.",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-07-notes.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
-    "status": "Coming Soon"
+    "status": "Available",
+    "lecture": "downloads/semester1/lectures/lecture-07-machine-assembly-high-level-languages.html"
   },
   {
     "number": "08",

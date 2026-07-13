@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 07 — Machine, Assembly & High-Level Languages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#090D18; --bg-2:#0C1120; --panel:#111A2E; --panel-2:#16203a;
+    --line:#22304d; --line-soft:#1a2540;
+    --ink:#EAF0FA; --ink-dim:#8593ad; --ink-faint:#5b6785;
+    --one:#FFB020; --one-soft:#4a3a1a; --one-glow:rgba(255,176,32,.45);
+    --zero:#4C74D0; --zero-soft:#1e2c4d;
+    --human:#B892FF; --human-glow:rgba(184,146,255,.4);
+    --ok:#4ade80; --no:#f87171;
+    --r:16px; --r-sm:10px; --maxw:1080px;
+    --f-display:'Space Grotesk',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--one);color:#1a1205}
+  a{color:var(--one);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  .layer + .layer{border-top:1px solid var(--line-soft)}
+  .rail{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:12px}
+  .rail button{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;transition:color .3s}
+  .rail .dot{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid var(--line);transition:all .3s;flex:none}
+  .rail button:hover{color:var(--ink-dim)}
+  .rail button.active{color:var(--one)}
+  .rail button.active .dot{background:var(--one);box-shadow:0 0 0 4px var(--one-glow);border-color:var(--one)}
+  .rail .label{opacity:0;transform:translateX(-4px);transition:all .3s;white-space:nowrap}
+  .rail button:hover .label,.rail button.active .label{opacity:1;transform:none}
+  @media(max-width:1300px){.rail{display:none}}
+  .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--one);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .num{font-weight:700;color:var(--bg);background:var(--one);padding:2px 8px;border-radius:6px;letter-spacing:.02em}
+  h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,46px);margin-bottom:20px}
+  h3{font-size:22px;margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-dim);max-width:60ch}
+  p{max-width:65ch;color:var(--ink-dim)}
+  strong{color:var(--ink);font-weight:600}
+  .amber{color:var(--one)} .blue{color:var(--zero)} .violet{color:var(--human)} .mono{font-family:var(--f-mono)}
+  .hero{padding:0;height:100vh;min-height:660px;display:flex;align-items:center;position:relative;overflow:hidden}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 42%,transparent 38%,var(--bg) 100%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--one);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+  .hero-tag .pill{background:var(--one);color:var(--bg);padding:3px 9px;border-radius:6px;font-weight:700}
+  .hero h1{font-size:clamp(36px,7vw,80px);margin-bottom:24px}
+  .hero h1 .flip{color:var(--one)}
+  .hero .lede{font-size:clamp(18px,2.3vw,23px);max-width:56ch}
+  .hero-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-hint .arrow{width:1px;height:26px;background:linear-gradient(var(--ink-faint),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(-6px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+  .objectives{padding:60px 0;background:var(--bg-2);border-bottom:1px solid var(--line-soft)}
+  .obj-head{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:22px}
+  .obj-head b{color:var(--one)}
+  .obj-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.obj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.obj-grid{grid-template-columns:repeat(5,1fr)}}
+  .obj{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .obj .on{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-bottom:8px}
+  .obj p{font-size:13.5px;color:var(--ink-dim)}
+  .stage{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:34px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .stage-title{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .readout{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)} .readout b{color:var(--one)}
+  .btn{font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .btn:hover{border-color:var(--one);color:var(--one)}
+  .btn.primary{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .recap{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);margin-top:26px;padding-left:14px;border-left:2px solid var(--one)}
+  .callout{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--human);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(184,146,255,.05);max-width:65ch}
+  .callout .ic{font-size:16px;flex:none} .callout .tx{font-size:14px;color:var(--ink-dim)} .callout .tx b{color:var(--human)}
+
+  table.dt{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  table.dt th,table.dt td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  table.dt th{background:var(--panel-2);color:var(--ink);font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  table.dt td{color:var(--ink-dim)}
+  table.dt tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+  .wrap-scroll{overflow-x:auto}
+
+  /* language ladder */
+  .lang-ladder{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .lrow{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px 18px;background:var(--bg);cursor:pointer;transition:all .2s}
+  .lrow:hover{border-color:var(--one)}
+  .lrow.sel{border-color:var(--one);background:var(--one-soft)}
+  .lrow .lh{display:flex;justify-content:space-between;align-items:center}
+  .lrow .lt{font-family:var(--f-display);font-weight:600;font-size:16px}
+  .lrow .ltag{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase}
+  .lrow .ld{font-size:13px;color:var(--ink-dim);margin-top:8px;max-height:0;overflow:hidden;transition:max-height .3s}
+  .lrow.sel .ld{max-height:220px;margin-top:10px}
+  .lrow .lcode{font-family:var(--f-mono);font-size:12px;background:var(--panel-2);border-radius:6px;padding:8px 10px;margin-top:8px;color:var(--one);overflow-x:auto;white-space:pre}
+
+  /* translator visual */
+  .trans-wrap{display:grid;grid-template-columns:1fr;gap:20px;align-items:center}
+  @media(min-width:820px){.trans-wrap{grid-template-columns:1.3fr 1fr}}
+  .trans-svg{width:100%;height:auto}
+  .trans-info{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg)}
+  .trans-info .t{font-family:var(--f-display);font-weight:600;font-size:17px;color:var(--one);margin-bottom:8px}
+  .trans-info p{font-size:14px}
+
+  /* code translate demo */
+  .code-demo{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:760px){.code-demo{grid-template-columns:repeat(3,1fr)}}
+  .code-col{border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;background:var(--bg);min-height:170px}
+  .code-col .ct{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:10px}
+  .code-col pre{font-family:var(--f-mono);font-size:12.5px;color:var(--ink);white-space:pre-wrap;line-height:1.7}
+  .code-col.hl pre{color:var(--human)}
+  .code-col.asm pre{color:var(--one)}
+  .code-col.bin pre{color:var(--zero);word-break:break-all}
+
+  /* compiler vs interpreter */
+  .ci-wrap{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:700px){.ci-wrap{grid-template-columns:1fr 1fr}}
+  .ci-card{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--panel)}
+  .ci-card h3{font-size:18px;margin-bottom:8px}
+  .ci-steps{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+  .ci-step{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);border-left:2px solid var(--line);padding-left:10px}
+  .ci-step.on{border-color:var(--one);color:var(--one)}
+  .ci-btn{margin-top:14px}
+
+  /* tabs (types) */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:11px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .2s}
+  .tab:hover{border-color:var(--one)} .tab.active{background:var(--one);color:#1a1205;border-color:var(--one)}
+
+  /* activities + quiz */
+  .act-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:780px){.act-grid{grid-template-columns:1fr 1fr}}
+  .act{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .act h3{font-size:19px;margin-bottom:6px}
+  .act .prompt{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+  .clue{border:1px solid var(--one);border-radius:var(--r-sm);padding:16px;background:var(--one-soft);color:var(--one);font-family:var(--f-mono);font-size:13.5px;text-align:center;margin-bottom:14px}
+  .opt-row{display:flex;gap:8px;flex-wrap:wrap}
+  .opt-btn{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--ink);transition:all .18s}
+  .opt-btn:hover:not(:disabled){border-color:var(--one)}
+  .opt-btn.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .opt-btn.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .feedback{font-family:var(--f-mono);font-size:13px;margin-top:14px;min-height:20px;color:var(--ink-faint)}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--no)}
+  .score{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+  .quiz{margin-top:28px}
+  .quiz-h{font-family:var(--f-display);font-size:22px;margin-bottom:16px}
+  .q{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);margin-bottom:14px}
+  .q .qt{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .q .qt .n{font-family:var(--f-mono);color:var(--one);margin-right:8px}
+  .q .opts{display:flex;flex-direction:column;gap:8px}
+  .q .opt{text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink-dim);background:var(--panel);transition:all .18s}
+  .q .opt:hover:not(:disabled){border-color:var(--one);color:var(--ink)}
+  .q .opt.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .q .opt.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .q .exp{font-size:13px;color:var(--ink-faint);margin-top:10px;display:none}
+  .q.answered .exp{display:block}
+  .quiz-score{font-family:var(--f-mono);font-size:14px;color:var(--one);margin-top:10px}
+  .why{background:linear-gradient(180deg,var(--bg),#070a12)}
+  .why h2{max-width:18ch}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:34px}
+  @media(min-width:680px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .card .k{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .card p{font-size:15px}
+  .hw{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel);margin-top:30px}
+  .hw .k{font-family:var(--f-mono);font-size:12px;color:var(--human);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+  .hw ol{margin:0 0 0 18px;color:var(--ink-dim);font-size:15px}
+  .hw li{margin-bottom:10px} .hw li b{color:var(--ink)}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line-soft);text-align:center}
+  footer .m{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  @media(max-width:520px){section{padding:70px 0}.stage{padding:20px}}
+</style>
+</head>
+<body>
+<nav class="rail" id="rail" aria-label="Lecture navigation"></nav>
+
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner"><div class="wrap">
+    <div class="hero-tag"><span class="pill">Lecture 07</span> Basic Programming Concepts · BSc Computer Science</div>
+    <h1>Three languages.<br>One <span class="flip">machine</span>.</h1>
+    <p class="lede">Back in Lecture 01 we saw a stack of translation from human meaning down to voltage. Today we zoom into the middle of that stack: the three levels of programming language — machine language, assembly language, and the high-level languages you'll actually write.</p>
+  </div></div>
+  <div class="hero-hint"><span>scroll to begin</span><span class="arrow"></span></div>
+</header>
+
+<section class="objectives" id="obj">
+  <div class="wrap">
+    <div class="obj-head">By the end of this session you will be able to — <b>five things</b></div>
+    <div class="obj-grid">
+      <div class="obj"><div class="on">01</div><p>Define <em>machine language</em> and explain why it's hard for humans.</p></div>
+      <div class="obj"><div class="on">02</div><p>Explain <em>assembly language</em> and the role of the <em>assembler</em>.</p></div>
+      <div class="obj"><div class="on">03</div><p>Explain <em>high-level languages</em> and why they're easier to use.</p></div>
+      <div class="obj"><div class="on">04</div><p>Distinguish a <em>compiler</em> from an <em>interpreter</em>.</p></div>
+      <div class="obj"><div class="on">05</div><p>Trace one instruction through <em>all three levels</em>.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 00 THE LADDER -->
+<section class="layer" id="s0" data-title="The language ladder">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">00</span> Three levels, one job</div>
+    <h2>Every language exists to close the same gap: human idea → machine action.</h2>
+    <p>In Lecture 01 we saw the CPU only ever executes patterns of 1s and 0s. But no one writes programs that way — instead we've built <strong>three levels of language</strong>, each trading closeness-to-the-machine for ease-of-use-for-humans. <strong>Click a level</strong> to explore it.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · the three levels</span></div>
+      <div class="lang-ladder" id="ladder"></div>
+    </div>
+    <div class="recap">TAKEAWAY · Machine language (what the CPU runs) → Assembly language (mnemonics for machine code) → High-level languages (human-readable, general-purpose). Each needs to be translated down to the one before it.</div>
+  </div>
+</section>
+
+<!-- 01 MACHINE LANGUAGE -->
+<section class="layer" id="s1" data-title="Machine language">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">01</span> Machine language</div>
+    <h2>The only language the CPU actually understands.</h2>
+    <p><strong>Machine language</strong> is a series of binary patterns (0s and 1s) that directly correspond to specific operations the CPU can perform — exactly the "machine code" that came out of the abstraction stack in Lecture 01. Each instruction typically has an <strong>opcode</strong> (which operation) and an <strong>operand</strong> (what data). It is executed directly by the hardware with no translation needed — but it's extremely difficult for humans to read, write, or debug.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Anatomy of one machine instruction</span></div>
+      <div class="wrap-scroll"><table class="dt">
+        <tr><th>Binary instruction</th><th>Opcode (operation)</th><th>Operand (data/address)</th><th>Meaning</th></tr>
+        <tr><td class="mono">0000 0101 0011</td><td class="mono">0000</td><td class="mono">0101 0011</td><td>LOAD the value 83 into a register</td></tr>
+        <tr><td class="mono">0001 0101 0011</td><td class="mono">0001</td><td class="mono">0101 0011</td><td>ADD the value 83 to the register</td></tr>
+      </table></div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>Link back:</b> This is exactly the "Layer 02" binary and "Layer 03" machine code from Lecture 01's abstraction stack — nothing new, just a closer look.</div></div>
+    <div class="recap">TAKEAWAY · Machine language = raw binary opcodes + operands. Fastest to execute, but nearly impossible for humans to write directly.</div>
+  </div>
+</section>
+
+<!-- 02 ASSEMBLY LANGUAGE -->
+<section class="layer" id="s2" data-title="Assembly language">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">02</span> Assembly language</div>
+    <h2>Giving binary opcodes short, human-readable names.</h2>
+    <p><strong>Assembly language</strong> replaces raw binary opcodes with short, memorable <strong>mnemonics</strong> — <span class="mono">MOV</span>, <span class="mono">ADD</span>, <span class="mono">JMP</span> — that correspond almost one-to-one with machine instructions. It's still tied closely to a specific CPU's design, but far more readable than binary. A translator called an <strong>assembler</strong> converts assembly code into machine code.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · assembler at work</span></div>
+      <div class="trans-wrap">
+        <div><svg class="trans-svg" viewBox="0 0 420 170" id="asmSvg" role="img" aria-label="Assembler converting assembly code to machine code"></svg></div>
+        <div class="trans-info"><div class="t">The Assembler</div><p>Reads assembly source line by line and produces the exact machine code for that specific CPU family — a nearly 1-to-1 translation, so the programmer still needs to think close to the hardware (registers, memory addresses).</p></div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="asmRun">Assemble it</button><button class="btn ghost" id="asmReset">Reset</button></div>
+    </div>
+    <div class="recap">TAKEAWAY · Assembly = mnemonics for machine instructions, translated 1-to-1 by an assembler. Readable by humans, but still CPU-specific.</div>
+  </div>
+</section>
+
+<!-- 03 HIGH-LEVEL LANGUAGES -->
+<section class="layer" id="s3" data-title="High-level languages">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">03</span> High-level languages</div>
+    <h2>Write like a human. Let a translator worry about the machine.</h2>
+    <p><strong>High-level languages</strong> (Python, Java, C++, JavaScript…) use English-like keywords and structures, hide the details of any particular CPU, and let one line of code often stand in for many machine instructions. This makes programs faster to write, easier to read, and <strong>portable</strong> — the same source code can often run on very different machines, once translated for each.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · one high-level line becomes many low-level ones</span></div>
+      <div class="code-demo">
+        <div class="code-col hl"><div class="ct">High-level (Python)</div><pre id="hlCode">total = 5 + 3
+print(total)</pre></div>
+        <div class="code-col asm"><div class="ct">Assembly</div><pre id="asmCode">—</pre></div>
+        <div class="code-col bin"><div class="ct">Machine code (binary)</div><pre id="binCode">—</pre></div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="hlTranslate">Translate down ↓</button><button class="btn ghost" id="hlReset">Reset</button></div>
+    </div>
+    <div class="recap">TAKEAWAY · High-level languages are portable and human-readable; one line often expands into several machine instructions once translated.</div>
+  </div>
+</section>
+
+<!-- 04 COMPILER VS INTERPRETER -->
+<section class="layer" id="s4" data-title="Compiler vs Interpreter">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">04</span> Translating high-level code</div>
+    <h2>Two ways to turn your code into something the CPU can run.</h2>
+    <p>A high-level program must still become machine code eventually. Two common strategies do this:</p>
+    <div class="stage">
+      <div class="ci-wrap">
+        <div class="ci-card">
+          <h3 class="amber">Compiler</h3>
+          <p>Translates the <strong>entire</strong> source program into machine code <em>before</em> it runs, producing a standalone executable file. Errors are caught all at once, before execution; the resulting program then runs fast on its own.</p>
+          <div class="ci-steps" id="compSteps"></div>
+          <button class="btn primary ci-btn" id="compRun">Run compilation</button>
+        </div>
+        <div class="ci-card">
+          <h3 class="amber">Interpreter</h3>
+          <p>Translates and executes the program <strong>line by line</strong>, on the fly, with no separate executable produced. Easier for testing and interactive use, but generally slower since translation happens every time it runs.</p>
+          <div class="ci-steps" id="interpSteps"></div>
+          <button class="btn primary ci-btn" id="interpRun">Run interpretation</button>
+        </div>
+      </div>
+    </div>
+    <div class="wrap-scroll"><table class="dt">
+      <tr><th>Feature</th><th>Compiler</th><th>Interpreter</th></tr>
+      <tr><td>Translates</td><td>The whole program, before running</td><td>Line by line, while running</td></tr>
+      <tr><td>Output</td><td>A standalone executable file</td><td>No separate file — runs directly from source</td></tr>
+      <tr><td>Speed of execution</td><td>Fast (already translated)</td><td>Slower (translated every run)</td></tr>
+      <tr><td>Error reporting</td><td>All errors found before running</td><td>Stops at the first error it reaches</td></tr>
+      <tr><td>Examples</td><td>C, C++</td><td>Python, JavaScript (typically)</td></tr>
+    </table></div>
+    <div class="recap">TAKEAWAY · Compiler = translate everything first, then run fast. Interpreter = translate and run one line at a time, slower but flexible.</div>
+  </div>
+</section>
+
+<!-- 05 ACTIVITIES -->
+<section class="layer" id="s5" data-title="Activities">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">05</span> Check yourself</div>
+    <h2>Your turn. Two challenges, then a graded quiz.</h2>
+    <p>Great for the projector — everything you need is on the slides above.</p>
+    <div class="act-grid">
+      <div class="act">
+        <h3>① Which language level?</h3>
+        <div class="prompt">Read the code snippet or clue and pick the level.</div>
+        <div class="clue" id="lvlClue">—</div>
+        <div class="opt-row"><button class="opt-btn" id="lvlMachine">MACHINE</button><button class="opt-btn" id="lvlAssembly">ASSEMBLY</button><button class="opt-btn" id="lvlHigh">HIGH-LEVEL</button></div>
+        <div class="feedback" id="lvlFb"></div>
+        <div class="btn-row"><button class="btn ghost" id="lvlNext">Next</button></div>
+      </div>
+      <div class="act">
+        <h3>② Compiler or interpreter?</h3>
+        <div class="prompt">Read the clue and pick the correct translator.</div>
+        <div class="clue" id="ciClue">—</div>
+        <div class="opt-row"><button class="opt-btn" id="ciComp">COMPILER</button><button class="opt-btn" id="ciInterp">INTERPRETER</button><button class="btn ghost" id="ciNext" style="margin-left:auto">Next</button></div>
+        <div class="feedback" id="ciFb"></div>
+      </div>
+    </div>
+    <div class="quiz">
+      <div class="quiz-h">③ Quick quiz</div>
+      <div id="quiz"></div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 WHY -->
+<section class="why layer" id="s6" data-title="Why & recap">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">06</span> Why it matters</div>
+    <h2>Every program you will ever write travels this same road down to voltage.</h2>
+    <p>Understanding the three levels of language — and how compilers, interpreters and assemblers connect them — explains why some languages are faster, why "portable" code still needs translating for each machine, and why a single typo can be caught before running (compiled) or crash the program mid-way (interpreted). This is the foundation for every programming course that follows.</p>
+    <div class="cards">
+      <div class="card"><div class="k">Choose the right tool</div><p>Need raw speed? A compiled language. Need to test quickly? An interpreted one.</p></div>
+      <div class="card"><div class="k">Debug with context</div><p>Knowing whether your language compiles or interprets tells you when and how errors will appear.</p></div>
+      <div class="card"><div class="k">Exam gold</div><p>"Differentiate machine, assembly and high-level languages" and "compiler vs interpreter" are classic questions — now covered in full.</p></div>
+    </div>
+    <div class="hw">
+      <div class="k">Homework · before Lecture 08</div>
+      <ol>
+        <li><b>Trace one instruction:</b> pick a simple task (e.g. add two numbers) and write it out in high-level pseudocode, then imagine its assembly and machine code equivalents.</li>
+        <li><b>Compare table:</b> make a table comparing machine, assembly and high-level languages on readability, speed, and portability.</li>
+        <li><b>Compiler vs interpreter:</b> in your own words, explain why a compiled program usually runs faster than an interpreted one.</li>
+        <li><b>Research:</b> name three high-level languages and one thing each is best known for (e.g. Python for data science).</li>
+        <li><b>Stretch:</b> find out what an "assembler" and a "linker" each do, and how they differ.</li>
+      </ol>
+    </div>
+    <p class="recap" style="margin-top:34px">THE WHOLE STORY · Machine language (raw binary, direct execution) → Assembly language (mnemonics, assembled 1-to-1) → High-level languages (human-readable, compiled or interpreted). Three levels, one destination: the CPU.</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="m">Lecture 07 · Basic Programming Concepts · an interactive teaching aid — press any widget to explore</div></div></footer>
+
+<script>
+"use strict";
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const wait=ms=>new Promise(r=>setTimeout(r,reduced?0:ms));
+
+/* RAIL */
+const nav=[
+  {id:'top',n:'—',t:'Cover'},{id:'s0',n:'00',t:'The language ladder'},{id:'s1',n:'01',t:'Machine language'},
+  {id:'s2',n:'02',t:'Assembly language'},{id:'s3',n:'03',t:'High-level languages'},{id:'s4',n:'04',t:'Compiler vs Interpreter'},
+  {id:'s5',n:'05',t:'Activities'},{id:'s6',n:'06',t:'Why & recap'}
+];
+const rail=$('#rail');
+nav.forEach(s=>{const el=document.getElementById(s.id);const b=document.createElement('button');b.innerHTML=`<span class="dot"></span><span class="label">${s.n==='—'?'top':s.n} · ${s.t}</span>`;b.dataset.for=s.id;b.addEventListener('click',()=>el&&el.scrollIntoView({behavior:reduced?'auto':'smooth'}));rail.appendChild(b);});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.for===e.target.id));}),{rootMargin:'-45% 0px -45% 0px'});
+nav.forEach(s=>{const el=document.getElementById(s.id);if(el)spy.observe(el);});
+
+/* HERO */
+(function heroGrid(){
+  const cv=$('#heroCanvas'),ctx=cv.getContext('2d');
+  let cols,rows,gap=26,size=6,t=0,mouse={x:-999,y:-999};
+  const AMBER='#FFB020',BLUE='#26385f';
+  function resize(){cv.width=cv.offsetWidth*devicePixelRatio;cv.height=cv.offsetHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cols=Math.ceil(cv.offsetWidth/gap)+1;rows=Math.ceil(cv.offsetHeight/gap)+1;}
+  resize();addEventListener('resize',resize);
+  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
+  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-999;});
+  function draw(){const W=cv.offsetWidth,H=cv.offsetHeight;ctx.clearRect(0,0,W,H);const wave=(t*0.9)%(W+H+400)-200;for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const px=x*gap+14,py=y*gap+14,diag=px+py,dw=Math.abs(diag-wave);const onWave=dw<60?1-(dw/60):0;const dx=px-mouse.x,dy=py-mouse.y,md=Math.hypot(dx,dy),onMouse=md<90?1-(md/90):0;const heat=Math.max(onWave,onMouse);if(heat>0.05){ctx.fillStyle=AMBER;ctx.globalAlpha=0.15+heat*0.85;const s=size+heat*4;ctx.fillRect(px-s/2,py-s/2,s,s);}else{ctx.fillStyle=BLUE;ctx.globalAlpha=0.5;ctx.fillRect(px-size/2,py-size/2,size,size);}}ctx.globalAlpha=1;}
+  if(reduced){draw();return;}
+  (function loop(){t+=2.4;draw();requestAnimationFrame(loop);})();
+})();
+
+/* 00 LANGUAGE LADDER */
+(function ladder(){
+  const levels=[
+    {t:'High-level languages',tag:'closest to humans',d:'English-like keywords and structures (Python, Java, C++, JavaScript). One line can represent many machine instructions. Portable across different machines, but must be compiled or interpreted before the CPU can run it.',code:'total = 5 + 3\\nprint(total)'},
+    {t:'Assembly language',tag:'mnemonics for machine code',d:'Short, memorable instruction names (MOV, ADD, JMP) standing in almost 1-to-1 for machine instructions. Tied to a specific CPU family, translated by an assembler.',code:'MOV AX, 5\\nADD AX, 3\\nCALL print'},
+    {t:'Machine language',tag:'the only thing the CPU runs',d:'Pure binary opcodes and operands. Executed directly by the hardware with zero translation, but essentially unreadable and unwritable by humans directly.',code:'0000 0000 0101\\n0001 0000 0011'}
+  ];
+  const wrap=$('#ladder');
+  levels.forEach((l,i)=>{
+    const el=document.createElement('div');el.className='lrow'+(i===0?' sel':'');
+    el.innerHTML=`<div class="lh"><span class="lt">${l.t}</span><span class="ltag">${l.tag}</span></div><div class="ld">${l.d}<div class="lcode">${l.code}</div></div>`;
+    el.addEventListener('click',()=>{$$('.lrow',wrap).forEach(x=>x.classList.remove('sel'));el.classList.add('sel');});
+    wrap.appendChild(el);
+  });
+})();
+
+/* 02 ASSEMBLER VISUAL */
+(function assembler(){
+  const svg=$('#asmSvg');
+  const asmLines=['MOV AX, 5','ADD AX, 3'];
+  const binLines=['1011000000000101','0000010100000011'];
+  function draw(progress){
+    let g=`<rect x="10" y="15" width="140" height="140" rx="8" fill="#16203a" stroke="#22304d" stroke-width="2"/>
+    <text x="80" y="10" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#8593ad">ASSEMBLY SOURCE</text>`;
+    asmLines.forEach((l,i)=>{g+=`<text x="20" y="${45+i*26}" font-family="'JetBrains Mono'" font-size="12" fill="#FFB020">${l}</text>`;});
+    g+=`<rect x="270" y="15" width="140" height="140" rx="8" fill="#16203a" stroke="#22304d" stroke-width="2"/>
+    <text x="340" y="10" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#8593ad">MACHINE CODE</text>`;
+    binLines.forEach((l,i)=>{
+      const shown = progress>i ? l : (progress>i-1 ? l.slice(0, Math.floor((progress-i+1)*l.length)) : '');
+      g+=`<text x="280" y="${45+i*26}" font-family="'JetBrains Mono'" font-size="9.5" fill="#4C74D0">${shown}</text>`;
+    });
+    g+=`<rect x="175" y="60" width="80" height="50" rx="8" fill="${progress>0?'#4a3a1a':'#16203a'}" stroke="#FFB020" stroke-width="2"/>
+    <text x="215" y="80" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#FFB020">ASSEM-</text>
+    <text x="215" y="94" text-anchor="middle" font-family="'JetBrains Mono'" font-size="10" fill="#FFB020">BLER</text>`;
+    svg.innerHTML=g;
+  }
+  draw(0);
+  $('#asmRun').addEventListener('click', async ()=>{
+    for(let p=0;p<=2;p+=0.1){draw(p);await wait(60);}
+    draw(2);
+  });
+  $('#asmReset').addEventListener('click',()=>draw(0));
+})();
+
+/* 03 HIGH-LEVEL TRANSLATE DEMO */
+(function hlDemo(){
+  const asmCode=$('#asmCode'),binCode=$('#binCode');
+  const asmText='MOV AX, 5\nADD AX, 3\nCALL print';
+  const binText='10110000 00000101\n00000100 00000011\n11101000 ????????';
+  $('#hlTranslate').addEventListener('click',()=>{asmCode.textContent=asmText;binCode.textContent=binText;});
+  $('#hlReset').addEventListener('click',()=>{asmCode.textContent='—';binCode.textContent='—';});
+})();
+
+/* 04 COMPILER / INTERPRETER SIM */
+(function ci(){
+  const compStepsData=['Read the entire source file','Check all syntax &amp; types for errors','Translate the whole program to machine code','Produce a standalone executable file','Run the executable — fast, no further translation'];
+  const interpStepsData=['Read the first line of source','Translate just that line to machine instructions','Execute that line immediately','Move to the next line and repeat','(Continues until the program ends or hits an error)'];
+  function build(container,data){container.innerHTML=data.map(s=>`<div class="ci-step">${s}</div>`).join('');}
+  const compEl=$('#compSteps'),interpEl=$('#interpSteps');
+  build(compEl,compStepsData);build(interpEl,interpStepsData);
+  async function animate(container,data){
+    const steps=$$('.ci-step',container);
+    steps.forEach(s=>s.classList.remove('on'));
+    for(let i=0;i<steps.length;i++){steps[i].classList.add('on');await wait(450);}
+  }
+  $('#compRun').addEventListener('click',()=>animate(compEl,compStepsData));
+  $('#interpRun').addEventListener('click',()=>animate(interpEl,interpStepsData));
+})();
+
+/* 05a LANGUAGE LEVEL GAME */
+(function lvlGame(){
+  const items=[
+    ['print("Hello, world!")','high'],
+    ['MOV AX, 5','asm'],
+    ['1011000000000101','machine'],
+    ['for i in range(10):','high'],
+    ['JMP 0040','asm'],
+    ['0000 0101 0011','machine'],
+    ['int total = a + b;','high'],
+    ['ADD AX, BX','asm']
+  ];
+  const clue=$('#lvlClue'),fb=$('#lvlFb');
+  const bM=$('#lvlMachine'),bA=$('#lvlAssembly'),bH=$('#lvlHigh');
+  let cur,done=false;
+  function next(){cur=items[Math.floor(Math.random()*items.length)];clue.textContent=cur[0];fb.className='feedback';fb.textContent='';done=false;[bM,bA,bH].forEach(b=>b.className='opt-btn');}
+  function ans(val,btn){
+    if(done)return;done=true;
+    const correct=(val===cur[1]);
+    btn.classList.add(correct?'correct':'wrong');
+    fb.className='feedback '+(correct?'ok':'no');
+    const names={machine:'MACHINE language',asm:'ASSEMBLY language',high:'a HIGH-LEVEL language'};
+    fb.textContent=(correct?'✓ ':'✗ ')+'That snippet is '+names[cur[1]]+'.';
+  }
+  bM.addEventListener('click',()=>ans('machine',bM));
+  bA.addEventListener('click',()=>ans('asm',bA));
+  bH.addEventListener('click',()=>ans('high',bH));
+  $('#lvlNext').addEventListener('click',next);
+  next();
+})();
+
+/* 05b COMPILER/INTERPRETER GAME */
+(function ciGame(){
+  const items=[
+    ['Translates the whole program before it runs','comp'],
+    ['Translates and runs one line at a time','interp'],
+    ['Produces a standalone executable file','comp'],
+    ['Typical for Python programs','interp'],
+    ['All errors are reported before execution begins','comp'],
+    ['Typical for C and C++ programs','comp'],
+    ['Execution stops as soon as an error line is reached','interp'],
+    ['Generally slower because translation repeats every run','interp']
+  ];
+  const clue=$('#ciClue'),fb=$('#ciFb'),bC=$('#ciComp'),bI=$('#ciInterp');let cur,done=false;
+  function next(){cur=items[Math.floor(Math.random()*items.length)];clue.textContent=cur[0];fb.className='feedback';fb.textContent='';done=false;bC.className='opt-btn';bI.className='opt-btn';}
+  function ans(val,btn){if(done)return;done=true;const correct=(val===cur[1]);btn.classList.add(correct?'correct':'wrong');fb.className='feedback '+(correct?'ok':'no');fb.textContent=(correct?'✓ ':'✗ ')+'That describes a '+(cur[1]==='comp'?'compiler':'interpreter')+'.';}
+  bC.addEventListener('click',()=>ans('comp',bC));bI.addEventListener('click',()=>ans('interp',bI));$('#ciNext').addEventListener('click',next);next();
+})();
+
+/* 05c QUIZ */
+(function quiz(){
+  const Q=[
+    {q:'Which language is executed directly by the CPU with no translation?',o:['High-level language','Assembly language','Machine language','Pseudocode'],a:2,e:'Machine language is pure binary and is the only thing a CPU runs directly.'},
+    {q:'What does an assembler do?',o:['Translates high-level code to assembly','Translates assembly code to machine code','Translates machine code to assembly','Runs a program line by line'],a:1,e:'An assembler converts assembly mnemonics into their equivalent machine code, roughly 1-to-1.'},
+    {q:'Which is a key advantage of high-level languages?',o:['They run without any translation','They are portable and easier for humans to read and write','They are always faster than assembly','They require no compiler or interpreter'],a:1,e:'High-level languages use readable, English-like syntax and can often run on different machines once translated for each.'},
+    {q:'A compiler differs from an interpreter mainly because a compiler…',o:['translates the whole program before running it','translates and runs one line at a time','never produces any errors','only works with assembly language'],a:0,e:'A compiler translates the entire program in advance, producing a standalone executable; an interpreter translates and runs line by line.'},
+    {q:'Which of these is a mnemonic you would find in assembly language?',o:['01001000','print()','MOV','for'],a:2,e:'MOV is a classic assembly mnemonic, standing in for a specific machine-code operation.'}
+  ];
+  const box=$('#quiz'),scoreEl=$('#quizScore');let answered=0,correct=0;
+  Q.forEach((item,qi)=>{const d=document.createElement('div');d.className='q';d.innerHTML=`<div class="qt"><span class="n">Q${qi+1}</span>${item.q}</div><div class="opts"></div><div class="exp">${item.e}</div>`;const opts=$('.opts',d);item.o.forEach((txt,oi)=>{const b=document.createElement('button');b.className='opt';b.textContent=txt;b.addEventListener('click',()=>{if(d.classList.contains('answered'))return;d.classList.add('answered');answered++;if(oi===item.a){b.classList.add('correct');correct++;}else{b.classList.add('wrong');$$('.opt',opts)[item.a].classList.add('correct');}$$('.opt',opts).forEach(x=>x.disabled=true);scoreEl.textContent=`Score: ${correct} / ${answered}`+(answered===Q.length?' — all done!':'');});opts.appendChild(b);});box.appendChild(d);});
+})();
+</script>
+</body>
+</html>
