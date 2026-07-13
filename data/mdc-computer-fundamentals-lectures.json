@@ -1,0 +1,11 @@
+[
+  {
+    "number": "01",
+    "title": "Meet the Computer",
+    "section": "MDC Computer Fundamentals",
+    "description": "Interactive beginner lecture explaining what a computer is, binary ideas, characters, uses, and the evolution of computers.",
+    "lecture": "downloads/semester1/mdc/lectures/lecture-01-meet-the-computer.html",
+    "notes": "#",
+    "status": "Available"
+  }
+]

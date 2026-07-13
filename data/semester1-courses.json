@@ -17,7 +17,7 @@
     "description": "Multi Disciplinary Course (MDC) for students who need a clear beginner-friendly foundation in computers, software, internet use, and digital skills.",
     "type": "MDC Course",
     "overviewLink": "mdc-computer-fundamentals.html",
-    "lecturesLink": "#",
+    "lecturesLink": "mdc-computer-fundamentals.html#mdc-lectures",
     "assignmentsLink": "#",
     "quizzesLink": "#",
     "labLink": "#",

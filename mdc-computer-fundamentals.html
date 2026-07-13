@@ -47,13 +47,15 @@
     </section>
 
     <section class="section soft-bg">
-      <div class="container">
+      <div class="container" id="mdc-lectures">
         <div class="section-heading">
           <p class="eyebrow">Course Material</p>
           <h2>MDC Computer Fundamentals Resources</h2>
         </div>
+        <label class="search-label" for="mdc-lecture-search">Search MDC lectures</label>
+        <input class="search-input" id="mdc-lecture-search" type="search" placeholder="Search COMP-1001 lectures">
+        <div class="lecture-grid" data-render="mdc-computer-fundamentals-lectures"></div>
         <div class="course-menu-grid">
-          <a class="menu-card" href="#"><strong>Lecture Notes</strong><span>Coming soon for COMP-1001</span></a>
           <a class="menu-card" href="#"><strong>PDF Notes</strong><span>Downloadable notes will be added here</span></a>
           <a class="menu-card" href="#"><strong>Assignments</strong><span>Practice work and submission links</span></a>
           <a class="menu-card" href="#"><strong>Quizzes</strong><span>Topic-wise revision quizzes</span></a>
@@ -66,5 +68,6 @@
 
   <footer class="site-footer"><div class="container"><p>Department of Computer Science / Computer Applications</p><p>Govt. Degree College Bhoranj, Himachal Pradesh</p></div></footer>
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/data-render.js?v=20260713-mdc-lecture01"></script>
 </body>
 </html>
