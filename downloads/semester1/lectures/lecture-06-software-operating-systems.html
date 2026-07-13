@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 06 — Software & Operating Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#090D18; --bg-2:#0C1120; --panel:#111A2E; --panel-2:#16203a;
+    --line:#22304d; --line-soft:#1a2540;
+    --ink:#EAF0FA; --ink-dim:#8593ad; --ink-faint:#5b6785;
+    --one:#FFB020; --one-soft:#4a3a1a; --one-glow:rgba(255,176,32,.45);
+    --zero:#4C74D0; --zero-soft:#1e2c4d;
+    --human:#B892FF; --human-glow:rgba(184,146,255,.4);
+    --ok:#4ade80; --no:#f87171;
+    --r:16px; --r-sm:10px; --maxw:1080px;
+    --f-display:'Space Grotesk',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--one);color:#1a1205}
+  a{color:var(--one);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  .layer + .layer{border-top:1px solid var(--line-soft)}
+  .rail{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:12px}
+  .rail button{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;transition:color .3s}
+  .rail .dot{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid var(--line);transition:all .3s;flex:none}
+  .rail button:hover{color:var(--ink-dim)}
+  .rail button.active{color:var(--one)}
+  .rail button.active .dot{background:var(--one);box-shadow:0 0 0 4px var(--one-glow);border-color:var(--one)}
+  .rail .label{opacity:0;transform:translateX(-4px);transition:all .3s;white-space:nowrap}
+  .rail button:hover .label,.rail button.active .label{opacity:1;transform:none}
+  @media(max-width:1300px){.rail{display:none}}
+  .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--one);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .num{font-weight:700;color:var(--bg);background:var(--one);padding:2px 8px;border-radius:6px;letter-spacing:.02em}
+  h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.08;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,46px);margin-bottom:20px}
+  h3{font-size:22px;margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-dim);max-width:60ch}
+  p{max-width:65ch;color:var(--ink-dim)}
+  strong{color:var(--ink);font-weight:600}
+  .amber{color:var(--one)} .blue{color:var(--zero)} .violet{color:var(--human)} .mono{font-family:var(--f-mono)}
+  .hero{padding:0;height:100vh;min-height:660px;display:flex;align-items:center;position:relative;overflow:hidden}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 42%,transparent 38%,var(--bg) 100%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--one);margin-bottom:22px;display:flex;align-items:center;gap:10px}
+  .hero-tag .pill{background:var(--one);color:var(--bg);padding:3px 9px;border-radius:6px;font-weight:700}
+  .hero h1{font-size:clamp(36px,7vw,80px);margin-bottom:24px}
+  .hero h1 .flip{color:var(--one)}
+  .hero .lede{font-size:clamp(18px,2.3vw,23px);max-width:56ch}
+  .hero-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-hint .arrow{width:1px;height:26px;background:linear-gradient(var(--ink-faint),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(-6px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+  .objectives{padding:60px 0;background:var(--bg-2);border-bottom:1px solid var(--line-soft)}
+  .obj-head{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:22px}
+  .obj-head b{color:var(--one)}
+  .obj-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.obj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.obj-grid{grid-template-columns:repeat(5,1fr)}}
+  .obj{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .obj .on{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-bottom:8px}
+  .obj p{font-size:13.5px;color:var(--ink-dim)}
+  .stage{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:34px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .stage-title{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .readout{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)} .readout b{color:var(--one)}
+  .btn{font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .btn:hover{border-color:var(--one);color:var(--one)}
+  .btn.primary{background:var(--one);color:#1a1205;border-color:var(--one);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .recap{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);margin-top:26px;padding-left:14px;border-left:2px solid var(--one)}
+  .callout{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--human);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(184,146,255,.05);max-width:65ch}
+  .callout .ic{font-size:16px;flex:none} .callout .tx{font-size:14px;color:var(--ink-dim)} .callout .tx b{color:var(--human)}
+
+  table.dt{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  table.dt th,table.dt td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  table.dt th{background:var(--panel-2);color:var(--ink);font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  table.dt td{color:var(--ink-dim)}
+  table.dt tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+  .wrap-scroll{overflow-x:auto}
+
+  /* software tree */
+  .stack-layers{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .slayer{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px 18px;background:var(--bg);cursor:pointer;transition:all .2s}
+  .slayer:hover{border-color:var(--one)}
+  .slayer.sel{border-color:var(--one);background:var(--one-soft)}
+  .slayer .sh{display:flex;justify-content:space-between;align-items:center}
+  .slayer .st{font-family:var(--f-display);font-weight:600;font-size:16px}
+  .slayer .stag{font-family:var(--f-mono);font-size:10px;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase}
+  .slayer .sd{font-size:13px;color:var(--ink-dim);margin-top:8px;max-height:0;overflow:hidden;transition:max-height .3s}
+  .slayer.sel .sd{max-height:200px;margin-top:10px}
+  .slayer .ex{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .slayer .chip{font-family:var(--f-mono);font-size:11px;padding:4px 10px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-dim)}
+
+  /* software sorter (input/output style reused) */
+  .sw-board{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:700px){.sw-board{grid-template-columns:1fr 1fr}}
+  .sw-col{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--bg);min-height:170px}
+  .sw-col .ch{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:12px}
+  .sw-col.sys .ch{color:var(--one)} .sw-col.app .ch{color:var(--human)}
+  .sw-slot{min-height:40px;border:1px dashed var(--line);border-radius:8px;margin-bottom:8px;display:flex;align-items:center;padding:0 10px;font-family:var(--f-mono);font-size:12px}
+  .sw-pool{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .sw-chip{font-family:var(--f-mono);font-size:12.5px;padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);cursor:pointer;transition:all .15s}
+  .sw-chip:hover{border-color:var(--one)}
+  .sw-chip.placed{opacity:.35;cursor:default}
+  .sw-msg{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);margin-top:12px;min-height:18px}
+
+  /* OS manager sim */
+  .os-wrap{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:900px){.os-wrap{grid-template-columns:1.2fr 1fr}}
+  .os-resources{display:flex;flex-direction:column;gap:10px}
+  .res{border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;background:var(--bg)}
+  .res .rh{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:8px}
+  .res .rbar{height:10px;border-radius:5px;background:var(--zero-soft);overflow:hidden}
+  .res .rfill{height:100%;background:var(--one);border-radius:5px;transition:width .4s ease}
+  .os-apps{display:flex;flex-direction:column;gap:8px}
+  .os-app{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--panel-2);display:flex;justify-content:space-between;align-items:center;font-family:var(--f-mono);font-size:13px}
+  .os-app button{font-family:var(--f-mono);font-size:11px;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+  .os-app button:hover{border-color:var(--one);color:var(--one)}
+  .os-log{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);border:1px solid var(--line-soft);border-radius:var(--r-sm);padding:12px;background:var(--bg);min-height:120px;max-height:180px;overflow-y:auto}
+  .os-log div{padding:3px 0;border-bottom:1px solid var(--line-soft)}
+  .os-log div:last-child{border-bottom:none}
+  .os-log .k{color:var(--one)}
+
+  /* tabs shared */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:11px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .2s}
+  .tab:hover{border-color:var(--one)} .tab.active{background:var(--one);color:#1a1205;border-color:var(--one)}
+  .tab-body{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+  @media(min-width:760px){.tab-body{grid-template-columns:.9fr 1.1fr}}
+  .glyph-box{height:190px;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 45%,#131d34,#0a0f1c);display:flex;align-items:center;justify-content:center}
+  .glyph-box svg{width:100%;height:150px}
+  .tmeta .tt{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.08em;text-transform:uppercase}
+  .tmeta h3{font-size:24px;margin:6px 0 10px}
+  .tmeta .td{font-size:14.5px;color:var(--ink-dim);margin-bottom:12px}
+  .tmeta .rows{display:flex;flex-direction:column;gap:8px}
+  .trow{display:flex;gap:12px;font-size:13.5px;border-top:1px solid var(--line-soft);padding-top:8px}
+  .trow .k{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;width:96px;flex:none}
+  .trow .v{color:var(--ink-dim)}
+
+  /* OS functions grid */
+  .fn-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  @media(min-width:640px){.fn-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:960px){.fn-grid{grid-template-columns:repeat(3,1fr)}}
+  .fn{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .fn .fi{font-size:22px;margin-bottom:8px}
+  .fn .ft{font-family:var(--f-display);font-weight:600;font-size:15px;margin-bottom:6px}
+  .fn p{font-size:13px}
+
+  /* activities + quiz */
+  .act-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:780px){.act-grid{grid-template-columns:1fr 1fr}}
+  .act{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .act h3{font-size:19px;margin-bottom:6px}
+  .act .prompt{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+  .clue{border:1px solid var(--one);border-radius:var(--r-sm);padding:16px;background:var(--one-soft);color:var(--one);font-family:var(--f-mono);font-size:14px;text-align:center;margin-bottom:14px}
+  .opt-row{display:flex;gap:8px;flex-wrap:wrap}
+  .opt-btn{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--ink);transition:all .18s}
+  .opt-btn:hover:not(:disabled){border-color:var(--one)}
+  .opt-btn.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .opt-btn.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .feedback{font-family:var(--f-mono);font-size:13px;margin-top:14px;min-height:20px;color:var(--ink-faint)}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--no)}
+  .score{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+  .quiz{margin-top:28px}
+  .quiz-h{font-family:var(--f-display);font-size:22px;margin-bottom:16px}
+  .q{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);margin-bottom:14px}
+  .q .qt{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .q .qt .n{font-family:var(--f-mono);color:var(--one);margin-right:8px}
+  .q .opts{display:flex;flex-direction:column;gap:8px}
+  .q .opt{text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink-dim);background:var(--panel);transition:all .18s}
+  .q .opt:hover:not(:disabled){border-color:var(--one);color:var(--ink)}
+  .q .opt.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .q .opt.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .q .exp{font-size:13px;color:var(--ink-faint);margin-top:10px;display:none}
+  .q.answered .exp{display:block}
+  .quiz-score{font-family:var(--f-mono);font-size:14px;color:var(--one);margin-top:10px}
+  .why{background:linear-gradient(180deg,var(--bg),#070a12)}
+  .why h2{max-width:18ch}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:34px}
+  @media(min-width:680px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .card .k{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .card p{font-size:15px}
+  .hw{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel);margin-top:30px}
+  .hw .k{font-family:var(--f-mono);font-size:12px;color:var(--human);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+  .hw ol{margin:0 0 0 18px;color:var(--ink-dim);font-size:15px}
+  .hw li{margin-bottom:10px} .hw li b{color:var(--ink)}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line-soft);text-align:center}
+  footer .m{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  @media(max-width:520px){section{padding:70px 0}.stage{padding:20px}}
+</style>
+</head>
+<body>
+<nav class="rail" id="rail" aria-label="Lecture navigation"></nav>
+
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner"><div class="wrap">
+    <div class="hero-tag"><span class="pill">Lecture 06</span> Software &amp; Operating Systems · BSc Computer Science</div>
+    <h1>Hardware is the body.<br>Software is the <span class="flip">mind</span>.</h1>
+    <p class="lede">A computer with no software is just an expensive paperweight — billions of transistors with nothing to do. Today: the software that manages the machine itself, the software that does your work, and the two operating systems that run most of the world's computers.</p>
+  </div></div>
+  <div class="hero-hint"><span>scroll to begin</span><span class="arrow"></span></div>
+</header>
+
+<section class="objectives" id="obj">
+  <div class="wrap">
+    <div class="obj-head">By the end of this session you will be able to — <b>five things</b></div>
+    <div class="obj-grid">
+      <div class="obj"><div class="on">01</div><p>Classify software into <em>system</em> and <em>application</em> software.</p></div>
+      <div class="obj"><div class="on">02</div><p>Define an <em>operating system</em> and list its main functions.</p></div>
+      <div class="obj"><div class="on">03</div><p>Explain how the OS <em>manages resources</em> for running programs.</p></div>
+      <div class="obj"><div class="on">04</div><p>Give examples of common <em>application software</em>.</p></div>
+      <div class="obj"><div class="on">05</div><p>Compare <em>Windows</em> and <em>Linux</em> as operating systems.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 00 SOFTWARE STACK -->
+<section class="layer" id="s0" data-title="The software stack">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">00</span> Where software sits</div>
+    <h2>Between you and the hardware sit two layers of software.</h2>
+    <p>Back in Lecture 01, we saw layers of translation from human meaning down to voltage. Software is where most of that translation lives. It splits into two broad categories: <strong>system software</strong>, which manages the computer itself, and <strong>application software</strong>, which does the actual work you care about. <strong>Click a layer</strong> to open it.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · the software stack</span></div>
+      <div class="stack-layers" id="stackLayers"></div>
+    </div>
+    <div class="recap">TAKEAWAY · Hardware at the bottom, System software (OS) in the middle managing it, Application software on top doing your work.</div>
+  </div>
+</section>
+
+<!-- 01 SYSTEM VS APPLICATION -->
+<section class="layer" id="s1" data-title="System vs application">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">01</span> System software vs application software</div>
+    <h2>One kind runs the show. The other kind is the show.</h2>
+    <p><strong>System software</strong> manages the computer's own hardware and resources so that everything else can run — you rarely interact with it directly. <strong>Application software</strong> is what you open on purpose to get something done. <strong>Sort the examples</strong> below into the correct column.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · sort system vs application</span></div>
+      <div class="sw-board">
+        <div class="sw-col sys"><div class="ch">System software</div><div id="sysSlots"></div></div>
+        <div class="sw-col app"><div class="ch">Application software</div><div id="appSlots"></div></div>
+      </div>
+      <div class="sw-pool" id="swPool"></div>
+      <div class="sw-msg" id="swMsg">Click a chip, then click the column it belongs in.</div>
+      <div class="btn-row"><button class="btn ghost" id="swReset">Reset</button></div>
+    </div>
+    <div class="wrap-scroll"><table class="dt">
+      <tr><th></th><th>System software</th><th>Application software</th></tr>
+      <tr><td>Purpose</td><td>Manages and controls the hardware</td><td>Performs a specific user task</td></tr>
+      <tr><td>Runs</td><td>In the background, often at startup</td><td>When the user opens it</td></tr>
+      <tr><td>Examples</td><td>Operating system, device drivers, utilities</td><td>Word processor, browser, game, spreadsheet</td></tr>
+      <tr><td>Who needs it</td><td>Every computer, always</td><td>Only if the user wants that task done</td></tr>
+    </table></div>
+    <div class="recap">TAKEAWAY · System software (OS, drivers, utilities) keeps the machine running. Application software (Word, Chrome, games) is why you use the machine.</div>
+  </div>
+</section>
+
+<!-- 02 OS DEFINITION & FUNCTIONS -->
+<section class="layer" id="s2" data-title="What an OS does">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">02</span> The operating system</div>
+    <h2>The OS is the manager standing between your programs and the hardware.</h2>
+    <p>An <strong>Operating System (OS)</strong> is the most important piece of system software: it manages the computer's hardware and resources, and provides a platform on which application software can run. Without it, every single program would need to know how to talk directly to every ALU, disk and screen — impossible in practice. The OS's core jobs:</p>
+    <div class="fn-grid">
+      <div class="fn"><div class="fi">🧠</div><div class="ft">Process management</div><p>Decides which program gets the CPU, and for how long, switching rapidly between them so many can appear to run "at once".</p></div>
+      <div class="fn"><div class="fi">🗂️</div><div class="ft">Memory management</div><p>Allocates RAM to each running program and reclaims it when the program closes, keeping programs from overwriting each other.</p></div>
+      <div class="fn"><div class="fi">💾</div><div class="ft">File management</div><p>Organises data into files and folders on storage, and controls how programs read and write them.</p></div>
+      <div class="fn"><div class="fi">🖨️</div><div class="ft">Device management</div><p>Talks to input/output hardware (keyboard, mouse, printer) through small programs called <b>drivers</b>.</p></div>
+      <div class="fn"><div class="fi">🔐</div><div class="ft">Security &amp; access control</div><p>Controls who can use the computer and what each user or program is allowed to do.</p></div>
+      <div class="fn"><div class="fi">🖥️</div><div class="ft">User interface</div><p>Provides the way you interact with the computer — typically a Graphical User Interface (GUI) or a Command Line Interface (CLI).</p></div>
+    </div>
+    <div class="callout"><span class="ic">✋</span><div class="tx"><b>Link back:</b> "Process management" is the OS deciding whose turn it is at the fetch-decode-execute cycle from Lecture 01 — many programs, one CPU, rapidly time-shared.</div></div>
+    <div class="recap">TAKEAWAY · The OS manages processes, memory, files, devices and security, and gives you a user interface — so applications never have to touch hardware directly.</div>
+  </div>
+</section>
+
+<!-- 03 OS RESOURCE MANAGER SIM -->
+<section class="layer" id="s3" data-title="OS as manager">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">03</span> Watch the OS manage resources</div>
+    <h2>Open a few apps and watch the manager go to work.</h2>
+    <p>Every app you open asks the OS for a share of two things above all: <strong>CPU time</strong> and <strong>RAM</strong>. The OS decides how much of each to hand out, and takes it back the moment you close the app. <strong>Open some apps</strong> below and watch the OS log its decisions.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · the OS allocating resources</span></div>
+      <div class="os-wrap">
+        <div>
+          <div class="os-resources">
+            <div class="res"><div class="rh"><span>CPU usage</span><span id="cpuPct">0%</span></div><div class="rbar"><div class="rfill" id="cpuFill" style="width:0%"></div></div></div>
+            <div class="res"><div class="rh"><span>RAM usage</span><span id="ramPct">0%</span></div><div class="rbar"><div class="rfill" id="ramFill" style="width:0%"></div></div></div>
+          </div>
+          <div class="os-apps" id="osApps" style="margin-top:16px"></div>
+        </div>
+        <div>
+          <div class="os-log" id="osLog"><div>System idle. Waiting for programs to launch…</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · Opening a program means asking the OS for CPU time + RAM; closing it returns those resources for the next program to use.</div>
+  </div>
+</section>
+
+<!-- 04 APPLICATION SOFTWARE -->
+<section class="layer" id="s4" data-title="Application software">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">04</span> Application software</div>
+    <h2>The software you actually opened the computer for.</h2>
+    <p>Application software (or "apps") are programs designed to help the user perform specific tasks. Unlike system software, you choose to open them, and the computer works perfectly well without any particular one installed.</p>
+    <div class="wrap-scroll"><table class="dt">
+      <tr><th>Category</th><th>Purpose</th><th>Examples</th></tr>
+      <tr><td>Word processors</td><td>Creating and editing text documents</td><td>Microsoft Word, Google Docs, LibreOffice Writer</td></tr>
+      <tr><td>Spreadsheets</td><td>Organising data and performing calculations</td><td>Microsoft Excel, Google Sheets</td></tr>
+      <tr><td>Presentation software</td><td>Creating slide decks</td><td>Microsoft PowerPoint, Google Slides</td></tr>
+      <tr><td>Web browsers</td><td>Accessing and viewing websites</td><td>Chrome, Firefox, Edge</td></tr>
+      <tr><td>Media players</td><td>Playing audio and video</td><td>VLC, Windows Media Player</td></tr>
+      <tr><td>Games</td><td>Entertainment</td><td>Any PC or mobile game</td></tr>
+      <tr><td>Specialised software</td><td>Task-specific professional tools</td><td>AutoCAD (design), Photoshop (image editing), MATLAB (computation)</td></tr>
+    </table></div>
+    <div class="recap">TAKEAWAY · Application software is chosen by the user for a specific task; the computer runs fine without any single one of them installed.</div>
+  </div>
+</section>
+
+<!-- 05 WINDOWS VS LINUX -->
+<section class="layer" id="s5" data-title="Windows vs Linux">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">05</span> Overview of Windows and Linux</div>
+    <h2>Two philosophies of operating system.</h2>
+    <p>Windows and Linux are both operating systems, but they come from very different traditions. <strong>Pick one</strong> to explore.</p>
+    <div class="stage">
+      <div class="tabs" id="osTabs"></div>
+      <div class="tab-body">
+        <div class="glyph-box" id="osGlyph"></div>
+        <div class="tmeta">
+          <div class="tt" id="osTt"></div>
+          <h3 id="osName"></h3>
+          <div class="td" id="osDesc"></div>
+          <div class="rows" id="osRows"></div>
+        </div>
+      </div>
+    </div>
+    <div class="wrap-scroll"><table class="dt">
+      <tr><th>Feature</th><th>Windows</th><th>Linux</th></tr>
+      <tr><td>Source model</td><td>Proprietary (closed source)</td><td>Open source</td></tr>
+      <tr><td>Cost</td><td>Paid licence</td><td>Usually free</td></tr>
+      <tr><td>Customisation</td><td>Limited</td><td>Highly customisable</td></tr>
+      <tr><td>Common use</td><td>Home PCs, gaming, business desktops</td><td>Servers, developers, embedded systems, supercomputers</td></tr>
+      <tr><td>Software support</td><td>Very wide commercial software &amp; game support</td><td>Strong for development &amp; server tools; growing desktop use</td></tr>
+      <tr><td>User interface</td><td>GUI by default</td><td>GUI available; command line widely used</td></tr>
+    </table></div>
+    <div class="callout"><span class="ic">🇮🇳</span><div class="tx"><b>Remember:</b> Linux is <i>open source</i> — its source code is publicly available for anyone to view, modify and distribute, which is why so many different Linux "distributions" (Ubuntu, Fedora, Debian and more) exist.</div></div>
+    <div class="recap">TAKEAWAY · Windows: proprietary, paid, huge software/game library, easy for most desktop users. Linux: open-source, usually free, highly customisable, dominant on servers and in development.</div>
+  </div>
+</section>
+
+<!-- 06 ACTIVITIES -->
+<section class="layer" id="s6" data-title="Activities">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">06</span> Check yourself</div>
+    <h2>Your turn. Two challenges, then a graded quiz.</h2>
+    <p>Great for the projector — everything you need is on the slides above.</p>
+    <div class="act-grid">
+      <div class="act">
+        <h3>① System or application?</h3>
+        <div class="prompt">Read the software and classify it.</div>
+        <div class="clue" id="saClue">—</div>
+        <div class="opt-row"><button class="opt-btn" id="saSys">SYSTEM</button><button class="opt-btn" id="saApp">APPLICATION</button><button class="btn ghost" id="saNext" style="margin-left:auto">Next</button></div>
+        <div class="feedback" id="saFb"></div>
+      </div>
+      <div class="act">
+        <h3>② Windows or Linux?</h3>
+        <div class="prompt">Read the clue and pick the correct OS.</div>
+        <div class="clue" id="wlClue">—</div>
+        <div class="opt-row"><button class="opt-btn" id="wlWin">WINDOWS</button><button class="opt-btn" id="wlLin">LINUX</button><button class="btn ghost" id="wlNext" style="margin-left:auto">Next</button></div>
+        <div class="feedback" id="wlFb"></div>
+      </div>
+    </div>
+    <div class="quiz">
+      <div class="quiz-h">③ Quick quiz</div>
+      <div id="quiz"></div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 WHY -->
+<section class="why layer" id="s7" data-title="Why & recap">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">07</span> Why it matters</div>
+    <h2>Every program you'll ever write runs on top of someone else's operating system.</h2>
+    <p>Knowing what the OS handles for you — memory, processes, files, devices — explains why programs can crash safely without destroying the whole machine, why closing an app frees up space, and why the same code can (with adjustments) run on Windows, Linux or macOS. It's the layer every later course — operating systems, networks, systems programming — will zoom into.</p>
+    <div class="cards">
+      <div class="card"><div class="k">Debug smarter</div><p>"Out of memory", "permission denied", "process not responding" are all OS-level messages — now you know what they mean.</p></div>
+      <div class="card"><div class="k">Choose your platform</div><p>Windows for wide software support, Linux for servers and development — an early, practical decision in every CS career.</p></div>
+      <div class="card"><div class="k">Exam gold</div><p>"Differentiate system and application software" and "compare Windows and Linux" are classic questions — you've now got both.</p></div>
+    </div>
+    <div class="hw">
+      <div class="k">Homework · before Lecture 07</div>
+      <ol>
+        <li><b>List ten programs:</b> from your own laptop/phone, label each as system or application software.</li>
+        <li><b>OS functions:</b> in your own words, explain what happens (in terms of CPU and RAM) when you open, then close, a program.</li>
+        <li><b>Compare table:</b> make a table comparing Windows and Linux on cost, customisation and typical use.</li>
+        <li><b>Drivers:</b> explain what a device driver is and why a printer needs one.</li>
+        <li><b>Stretch:</b> research what "open source" means and give two other examples of open-source software besides Linux.</li>
+      </ol>
+    </div>
+    <p class="recap" style="margin-top:34px">THE WHOLE STORY · software splits into system (the OS managing hardware) and application (the tools you use) · the OS handles processes, memory, files, devices and security · Windows and Linux are two very different takes on that same job.</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="m">Lecture 06 · Software &amp; Operating Systems · an interactive teaching aid — press any widget to explore</div></div></footer>
+
+<script>
+"use strict";
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const wait=ms=>new Promise(r=>setTimeout(r,reduced?0:ms));
+
+/* RAIL */
+const nav=[
+  {id:'top',n:'—',t:'Cover'},{id:'s0',n:'00',t:'Software stack'},{id:'s1',n:'01',t:'System vs application'},
+  {id:'s2',n:'02',t:'What an OS does'},{id:'s3',n:'03',t:'OS as manager'},{id:'s4',n:'04',t:'Application software'},
+  {id:'s5',n:'05',t:'Windows vs Linux'},{id:'s6',n:'06',t:'Activities'},{id:'s7',n:'07',t:'Why & recap'}
+];
+const rail=$('#rail');
+nav.forEach(s=>{const el=document.getElementById(s.id);const b=document.createElement('button');b.innerHTML=`<span class="dot"></span><span class="label">${s.n==='—'?'top':s.n} · ${s.t}</span>`;b.dataset.for=s.id;b.addEventListener('click',()=>el&&el.scrollIntoView({behavior:reduced?'auto':'smooth'}));rail.appendChild(b);});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.for===e.target.id));}),{rootMargin:'-45% 0px -45% 0px'});
+nav.forEach(s=>{const el=document.getElementById(s.id);if(el)spy.observe(el);});
+
+/* HERO */
+(function heroGrid(){
+  const cv=$('#heroCanvas'),ctx=cv.getContext('2d');
+  let cols,rows,gap=26,size=6,t=0,mouse={x:-999,y:-999};
+  const AMBER='#FFB020',BLUE='#26385f';
+  function resize(){cv.width=cv.offsetWidth*devicePixelRatio;cv.height=cv.offsetHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cols=Math.ceil(cv.offsetWidth/gap)+1;rows=Math.ceil(cv.offsetHeight/gap)+1;}
+  resize();addEventListener('resize',resize);
+  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
+  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-999;});
+  function draw(){const W=cv.offsetWidth,H=cv.offsetHeight;ctx.clearRect(0,0,W,H);const wave=(t*0.9)%(W+H+400)-200;for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const px=x*gap+14,py=y*gap+14,diag=px+py,dw=Math.abs(diag-wave);const onWave=dw<60?1-(dw/60):0;const dx=px-mouse.x,dy=py-mouse.y,md=Math.hypot(dx,dy),onMouse=md<90?1-(md/90):0;const heat=Math.max(onWave,onMouse);if(heat>0.05){ctx.fillStyle=AMBER;ctx.globalAlpha=0.15+heat*0.85;const s=size+heat*4;ctx.fillRect(px-s/2,py-s/2,s,s);}else{ctx.fillStyle=BLUE;ctx.globalAlpha=0.5;ctx.fillRect(px-size/2,py-size/2,size,size);}}ctx.globalAlpha=1;}
+  if(reduced){draw();return;}
+  (function loop(){t+=2.4;draw();requestAnimationFrame(loop);})();
+})();
+
+/* 00 SOFTWARE STACK */
+(function stack(){
+  const layers=[
+    {t:'Application software',tag:'top layer · what you open',d:'Programs chosen by the user for a specific task — word processors, browsers, games, spreadsheets. The computer runs fine without any one particular app.',ex:['Word','Chrome','Excel','Games']},
+    {t:'System software',tag:'middle layer · manages the machine',d:'Software that manages the computer\'s own hardware and resources so applications can run at all. Includes the operating system, device drivers and utility programs.',ex:['Operating System','Device Drivers','Utilities']},
+    {t:'Hardware',tag:'bottom layer · the physical machine',d:'The CPU, memory, storage and all physical components from Lectures 01–05 — the transistors, circuits and devices that system software directly controls.',ex:['CPU','RAM','Storage','I/O devices']}
+  ];
+  const wrap=$('#stackLayers');
+  layers.forEach((l,i)=>{
+    const el=document.createElement('div');el.className='slayer'+(i===0?' sel':'');
+    el.innerHTML=`<div class="sh"><span class="st">${l.t}</span><span class="stag">${l.tag}</span></div><div class="sd">${l.d}<div class="ex">${l.ex.map(x=>`<span class="chip">${x}</span>`).join('')}</div></div>`;
+    el.addEventListener('click',()=>{$$('.slayer',wrap).forEach(x=>x.classList.remove('sel'));el.classList.add('sel');});
+    wrap.appendChild(el);
+  });
+})();
+
+/* 01 SYSTEM VS APPLICATION SORTER */
+(function swSort(){
+  const items=[
+    {n:'Windows / Linux (the OS)',t:'sys'},{n:'Device driver',t:'sys'},{n:'Antivirus utility',t:'sys'},{n:'Disk defragmenter',t:'sys'},
+    {n:'Microsoft Word',t:'app'},{n:'Google Chrome',t:'app'},{n:'A video game',t:'app'},{n:'Photo editor',t:'app'},{n:'Excel',t:'app'},{n:'File compression utility',t:'sys'}
+  ];
+  const pool=$('#swPool'),sysSlots=$('#sysSlots'),appSlots=$('#appSlots'),msg=$('#swMsg');
+  let selected=null,placed=0;
+  items.forEach((it,i)=>{
+    const chip=document.createElement('button');chip.className='sw-chip';chip.textContent=it.n;chip.dataset.i=i;
+    chip.addEventListener('click',()=>{
+      if(chip.classList.contains('placed'))return;
+      $$('.sw-chip',pool).forEach(c=>c.style.outline='');
+      selected=i;chip.style.outline='2px solid var(--one)';
+      msg.textContent='Now click System or Application for "'+it.n+'".';
+    });
+    pool.appendChild(chip);
+  });
+  function place(colType){
+    if(selected===null){msg.textContent='Pick a chip first.';return;}
+    const it=items[selected],chip=$$('.sw-chip',pool)[selected];
+    const correct=it.t===colType;
+    const slot=document.createElement('div');slot.className='sw-slot';
+    slot.style.borderStyle='solid';
+    slot.style.borderColor=correct?'var(--ok)':'var(--no)';
+    slot.style.color=correct?'var(--ok)':'var(--no)';
+    slot.textContent=it.n+(correct?' ✓':' — that\'s actually '+(it.t==='sys'?'system':'application')+' software');
+    (colType==='sys'?sysSlots:appSlots).appendChild(slot);
+    chip.classList.add('placed');chip.style.outline='';
+    placed++;selected=null;
+    msg.textContent=correct?'Correct.':'Not quite — check the note above.';
+    if(placed>=items.length)msg.textContent='All sorted! Review the columns above.';
+  }
+  $('.sw-col.sys').addEventListener('click',e=>{if(e.target.closest('.sw-slot'))return;place('sys');});
+  $('.sw-col.app').addEventListener('click',e=>{if(e.target.closest('.sw-slot'))return;place('app');});
+  $('#swReset').addEventListener('click',()=>{
+    sysSlots.innerHTML='';appSlots.innerHTML='';selected=null;placed=0;
+    $$('.sw-chip',pool).forEach(c=>{c.classList.remove('placed');c.style.outline='';});
+    msg.textContent='Click a chip, then click the column it belongs in.';
+  });
+})();
+
+/* 03 OS RESOURCE MANAGER SIM */
+(function osSim(){
+  const apps=[
+    {n:'Browser',cpu:18,ram:22},{n:'Video Editor',cpu:35,ram:30},{n:'Music Player',cpu:6,ram:8},
+    {n:'Spreadsheet',cpu:10,ram:12},{n:'Game',cpu:40,ram:28}
+  ];
+  const appsEl=$('#osApps'),cpuFill=$('#cpuFill'),ramFill=$('#ramFill'),cpuPct=$('#cpuPct'),ramPct=$('#ramPct'),log=$('#osLog');
+  let cpu=0,ram=0,open={};
+  function addLog(msg){
+    const d=document.createElement('div');d.innerHTML=msg;log.insertBefore(d,log.firstChild);
+    while(log.children.length>8)log.removeChild(log.lastChild);
+  }
+  function render(){
+    cpu=Math.max(0,Math.min(100,cpu));ram=Math.max(0,Math.min(100,ram));
+    cpuFill.style.width=cpu+'%';ramFill.style.width=ram+'%';cpuPct.textContent=cpu+'%';ramPct.textContent=ram+'%';
+    cpuFill.style.background = cpu>85?'var(--no)':'var(--one)';
+    ramFill.style.background = ram>85?'var(--no)':'var(--one)';
+  }
+  apps.forEach(a=>{
+    const row=document.createElement('div');row.className='os-app';
+    row.innerHTML=`<span>${a.n} <span style="color:var(--ink-faint)">(cpu ${a.cpu}% · ram ${a.ram}%)</span></span>`;
+    const btn=document.createElement('button');btn.textContent='Open';
+    btn.addEventListener('click',()=>{
+      if(open[a.n]){
+        cpu-=a.cpu;ram-=a.ram;delete open[a.n];btn.textContent='Open';
+        addLog('<span class="k">CLOSE</span> '+a.n+' → OS reclaims '+a.cpu+'% CPU and '+a.ram+'% RAM.');
+      }else{
+        if(cpu+a.cpu>100||ram+a.ram>100){addLog('<span class="k">DENIED</span> Not enough free resources to open '+a.n+'.');return;}
+        cpu+=a.cpu;ram+=a.ram;open[a.n]=true;btn.textContent='Close';
+        addLog('<span class="k">LAUNCH</span> '+a.n+' → OS allocates '+a.cpu+'% CPU and '+a.ram+'% RAM.');
+      }
+      render();
+    });
+    row.appendChild(btn);appsEl.appendChild(row);
+  });
+  render();
+})();
+
+/* 05 WINDOWS VS LINUX TABS */
+(function osTabs(){
+  const glyphs={
+    win:`<svg viewBox="0 0 160 130"><rect x="20" y="20" width="55" height="42" fill="#FFB020" opacity="0.85"/><rect x="82" y="20" width="55" height="42" fill="#FFB020" opacity="0.6"/><rect x="20" y="68" width="55" height="42" fill="#FFB020" opacity="0.6"/><rect x="82" y="68" width="55" height="42" fill="#FFB020" opacity="0.85"/></svg>`,
+    lin:`<svg viewBox="0 0 160 130"><ellipse cx="80" cy="70" rx="34" ry="42" fill="none" stroke="#FFB020" stroke-width="2.5"/><circle cx="68" cy="55" r="6" fill="#FFB020"/><circle cx="92" cy="55" r="6" fill="#FFB020"/><path d="M60 90 Q80 105 100 90" fill="none" stroke="#FFB020" stroke-width="2.5"/><path d="M80 28 L80 12" stroke="#FFB020" stroke-width="2.5"/></svg>`
+  };
+  const data=[
+    {k:'win',tt:'proprietary · closed source',n:'Windows',d:'Developed by Microsoft, Windows is the most widely used desktop operating system in the world, known for its broad hardware and software compatibility and consistent graphical interface.',rows:[['Source','Proprietary (closed)'],['Cost','Paid licence'],['Interface','GUI-first'],['Strength','Huge software &amp; game library'],['Typical use','Home &amp; business desktops']]},
+    {k:'lin',tt:'open source · community-driven',n:'Linux',d:'Linux is an open-source operating system kernel, first released by Linus Torvalds in 1991. Anyone can view, modify and distribute its source code, leading to many different versions called "distributions" (e.g. Ubuntu, Fedora, Debian).',rows:[['Source','Open source'],['Cost','Usually free'],['Interface','GUI available; command line common'],['Strength','Highly customisable, secure, stable'],['Typical use','Servers, developers, embedded systems']]}
+  ];
+  const tabs=$('#osTabs'),glyph=$('#osGlyph'),tt=$('#osTt'),name=$('#osName'),desc=$('#osDesc'),rows=$('#osRows');
+  data.forEach((d,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.textContent=d.n;b.addEventListener('click',()=>show(i));tabs.appendChild(b);});
+  function show(i){const d=data[i];$$('.tab',tabs).forEach((b,bi)=>b.classList.toggle('active',bi===i));glyph.innerHTML=glyphs[d.k];tt.textContent=d.tt;name.textContent=d.n;desc.textContent=d.d;rows.innerHTML=d.rows.map(r=>`<div class="trow"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');}
+  show(0);
+})();
+
+/* 06a SYSTEM/APP GAME */
+(function saGame(){
+  const items=[['The operating system','sys'],['Microsoft Word','app'],['A printer driver','sys'],['A web browser','app'],['A photo-editing app','app'],['Disk cleanup utility','sys'],['A video game','app'],['Antivirus software','sys']];
+  const clue=$('#saClue'),fb=$('#saFb'),bS=$('#saSys'),bA=$('#saApp');let cur,done=false;
+  function next(){cur=items[Math.floor(Math.random()*items.length)];clue.textContent=cur[0];fb.className='feedback';fb.textContent='';done=false;bS.className='opt-btn';bA.className='opt-btn';}
+  function ans(val,btn){if(done)return;done=true;const correct=(val===cur[1]);btn.classList.add(correct?'correct':'wrong');fb.className='feedback '+(correct?'ok':'no');fb.textContent=(correct?'✓ ':'✗ ')+cur[0]+' is '+(cur[1]==='sys'?'SYSTEM':'APPLICATION')+' software.';}
+  bS.addEventListener('click',()=>ans('sys',bS));bA.addEventListener('click',()=>ans('app',bA));$('#saNext').addEventListener('click',next);next();
+})();
+
+/* 06b WINDOWS/LINUX GAME */
+(function wlGame(){
+  const items=[['Proprietary, closed-source code','win'],['Open source — anyone can view and modify the code','lin'],['Dominant on servers and in software development','lin'],['The most common OS for home gaming PCs','win'],['Comes in many "distributions" like Ubuntu and Fedora','lin'],['Usually requires a paid licence','win'],['Highly customisable down to the kernel','lin'],['Huge library of commercial desktop software','win']];
+  const clue=$('#wlClue'),fb=$('#wlFb'),bW=$('#wlWin'),bL=$('#wlLin');let cur,done=false;
+  function next(){cur=items[Math.floor(Math.random()*items.length)];clue.textContent=cur[0];fb.className='feedback';fb.textContent='';done=false;bW.className='opt-btn';bL.className='opt-btn';}
+  function ans(val,btn){if(done)return;done=true;const correct=(val===cur[1]);btn.classList.add(correct?'correct':'wrong');fb.className='feedback '+(correct?'ok':'no');fb.textContent=(correct?'✓ ':'✗ ')+'That describes '+(cur[1]==='win'?'Windows':'Linux')+'.';}
+  bW.addEventListener('click',()=>ans('win',bW));bL.addEventListener('click',()=>ans('lin',bL));$('#wlNext').addEventListener('click',next);next();
+})();
+
+/* 06c QUIZ */
+(function quiz(){
+  const Q=[
+    {q:'Which of the following is system software?',o:['Microsoft Excel','Operating system','A web browser','A video game'],a:1,e:'The operating system manages hardware and resources, making it system software.'},
+    {q:'Which OS function decides which program gets the CPU next?',o:['File management','Process management','Device management','Security'],a:1,e:'Process management schedules programs for CPU time, switching rapidly between them.'},
+    {q:'What happens to a program\'s resources when it is closed?',o:['They stay allocated forever','The OS reclaims the CPU time and RAM it was using','The computer must restart','Nothing changes'],a:1,e:'The OS frees the CPU and RAM that were given to the program, making them available again.'},
+    {q:'Which best describes Linux?',o:['Proprietary and always paid','Open source, with many distributions','Only used on smartphones','Cannot run on servers'],a:1,e:'Linux is open source, and its code has been used to build many different distributions such as Ubuntu and Fedora.'},
+    {q:'A device driver is an example of…',o:['application software','system software','a spreadsheet','a game'],a:1,e:'A driver is system software that lets the OS communicate with a specific piece of hardware.'}
+  ];
+  const box=$('#quiz'),scoreEl=$('#quizScore');let answered=0,correct=0;
+  Q.forEach((item,qi)=>{const d=document.createElement('div');d.className='q';d.innerHTML=`<div class="qt"><span class="n">Q${qi+1}</span>${item.q}</div><div class="opts"></div><div class="exp">${item.e}</div>`;const opts=$('.opts',d);item.o.forEach((txt,oi)=>{const b=document.createElement('button');b.className='opt';b.textContent=txt;b.addEventListener('click',()=>{if(d.classList.contains('answered'))return;d.classList.add('answered');answered++;if(oi===item.a){b.classList.add('correct');correct++;}else{b.classList.add('wrong');$$('.opt',opts)[item.a].classList.add('correct');}$$('.opt',opts).forEach(x=>x.disabled=true);scoreEl.textContent=`Score: ${correct} / ${answered}`+(answered===Q.length?' — all done!':'');});opts.appendChild(b);});box.appendChild(d);});
+})();
+</script>
+</body>
+</html>

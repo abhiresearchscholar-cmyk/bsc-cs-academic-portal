@@ -57,7 +57,7 @@
     "section": "Section I: Introduction to Computers",
     "description": "Interactive lecture explaining common input devices, output devices, and how users communicate with computers.",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-05-notes.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
@@ -66,15 +66,16 @@
   },
   {
     "number": "06",
-    "title": "Memory and Storage",
+    "title": "Software & Operating Systems",
     "section": "Section I: Introduction to Computers",
-    "description": "Primary memory, secondary storage, RAM, ROM, hard disk, SSD, and pen drive.",
+    "description": "Interactive lecture explaining system software, application software, and how operating systems manage computer hardware.",
     "ppt": "#",
     "notes": "#",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
-    "status": "Coming Soon"
+    "status": "Available",
+    "lecture": "downloads/semester1/lectures/lecture-06-software-operating-systems.html"
   },
   {
     "number": "07",
