@@ -533,6 +533,39 @@ h3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.course-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.course-meta .tag {
+  margin-bottom: 0;
+}
+
+.course-type {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.course-type.mdc-type {
+  color: #075985;
+  background: #e0f2fe;
+  border: 1px solid #7dd3fc;
+}
+
+.mdc-course-card {
+  border-color: #7dd3fc;
+  box-shadow: 0 18px 44px rgba(14, 116, 144, 0.14);
+}
+
 .academic-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -807,6 +840,11 @@ h3 {
 .status-badge.coming-soon {
   color: #7c2d12;
   background: #ffedd5;
+}
+
+.status-badge.mdc {
+  color: #075985;
+  background: #e0f2fe;
 }
 
 .status-badge.closed {

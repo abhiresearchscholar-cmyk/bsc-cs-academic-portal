@@ -1,6 +1,6 @@
 async function loadJson(path) {
   const separator = path.includes("?") ? "&" : "?";
-  const response = await fetch(path + separator + "v=20260713-lecture07");
+  const response = await fetch(path + separator + "v=20260713-mdc-course");
   if (!response.ok) {
     throw new Error("Could not load " + path);
   }
@@ -67,8 +67,11 @@ async function renderSemesterOneCourses() {
   const courses = await loadJson("data/semester1-courses.json");
   container.innerHTML = courses.map(function (course) {
     return `
-      <article class="course-card searchable-item" data-search-text="${textForSearch([course.code, course.title, course.description, course.status])}">
-        <p class="tag">${course.code}</p>
+      <article class="course-card searchable-item ${course.type === "MDC Course" ? "mdc-course-card" : ""}" data-search-text="${textForSearch([course.code, course.title, course.description, course.type, course.status])}">
+        <div class="course-meta">
+          <p class="tag">${course.code}</p>
+          ${course.type ? `<span class="course-type ${course.type === "MDC Course" ? "mdc-type" : ""}">${course.type}</span>` : ""}
+        </div>
         <h2>${course.title}</h2>
         <p>${course.description}</p>
         <p><span class="status-badge ${statusClass(course.status)}">${course.status}</span></p>
