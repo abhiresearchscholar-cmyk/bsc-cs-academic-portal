@@ -1,6 +1,6 @@
 async function loadJson(path) {
   const separator = path.includes("?") ? "&" : "?";
-  const response = await fetch(path + separator + "v=20260713-mdc-lecture01");
+  const response = await fetch(path + separator + "v=20260713-course-lectures-primary");
   if (!response.ok) {
     throw new Error("Could not load " + path);
   }
@@ -76,8 +76,8 @@ async function renderSemesterOneCourses() {
         <p>${course.description}</p>
         <p><span class="status-badge ${statusClass(course.status)}">${course.status}</span></p>
         <div class="card-actions">
-          ${linkButton(course.overviewLink, "Overview", "button small")}
-          ${linkButton(course.lecturesLink, "Lectures", "button small secondary")}
+          ${linkButton(course.lecturesLink, "Lectures", "button small")}
+          ${linkButton(course.overviewLink, "Overview", "button small secondary")}
           ${linkButton(course.assignmentsLink, "Assignments", "button small muted")}
           ${linkButton(course.quizzesLink, "Quizzes", "button small muted")}
           ${linkButton(course.labLink, "Lab", "button small muted")}
