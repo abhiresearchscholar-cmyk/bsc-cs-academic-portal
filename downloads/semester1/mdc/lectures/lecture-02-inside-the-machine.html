@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer Fundamentals — Lecture 02: Inside the Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ===================================================================
+     DESIGN TOKENS — same Computer Fundamentals (MDC) identity as Lecture 01:
+     cyan/teal primary on a deep teal-navy background, warm gold for
+     analogies & real-world callouts. High contrast, large-screen friendly.
+     =================================================================== */
+  :root{
+    --bg:#071019; --bg-2:#0A141F; --panel:#0E1B24; --panel-2:#132530;
+    --line:#1E3644; --line-soft:#172B36;
+    --ink:#EAF6F7; --ink-dim:#8FAFB6; --ink-faint:#5C7B82;
+
+    --one:#22D3EE; --one-soft:#123344; --one-glow:rgba(34,211,238,.42);
+    --zero:#6C7CE0; --zero-soft:#1e2350;
+
+    --human:#F5A623; --human-glow:rgba(245,166,35,.4);
+
+    --ok:#4ade80; --no:#f87171;
+    --r:16px; --r-sm:10px; --maxw:1080px;
+    --f-display:'Space Grotesk',sans-serif; --f-body:'IBM Plex Sans',sans-serif; --f-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--one);color:#04222b}
+  a{color:var(--one);text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{position:relative;padding:96px 0}
+  .layer + .layer{border-top:1px solid var(--line-soft)}
+  .rail{position:fixed;left:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:10px}
+  .rail button{display:flex;align-items:center;gap:10px;color:var(--ink-faint);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;transition:color .3s}
+  .rail .dot{width:9px;height:9px;border-radius:50%;background:var(--line);border:1px solid var(--line);transition:all .3s;flex:none}
+  .rail button:hover{color:var(--ink-dim)}
+  .rail button.active{color:var(--one)}
+  .rail button.active .dot{background:var(--one);box-shadow:0 0 0 4px var(--one-glow);border-color:var(--one)}
+  .rail .label{opacity:0;transform:translateX(-4px);transition:all .3s;white-space:nowrap}
+  .rail button:hover .label,.rail button.active .label{opacity:1;transform:none}
+  @media(max-width:1300px){.rail{display:none}}
+  .eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--one);display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .eyebrow .num{font-weight:700;color:var(--bg);background:var(--one);padding:2px 8px;border-radius:6px;letter-spacing:.02em}
+  h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.1;letter-spacing:-.02em}
+  h2{font-size:clamp(28px,4.6vw,44px);margin-bottom:20px}
+  h3{font-size:21px;margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-dim);max-width:62ch}
+  p{max-width:66ch;color:var(--ink-dim)}
+  strong{color:var(--ink);font-weight:600}
+  .amber{color:var(--human)} .blue{color:var(--zero)} .cyan{color:var(--one)} .mono{font-family:var(--f-mono)}
+  .hero{padding:0;height:100vh;min-height:660px;display:flex;align-items:center;position:relative;overflow:hidden}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(120% 80% at 50% 42%,transparent 38%,var(--bg) 100%)}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero-tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--one);margin-bottom:22px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .hero-tag .pill{background:var(--one);color:#04222b;padding:3px 9px;border-radius:6px;font-weight:700}
+  .hero h1{font-size:clamp(34px,6.6vw,72px);margin-bottom:24px}
+  .hero h1 .flip{color:var(--one)}
+  .hero .lede{font-size:clamp(18px,2.3vw,22px);max-width:58ch}
+  .hero-note{margin-top:24px;font-size:14px;color:var(--ink-faint);font-family:var(--f-mono);max-width:52ch}
+  .hero-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .hero-hint .arrow{width:1px;height:26px;background:linear-gradient(var(--ink-faint),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(-6px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+  .objectives{padding:60px 0;background:var(--bg-2);border-bottom:1px solid var(--line-soft)}
+  .obj-head{font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:22px}
+  .obj-head b{color:var(--one)}
+  .obj-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.obj-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1000px){.obj-grid{grid-template-columns:repeat(5,1fr)}}
+  .obj{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel)}
+  .obj .on{font-family:var(--f-mono);font-size:12px;color:var(--one);margin-bottom:8px}
+  .obj p{font-size:13.5px;color:var(--ink-dim)}
+  .stage{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-top:34px;position:relative;overflow:hidden}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .stage-title{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim)}
+  .readout{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)} .readout b{color:var(--one)}
+  .btn{font-family:var(--f-mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .btn:hover{border-color:var(--one);color:var(--one)}
+  .btn.primary{background:var(--one);color:#04222b;border-color:var(--one);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn.warm{border-color:var(--human);color:var(--human)}
+  .btn.warm:hover{background:rgba(245,166,35,.1)}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .recap{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);margin-top:26px;padding-left:14px;border-left:2px solid var(--one)}
+  .callout{display:flex;gap:12px;align-items:flex-start;margin-top:22px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--human);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(245,166,35,.05);max-width:66ch}
+  .callout .ic{font-size:18px;flex:none} .callout .tx{font-size:14px;color:var(--ink-dim)} .callout .tx b{color:var(--human)}
+  .analogy{display:flex;gap:12px;align-items:flex-start;margin-top:18px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(74,222,128,.05);max-width:66ch}
+  .analogy .ic{font-size:18px;flex:none} .analogy .tx{font-size:14px;color:var(--ink-dim)} .analogy .tx b{color:var(--ok)}
+  .trivia{display:flex;gap:12px;align-items:flex-start;margin-top:18px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--one);border-radius:0 var(--r-sm) var(--r-sm) 0;background:rgba(34,211,238,.06);max-width:66ch}
+  .trivia .ic{font-size:18px;flex:none} .trivia .tx{font-size:14px;color:var(--ink-dim)} .trivia .tx b{color:var(--one)}
+
+  table.dt{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  table.dt th,table.dt td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  table.dt th{background:var(--panel-2);color:var(--ink);font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  table.dt td{color:var(--ink-dim)}
+  table.dt tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+  .wrap-scroll{overflow-x:auto}
+
+  /* ---------- device picker (input/output refresher) ---------- */
+  .io-cols{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:760px){.io-cols{grid-template-columns:1fr 1fr}}
+  .io-col{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg)}
+  .io-col h3{font-size:16px;margin-bottom:4px}
+  .io-col .sub{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+  .io-devices{display:flex;flex-wrap:wrap;gap:8px}
+  .io-chip{font-family:var(--f-mono);font-size:12px;padding:8px 13px;border-radius:20px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .18s}
+  .io-chip:hover,.io-chip.sel{border-color:var(--one);color:var(--one)}
+  .io-detail{margin-top:14px;font-size:13px;color:var(--ink-dim);min-height:40px}
+
+  /* ---------- accordion (reused pattern) ---------- */
+  .char-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  @media(min-width:640px){.char-grid{grid-template-columns:1fr 1fr 1fr}}
+  .char{border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);overflow:hidden;transition:border-color .2s}
+  .char.open{border-color:var(--one)}
+  .char-head{display:flex;align-items:center;gap:14px;padding:18px;width:100%;text-align:left}
+  .char-ico{font-size:26px;flex:none}
+  .char-ttl{font-family:var(--f-display);font-size:16px;font-weight:600;color:var(--ink)}
+  .char-sub{font-size:12px;color:var(--ink-dim)}
+  .char-plus{margin-left:auto;font-family:var(--f-mono);color:var(--one);font-size:20px;transition:transform .3s;flex:none}
+  .char.open .char-plus{transform:rotate(45deg)}
+  .char-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .char-body .in{padding:0 18px 20px 58px;font-size:13.5px;color:var(--ink-dim)}
+
+  /* ---------- CPU exploded diagram ---------- */
+  .cpu-shell{border:2px solid var(--one);border-radius:var(--r);padding:22px;background:radial-gradient(circle at 50% 0%,#0f2530,#071019);position:relative;margin-top:8px}
+  .cpu-parts{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:700px){.cpu-parts{grid-template-columns:repeat(3,1fr)}}
+  .cpu-part{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--panel);text-align:center;cursor:pointer;transition:all .2s}
+  .cpu-part:hover{border-color:var(--one);transform:translateY(-2px)}
+  .cpu-part.sel{border-color:var(--one);background:var(--one-soft)}
+  .cpu-part .pi{font-size:30px;margin-bottom:8px}
+  .cpu-part .pn{font-family:var(--f-display);font-weight:600;font-size:15px}
+  .cpu-label{text-align:center;font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+
+  /* ---------- ALU calculator demo ---------- */
+  .alu-wrap{display:grid;grid-template-columns:1fr;gap:20px;align-items:center}
+  @media(min-width:720px){.alu-wrap{grid-template-columns:1fr auto 1fr auto 1fr}}
+  .alu-num{width:100%;font-family:var(--f-mono);font-size:28px;font-weight:700;text-align:center;padding:14px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);color:var(--one)}
+  .alu-num:focus{outline:none;border-color:var(--one)}
+  .alu-op-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .alu-op{font-family:var(--f-mono);font-weight:700;font-size:18px;width:52px;height:52px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);transition:all .2s}
+  .alu-op:hover{border-color:var(--one);color:var(--one)}
+  .alu-op.active{background:var(--one);color:#04222b;border-color:var(--one)}
+  .alu-result{text-align:center}
+  .alu-result .rv{font-family:var(--f-display);font-weight:700;font-size:44px;color:var(--human)}
+  .alu-result .rl{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em}
+  .alu-symbol{text-align:center;font-family:var(--f-display);font-size:30px;color:var(--ink-faint)}
+
+  /* ---------- registers demo ---------- */
+  .reg-wrap{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:760px){.reg-wrap{grid-template-columns:1.1fr .9fr}}
+  .ram-box{border:1px solid var(--line);border-radius:var(--r-sm);padding:16px;background:var(--bg)}
+  .ram-box .rh{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px}
+  .ram-cells{display:flex;gap:10px;flex-wrap:wrap}
+  .ram-cell{font-family:var(--f-mono);font-weight:700;font-size:16px;padding:12px 18px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);cursor:pointer;transition:all .18s}
+  .ram-cell:hover{border-color:var(--one);color:var(--one)}
+  .reg-box{border:1px solid var(--one);border-radius:var(--r-sm);padding:16px;background:var(--one-soft);min-height:150px}
+  .reg-box .rh{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--one);margin-bottom:12px}
+  .reg-slots{display:flex;gap:10px;flex-wrap:wrap}
+  .reg-slot{width:70px;height:60px;border-radius:8px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:700;font-size:18px;color:var(--ink-faint);background:var(--panel-2)}
+  .reg-slot.filled{border-style:solid;border-color:var(--one);color:var(--one);background:var(--bg)}
+  .reg-note{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);margin-top:14px;min-height:18px}
+
+  /* ---------- instruction cycle ---------- */
+  .cycle-svg{width:100%;height:auto}
+  .cycle-wrap{display:grid;grid-template-columns:1fr;gap:22px}
+  @media(min-width:840px){.cycle-wrap{grid-template-columns:1.3fr 1fr}}
+  .cycle-info{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);min-height:150px}
+  .cycle-info .t{font-family:var(--f-display);font-weight:600;font-size:17px;color:var(--one);margin-bottom:8px}
+  .cycle-info p{font-size:13.5px}
+  .cycle-step{font-family:var(--f-mono);font-size:12px;color:var(--ink-dim);margin-top:14px;min-height:36px}
+  .cycle-step b{color:var(--one)}
+
+  /* ---------- clock speed ---------- */
+  .clock-wrap{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:760px){.clock-wrap{grid-template-columns:1fr 1fr}}
+  .clock-face{width:120px;height:120px;border-radius:50%;border:3px solid var(--one);margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center}
+  .clock-dot{width:14px;height:14px;border-radius:50%;background:var(--one);box-shadow:0 0 12px var(--one-glow)}
+  .clock-ghz{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+  .ghz-btn{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:9px 15px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .18s}
+  .ghz-btn:hover{border-color:var(--one)}
+  .ghz-btn.active{background:var(--one);color:#04222b;border-color:var(--one)}
+  .tick-count{text-align:center;font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);margin-top:10px}
+  .tick-count b{color:var(--human);font-size:20px}
+
+  /* ---------- multi-core task demo ---------- */
+  .core-lanes{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+  .core-lane{display:flex;align-items:center;gap:10px}
+  .core-lane .cl{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);width:60px;flex:none}
+  .core-track{flex:1;height:34px;border-radius:8px;background:var(--panel-2);border:1px solid var(--line);display:flex;gap:4px;padding:4px}
+  .core-task{flex:1;border-radius:5px;background:var(--line);transition:background .3s}
+  .core-task.done{background:var(--one)}
+  .core-verdict{font-family:var(--f-mono);font-size:13px;color:var(--ink-dim);text-align:center;margin-top:14px;min-height:20px}
+  .core-verdict b{color:var(--human)}
+
+  /* ---------- tabs (brand comparison, reused) ---------- */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:11px 16px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--ink-dim);transition:all .2s}
+  .tab:hover{border-color:var(--one)} .tab.active{background:var(--one);color:#04222b;border-color:var(--one)}
+  .tab-body{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+  @media(min-width:760px){.tab-body{grid-template-columns:.85fr 1.15fr}}
+  .glyph-box{height:180px;border:1px solid var(--line);border-radius:var(--r-sm);background:radial-gradient(circle at 50% 45%,#0f2530,#071019);display:flex;align-items:center;justify-content:center;font-size:60px}
+  .tmeta .tt{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.08em;text-transform:uppercase}
+  .tmeta h3{font-size:22px;margin:6px 0 10px}
+  .tmeta .td{font-size:14px;color:var(--ink-dim);margin-bottom:12px}
+  .tmeta .rows{display:flex;flex-direction:column;gap:8px}
+  .trow{display:flex;gap:12px;font-size:13px;border-top:1px solid var(--line-soft);padding-top:8px}
+  .trow .k{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;width:92px;flex:none}
+  .trow .v{color:var(--ink-dim)}
+
+  /* ---------- RISC vs CISC ---------- */
+  .rc-wrap{display:grid;grid-template-columns:1fr;gap:16px;margin-top:8px}
+  @media(min-width:700px){.rc-wrap{grid-template-columns:1fr 1fr}}
+  .rc-card{border:1px solid var(--line);border-radius:var(--r-sm);padding:20px;background:var(--bg)}
+  .rc-card h3{font-size:19px;margin-bottom:6px}
+  .rc-card .rex{font-family:var(--f-mono);font-size:11px;color:var(--human);letter-spacing:.06em;text-transform:uppercase;margin-top:12px}
+
+  /* ---------- activities + games (reused) ---------- */
+  .act-grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:780px){.act-grid{grid-template-columns:1fr 1fr}}
+  .act{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .act h3{font-size:19px;margin-bottom:6px}
+  .act .prompt{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-dim);margin-bottom:14px}
+  .clue{border:1px solid var(--one);border-radius:var(--r-sm);padding:16px;background:var(--one-soft);color:var(--one);font-family:var(--f-mono);font-size:14px;text-align:center;margin-bottom:14px}
+  .opt-row{display:flex;gap:8px;flex-wrap:wrap}
+  .opt-btn{font-family:var(--f-mono);font-weight:700;font-size:13px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--ink);transition:all .18s}
+  .opt-btn:hover:not(:disabled){border-color:var(--one)}
+  .opt-btn.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .opt-btn.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .feedback{font-family:var(--f-mono);font-size:13px;margin-top:14px;min-height:20px;color:var(--ink-faint)}
+  .feedback.ok{color:var(--ok)} .feedback.no{color:var(--no)}
+  .score{font-family:var(--f-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+
+  /* ---------- memory match game (reused) ---------- */
+  .match-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+  @media(max-width:640px){.match-grid{grid-template-columns:repeat(2,1fr)}}
+  .match-card{aspect-ratio:1/0.85;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel-2);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;cursor:pointer;transition:all .25s;position:relative}
+  .match-card .face{font-size:12.5px;font-weight:600;color:var(--ink);opacity:0;transition:opacity .2s}
+  .match-card .back{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--f-display);font-size:22px;color:var(--ink-faint);transition:opacity .2s}
+  .match-card.revealed{border-color:var(--one);background:var(--one-soft)}
+  .match-card.revealed .face{opacity:1}
+  .match-card.revealed .back{opacity:0}
+  .match-card.matched{border-color:var(--ok);background:rgba(74,222,128,.1);cursor:default}
+  .match-card.matched .face{opacity:1;color:var(--ok)}
+  .match-card.matched .back{opacity:0}
+  .match-card.def .face{font-size:11px;font-weight:500;color:var(--ink-dim)}
+  .match-card.matched.def .face{color:var(--ok)}
+  .match-stats{display:flex;gap:20px;flex-wrap:wrap;margin-top:18px;font-family:var(--f-mono);font-size:13px;color:var(--ink-dim)}
+  .match-stats b{color:var(--one)}
+  .match-win{text-align:center;font-family:var(--f-display);font-size:20px;color:var(--ok);margin-top:16px;display:none}
+  .match-win.show{display:block}
+
+  .quiz{margin-top:28px}
+  .quiz-h{font-family:var(--f-display);font-size:22px;margin-bottom:16px}
+  .q{border:1px solid var(--line);border-radius:var(--r-sm);padding:18px;background:var(--bg);margin-bottom:14px}
+  .q .qt{font-size:15px;color:var(--ink);margin-bottom:12px}
+  .q .qt .n{font-family:var(--f-mono);color:var(--one);margin-right:8px}
+  .q .opts{display:flex;flex-direction:column;gap:8px}
+  .q .opt{text-align:left;padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;color:var(--ink-dim);background:var(--panel);transition:all .18s}
+  .q .opt:hover:not(:disabled){border-color:var(--one);color:var(--ink)}
+  .q .opt.correct{border-color:var(--ok);color:var(--ok);background:rgba(74,222,128,.08)}
+  .q .opt.wrong{border-color:var(--no);color:var(--no);background:rgba(248,113,113,.08)}
+  .q .exp{font-size:13px;color:var(--ink-faint);margin-top:10px;display:none}
+  .q.answered .exp{display:block}
+  .quiz-score{font-family:var(--f-mono);font-size:14px;color:var(--one);margin-top:10px}
+
+  .why{background:linear-gradient(180deg,var(--bg),#050c12)}
+  .why h2{max-width:20ch}
+  .cards{display:grid;grid-template-columns:1fr;gap:16px;margin-top:34px}
+  @media(min-width:680px){.cards{grid-template-columns:repeat(3,1fr)}}
+  .card{border:1px solid var(--line);border-radius:var(--r);padding:24px;background:var(--panel)}
+  .card .k{font-family:var(--f-mono);font-size:12px;color:var(--one);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+  .card p{font-size:15px}
+  .hw{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel);margin-top:30px}
+  .hw .k{font-family:var(--f-mono);font-size:12px;color:var(--human);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+  .hw ol{margin:0 0 0 18px;color:var(--ink-dim);font-size:15px}
+  .hw li{margin-bottom:10px} .hw li b{color:var(--ink)}
+  footer{padding:48px 0 60px;border-top:1px solid var(--line-soft);text-align:center}
+  footer .m{font-family:var(--f-mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  @media(max-width:520px){section{padding:70px 0}.stage{padding:20px}}
+</style>
+</head>
+<body>
+<nav class="rail" id="rail" aria-label="Lecture navigation"></nav>
+
+<header class="hero" id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-vignette"></div>
+  <div class="hero-inner"><div class="wrap">
+    <div class="hero-tag"><span class="pill">Computer Fundamentals · Lecture 02</span> Multidisciplinary Course · Continuing from Lecture 01</div>
+    <h1>Let's open up<br>the <span class="flip">machine</span>.</h1>
+    <p class="lede">In Lecture 01 you met the computer as a whole. Today we crack it open: the parts that take in your data, the "brain" that thinks, the parts that show you the result — and why the chip inside a gaming laptop, a budget phone, and a supercomputer aren't all built the same way.</p>
+    <p class="hero-note">No coding, no jargon assumed — we build every idea from scratch, with hands-on demos.</p>
+  </div></div>
+  <div class="hero-hint"><span>scroll to begin</span><span class="arrow"></span></div>
+</header>
+
+<section class="objectives" id="obj">
+  <div class="wrap">
+    <div class="obj-head">By the end of this lecture, you will be able to — <b>five things</b></div>
+    <div class="obj-grid">
+      <div class="obj"><div class="on">01</div><p>Name the five basic components of a computer system and what each does.</p></div>
+      <div class="obj"><div class="on">02</div><p>Explain what the ALU, Control Unit, and Registers do inside the CPU.</p></div>
+      <div class="obj"><div class="on">03</div><p>Describe the instruction cycle and what an "instruction set" is.</p></div>
+      <div class="obj"><div class="on">04</div><p>Explain processor speed — clock speed (GHz) and multiple cores.</p></div>
+      <div class="obj"><div class="on">05</div><p>Compare Intel, AMD, and ARM, and understand RISC vs. CISC.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 00 OPENING THE CPU -->
+<section class="layer" id="s0" data-title="Opening the machine">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">00</span> Picking up where we left off</div>
+    <h2>Every computer has five basic parts.</h2>
+    <p>Remember the Input → Process → Output → Storage cycle from Lecture 01? Today we give each stage a name and a job description. Every computer system — a supercomputer, your laptop, a smartwatch — is built from exactly <strong>five basic components</strong>.</p>
+    <div class="analogy"><span class="ic">🏢</span><div class="tx"><b>Think of a company.</b> The <b>Input Unit</b> is reception, taking in requests. The <b>CPU</b> is the manager's office, making every decision. The <b>Output Unit</b> is the front desk, delivering results. And <b>Storage</b> (from Lecture 01) is the filing room, keeping records for later.</div></div>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">The five basic components</span></div>
+      <div class="cpu-parts" id="fiveParts"></div>
+    </div>
+    <div class="recap">TAKEAWAY · Input Unit, Output Unit, CPU (which contains the Control Unit, ALU and Registers), and Storage — five parts, one team, working together on every task.</div>
+  </div>
+</section>
+
+<!-- 01 INPUT & OUTPUT -->
+<section class="layer" id="s1" data-title="Input & Output units">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">01</span> The doors in and out</div>
+    <h2>Input Unit and Output Unit: the two doors.</h2>
+    <p>The <strong>Input Unit</strong> is any hardware that lets data enter the computer, converting your action (a keypress, a tap, a sound) into binary the machine can process. The <strong>Output Unit</strong> does the reverse: it takes the computer's binary result and turns it into something you can see, hear, or hold. <strong>Click a device</strong> to see which side it belongs to.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · sort the devices</span></div>
+      <div class="io-cols">
+        <div class="io-col">
+          <h3>⌨️ Input Unit</h3>
+          <div class="sub">world → binary</div>
+          <div class="io-devices" id="inputDevices"></div>
+          <div class="io-detail" id="inputDetail">Click a device above.</div>
+        </div>
+        <div class="io-col">
+          <h3>🖥️ Output Unit</h3>
+          <div class="sub">binary → world</div>
+          <div class="io-devices" id="outputDevices"></div>
+          <div class="io-detail" id="outputDetail">Click a device above.</div>
+        </div>
+      </div>
+    </div>
+    <div class="trivia"><span class="ic">👆</span><div class="tx"><b>Did you know?</b> A touchscreen is both an input device (it senses your tap) and an output device (it shows the picture) — the only common device that's fully both at once.</div></div>
+    <div class="recap">TAKEAWAY · Input devices bring the real world into the computer as binary; output devices turn the computer's binary results back into the real world.</div>
+  </div>
+</section>
+
+<!-- 02 MEET THE CPU'S THREE PARTS -->
+<section class="layer" id="s2" data-title="Meet the CPU's three parts">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">02</span> The brain, unpacked</div>
+    <h2>The CPU isn't one thing — it's three, working as a team.</h2>
+    <p>The <strong>Central Processing Unit (CPU)</strong> is the computer's brain, but inside that single chip are three distinct parts, each with its own job. <strong>Tap each card</strong> to open it.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · tap to expand</span></div>
+      <div class="char-grid" id="cpuGrid"></div>
+    </div>
+    <div class="analogy"><span class="ic">🎼</span><div class="tx"><b>Think of an orchestra.</b> The <b>Control Unit</b> is the conductor, directing who plays when. The <b>ALU</b> is the musicians actually playing the notes — doing the work. The <b>Registers</b> are the sheet music stands right in front of each musician — holding exactly what they need, right now, within arm's reach.</div></div>
+    <div class="recap">TAKEAWAY · Control Unit = the manager/conductor. ALU = the calculator/decision-maker. Registers = tiny, lightning-fast holding space. Together, they are the CPU.</div>
+  </div>
+</section>
+
+<!-- 03 THE ALU -->
+<section class="layer" id="s3" data-title="The ALU in action">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">03</span> The calculator inside every chip</div>
+    <h2>You can operate a real ALU, right now.</h2>
+    <p>The <strong>Arithmetic Logic Unit (ALU)</strong> does exactly two kinds of jobs: <strong>arithmetic</strong> (add, subtract, multiply, divide) and <strong>logic</strong> (is this bigger than that? are these equal?). Every calculation you've ever seen a computer do — a spreadsheet total, a game's score, a filter sorting your photos — comes down to millions of tiny ALU operations like the one below.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · you are the ALU</span></div>
+      <div class="alu-wrap">
+        <input class="alu-num" id="aluA" type="number" value="12">
+        <div class="alu-symbol" id="aluSym">+</div>
+        <input class="alu-num" id="aluB" type="number" value="7">
+        <div class="alu-symbol">=</div>
+        <div class="alu-result"><div class="rv" id="aluResult">19</div><div class="rl">Result</div></div>
+      </div>
+      <div class="alu-op-row" style="margin-top:20px">
+        <button class="alu-op active" data-op="+">+</button>
+        <button class="alu-op" data-op="-">−</button>
+        <button class="alu-op" data-op="*">×</button>
+        <button class="alu-op" data-op=">">&gt;</button>
+        <button class="alu-op" data-op="=">=</button>
+      </div>
+    </div>
+    <div class="callout"><span class="ic">💡</span><div class="tx"><b>What just happened:</b> the moment you clicked an operation, you told the ALU which of its built-in jobs to perform. A real CPU's ALU does this billions of times per second, on numbers representing everything from your bank balance to a game character's health bar.</div></div>
+    <div class="recap">TAKEAWAY · The ALU performs arithmetic (+, −, ×, ÷) and logic (>, <, =) operations — the actual "doing" part of every computation.</div>
+  </div>
+</section>
+
+<!-- 04 REGISTERS -->
+<section class="layer" id="s4" data-title="Registers in action">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">04</span> The CPU's own tiny notepad</div>
+    <h2>Why does the CPU need its own private memory?</h2>
+    <p><strong>Registers</strong> are extremely small, extremely fast storage locations built directly into the CPU itself — holding only the handful of values the CPU is working with <em>right this instant</em>. They're far faster than RAM, but there are only a few of them, each holding just one small value at a time. <strong>Click a value in memory</strong> to load it into a register.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · loading a register</span></div>
+      <div class="reg-wrap">
+        <div class="ram-box">
+          <div class="rh">RAM (main memory) — click a value</div>
+          <div class="ram-cells" id="ramCells"></div>
+        </div>
+        <div class="reg-box">
+          <div class="rh">CPU Registers — only 4 slots!</div>
+          <div class="reg-slots" id="regSlots"></div>
+          <div class="reg-note" id="regNote">Registers are empty. Load a value from RAM.</div>
+        </div>
+      </div>
+    </div>
+    <div class="trivia"><span class="ic">⚡</span><div class="tx"><b>Did you know?</b> Accessing a register can be more than 100 times faster than accessing RAM. That's why the CPU keeps shuttling small batches of data in and out of its registers constantly, rather than reading everything straight from RAM.</div></div>
+    <div class="recap">TAKEAWAY · Registers are the CPU's own tiny, blazing-fast workspace — a handful of slots holding exactly what's needed right now.</div>
+  </div>
+</section>
+
+<!-- 05 INSTRUCTION CYCLE & INSTRUCTION SET -->
+<section class="layer" id="s5" data-title="Instruction cycle & instruction set">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">05</span> How the CPU actually "runs"</div>
+    <h2>Fetch. Decode. Execute. Repeat — billions of times a second.</h2>
+    <p>A <strong>program</strong> is just a list of tiny commands stored in memory. The CPU works through that list one command at a time, in an endless three-step loop called the <strong>instruction cycle</strong>:</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · step through the cycle</span></div>
+      <div class="cycle-wrap">
+        <div><svg class="cycle-svg" viewBox="0 0 420 220" id="cycleSvg" role="img" aria-label="Fetch decode execute cycle"></svg></div>
+        <div>
+          <div class="cycle-info"><div class="t" id="cycleT">Fetch</div><p id="cycleP">The Control Unit retrieves the next instruction waiting in memory.</p></div>
+          <div class="cycle-step" id="cycleStep"></div>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn primary" id="cycleRun">▶ Step through a full cycle</button><button class="btn ghost" id="cycleReset">Reset</button></div>
+    </div>
+    <div class="callout"><span class="ic">📖</span><div class="tx"><b>What is an "instruction set"?</b> Every CPU understands only a fixed vocabulary of basic commands — like "add these two numbers" or "move this value" — called its <b>instruction set</b>. It's the complete list of every single thing that model of CPU knows how to do. Different CPU families (which you'll meet shortly) can have different instruction sets, which is one reason software built for one type of chip doesn't always run on another.</div></div>
+    <div class="recap">TAKEAWAY · The instruction cycle (Fetch → Decode → Execute) repeats endlessly. The instruction set is the fixed vocabulary of commands a CPU understands.</div>
+  </div>
+</section>
+
+<!-- 06 PROCESSOR SPEED -->
+<section class="layer" id="s6" data-title="Processor speed">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">06</span> How fast is "fast"?</div>
+    <h2>Clock speed, and why more cores can mean more speed.</h2>
+    <p>A CPU has an internal "clock" ticking at an incredibly steady rate — every tick, it can start a new step of work. This rate is called the <strong>clock speed</strong>, measured in <strong>GHz (gigahertz)</strong> — billions of ticks per second. <strong>Try different speeds</strong> below.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · the CPU clock</span></div>
+      <div class="clock-wrap">
+        <div>
+          <div class="clock-face"><div class="clock-dot" id="clockDot"></div></div>
+          <div class="clock-ghz" id="ghzButtons"></div>
+          <div class="tick-count">Roughly <b id="tickRate">1</b> billion ticks/second at this speed</div>
+        </div>
+        <div>
+          <p style="font-size:14px">A single core can only work on one thing per tick. <strong>Multi-core</strong> processors pack several independent "workers" (cores) onto one chip, so multiple tasks can run at the same time.</p>
+          <div class="btn-row" style="margin-top:6px"><button class="btn primary" id="core1Btn">Run 8 tasks — 1 core</button><button class="btn primary" id="core4Btn">Run 8 tasks — 4 cores</button></div>
+          <div class="core-lanes" id="coreLanes"></div>
+          <div class="core-verdict" id="coreVerdict"></div>
+        </div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · Clock speed (GHz) = how many steps per second one core can take. More cores = more tasks handled at once, not a faster single task.</div>
+  </div>
+</section>
+
+<!-- 07 INTEL / AMD / ARM -->
+<section class="layer" id="s7" data-title="Meet the chip makers">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">07</span> Who actually makes these chips?</div>
+    <h2>Intel, AMD, and ARM.</h2>
+    <p>Almost every processor you'll ever touch comes from one of three families. <strong>Pick a tab</strong> to explore.</p>
+    <div class="stage">
+      <div class="tabs" id="chipTabs"></div>
+      <div class="tab-body">
+        <div class="glyph-box" id="chipGlyph">🔷</div>
+        <div class="tmeta">
+          <div class="tt" id="chipTt"></div>
+          <h3 id="chipName"></h3>
+          <div class="td" id="chipDesc"></div>
+          <div class="rows" id="chipRows"></div>
+        </div>
+      </div>
+    </div>
+    <div class="recap">TAKEAWAY · Intel and AMD dominate laptops/desktops with powerful x86 chips. ARM designs efficient chips used in almost every smartphone and increasingly in laptops too.</div>
+  </div>
+</section>
+
+<!-- 08 RISC VS CISC -->
+<section class="layer" id="s8" data-title="RISC vs CISC">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">08</span> Two philosophies of chip design</div>
+    <h2>RISC vs. CISC: simple bricks, or an all-in-one tool?</h2>
+    <p>Beyond brands, CPUs also differ in <em>design philosophy</em> — specifically, how big and complex their instruction set is.</p>
+    <div class="rc-wrap">
+      <div class="rc-card">
+        <h3 class="cyan">RISC</h3>
+        <p style="font-size:13.5px">Reduced Instruction Set Computer. Uses a small number of simple instructions, each doing one basic job, executed very quickly. Programs need more instructions overall, but each one is fast and predictable.</p>
+        <div class="rex">Used by: ARM chips (most phones), Apple's M-series chips</div>
+      </div>
+      <div class="rc-card">
+        <h3 class="amber">CISC</h3>
+        <p style="font-size:13.5px">Complex Instruction Set Computer. Uses a larger set of more powerful instructions, where a single instruction can perform several steps at once. Fewer instructions needed per program, but each one is more complex.</p>
+        <div class="rex">Used by: Intel and AMD's x86 chips (most laptops/desktops)</div>
+      </div>
+    </div>
+    <div class="analogy"><span class="ic">🧱</span><div class="tx"><b>Think of building furniture.</b> RISC is like simple Lego bricks — each piece does one small thing, but you snap together many of them quickly and predictably. CISC is like a Swiss Army knife — fewer tools overall, but each one is a powerful multi-step gadget in itself.</div></div>
+    <div class="recap">TAKEAWAY · RISC = many simple, fast instructions (ARM, Apple Silicon). CISC = fewer, more powerful, complex instructions (Intel, AMD x86).</div>
+  </div>
+</section>
+
+<!-- 09 MEMORY MATCH GAME -->
+<section class="layer" id="s9" data-title="Memory match game">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">09</span> Lock it all in</div>
+    <h2>🎮 Game: Match every part to its job.</h2>
+    <p>Eight pairs — every component from today's lecture is hiding in here. Flip two cards at a time; a matching term and definition stay revealed.</p>
+    <div class="stage">
+      <div class="stage-head"><span class="stage-title">Interactive · memory match</span></div>
+      <div class="match-grid" id="matchGrid"></div>
+      <div class="match-stats"><span>Moves: <b id="matchMoves">0</b></span><span>Matches: <b id="matchFound">0</b> / 8</span></div>
+      <div class="match-win" id="matchWin">🎉 Well played — every component matched!</div>
+      <div class="btn-row"><button class="btn primary" id="matchReset">Shuffle &amp; restart</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 ACTIVITIES -->
+<section class="layer" id="s10" data-title="Activities">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">10</span> Check yourself</div>
+    <h2>A couple more quick games, then a quiz.</h2>
+    <p>No pressure — these help the ideas stick.</p>
+    <div class="act-grid">
+      <div class="act">
+        <h3>① Which component am I?</h3>
+        <div class="prompt">Read the clue and pick the right part.</div>
+        <div class="clue" id="partClue">—</div>
+        <div class="opt-row" id="partOpts"></div>
+        <div class="feedback" id="partFb">Choose one.</div>
+        <div class="btn-row"><button class="btn" id="partNew">New clue</button><span class="score" id="partScore" style="align-self:center">solved: 0</span></div>
+      </div>
+      <div class="act">
+        <h3>② RISC or CISC?</h3>
+        <div class="prompt">Read the clue and pick the correct design.</div>
+        <div class="clue" id="rcClue">—</div>
+        <div class="opt-row"><button class="opt-btn" id="rcRisc">RISC</button><button class="opt-btn" id="rcCisc">CISC</button><button class="btn ghost" id="rcNext" style="margin-left:auto">Next</button></div>
+        <div class="feedback" id="rcFb"></div>
+      </div>
+    </div>
+    <div class="quiz">
+      <div class="quiz-h">③ Quick quiz</div>
+      <div id="quiz"></div>
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 WHY -->
+<section class="why layer" id="s11" data-title="Why & recap">
+  <div class="wrap">
+    <div class="eyebrow"><span class="num">11</span> Why this matters to you</div>
+    <h2>The next time someone says "GHz" or "cores", you'll know exactly what they mean.</h2>
+    <p>Buying a laptop, choosing a phone, or just understanding why a video call lags — all of it comes back to today's five components. You now know what's actually happening inside the box, not just how to use what's on the screen.</p>
+    <div class="cards">
+      <div class="card"><div class="k">Shop smarter</div><p>Clock speed, cores, Intel/AMD/ARM — you can now read a laptop spec sheet and understand what it's actually telling you.</p></div>
+      <div class="card"><div class="k">Debug with confidence</div><p>"My CPU usage is high" or "it only uses one core" will mean something concrete, not just jargon.</p></div>
+      <div class="card"><div class="k">Ready for what's next</div><p>Every future lecture on software, storage, and networks assumes you understand these five hardware components.</p></div>
+    </div>
+    <div class="hw">
+      <div class="k">Before next lecture, try this</div>
+      <ol>
+        <li><b>Check your own device:</b> look up the processor in your phone or laptop. Is it Intel, AMD, or ARM? What's its clock speed and how many cores does it have?</li>
+        <li><b>Explain it simply:</b> in 2–3 sentences, explain what the ALU and Control Unit each do, to someone who's never studied computers.</li>
+        <li><b>RISC or CISC:</b> find out whether your own phone's processor is more RISC-like or CISC-like, and explain why.</li>
+        <li><b>Draw it:</b> sketch the five basic components and how data flows between them, from memory.</li>
+      </ol>
+    </div>
+    <p class="recap" style="margin-top:34px">THE WHOLE STORY · Input and Output units are the doors · the CPU's Control Unit, ALU and Registers form the brain · the instruction cycle (fetch-decode-execute) is how it runs · clock speed and cores define its raw power · and Intel, AMD, ARM, RISC and CISC describe the many different ways to build that same brain.</p>
+  </div>
+</section>
+
+<footer><div class="wrap"><div class="m">Computer Fundamentals · Lecture 02 · Inside the Machine — an interactive teaching aid for beginners</div></div></footer>
+
+<script>
+"use strict";
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const wait=ms=>new Promise(r=>setTimeout(r,reduced?0:ms));
+
+/* RAIL */
+const nav=[
+  {id:'top',n:'—',t:'Cover'},{id:'s0',n:'00',t:'Opening the machine'},{id:'s1',n:'01',t:'Input & Output units'},
+  {id:'s2',n:'02',t:"CPU's three parts"},{id:'s3',n:'03',t:'The ALU in action'},{id:'s4',n:'04',t:'Registers in action'},
+  {id:'s5',n:'05',t:'Instruction cycle & set'},{id:'s6',n:'06',t:'Processor speed'},{id:'s7',n:'07',t:'Chip makers'},
+  {id:'s8',n:'08',t:'RISC vs CISC'},{id:'s9',n:'09',t:'Memory match game'},{id:'s10',n:'10',t:'Activities'},
+  {id:'s11',n:'11',t:'Why & recap'}
+];
+const rail=$('#rail');
+nav.forEach(s=>{const el=document.getElementById(s.id);const b=document.createElement('button');b.innerHTML=`<span class="dot"></span><span class="label">${s.n==='—'?'top':s.n} · ${s.t}</span>`;b.dataset.for=s.id;b.addEventListener('click',()=>el&&el.scrollIntoView({behavior:reduced?'auto':'smooth'}));rail.appendChild(b);});
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)$$('.rail button').forEach(b=>b.classList.toggle('active',b.dataset.for===e.target.id));}),{rootMargin:'-45% 0px -45% 0px'});
+nav.forEach(s=>{const el=document.getElementById(s.id);if(el)spy.observe(el);});
+
+/* HERO */
+(function heroGrid(){
+  const cv=$('#heroCanvas'),ctx=cv.getContext('2d');
+  let cols,rows,gap=26,size=6,t=0,mouse={x:-999,y:-999};
+  const CYAN='#22D3EE',INDIGO='#1c3444';
+  function resize(){cv.width=cv.offsetWidth*devicePixelRatio;cv.height=cv.offsetHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);cols=Math.ceil(cv.offsetWidth/gap)+1;rows=Math.ceil(cv.offsetHeight/gap)+1;}
+  resize();addEventListener('resize',resize);
+  cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;});
+  cv.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-999;});
+  function draw(){const W=cv.offsetWidth,H=cv.offsetHeight;ctx.clearRect(0,0,W,H);const wave=(t*0.9)%(W+H+400)-200;for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const px=x*gap+14,py=y*gap+14,diag=px+py,dw=Math.abs(diag-wave);const onWave=dw<60?1-(dw/60):0;const dx=px-mouse.x,dy=py-mouse.y,md=Math.hypot(dx,dy),onMouse=md<90?1-(md/90):0;const heat=Math.max(onWave,onMouse);if(heat>0.05){ctx.fillStyle=CYAN;ctx.globalAlpha=0.15+heat*0.85;const s=size+heat*4;ctx.fillRect(px-s/2,py-s/2,s,s);}else{ctx.fillStyle=INDIGO;ctx.globalAlpha=0.5;ctx.fillRect(px-size/2,py-size/2,size,size);}}ctx.globalAlpha=1;}
+  if(reduced){draw();return;}
+  (function loop(){t+=2.4;draw();requestAnimationFrame(loop);})();
+})();
+
+/* 00 FIVE PARTS */
+(function fiveParts(){
+  const parts=[
+    {i:'⌨️',n:'Input Unit',d:'Brings data in — keyboard, mouse, mic, camera, scanner.'},
+    {i:'🧠',n:'CPU',d:'The brain — contains the Control Unit, ALU, and Registers.'},
+    {i:'🖥️',n:'Output Unit',d:'Shows the result — monitor, printer, speaker.'},
+    {i:'💾',n:'Storage',d:'Keeps data and programs, even when the power is off.'},
+    {i:'🔌',n:'Memory (RAM)',d:'Temporarily holds what the CPU is actively using right now.'}
+  ];
+  const grid=$('#fiveParts');
+  parts.forEach(p=>{
+    const el=document.createElement('div');el.className='cpu-part';
+    el.innerHTML=`<div class="pi">${p.i}</div><div class="pn">${p.n}</div>`;
+    el.addEventListener('click',()=>{
+      $$('.cpu-part',grid).forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
+      let d=el.querySelector('.pd');
+      if(!d){d=document.createElement('div');d.className='pd';d.style.cssText='font-size:12.5px;color:var(--ink-dim);margin-top:8px';el.appendChild(d);}
+      d.textContent=p.d;
+    });
+    grid.appendChild(el);
+  });
+  grid.firstChild.click();
+})();
+
+/* 01 INPUT/OUTPUT REFRESHER */
+(function io(){
+  const inputs=[
+    ['Keyboard','Converts each keypress into a character code.'],
+    ['Mouse','Reports movement and clicks as coordinates.'],
+    ['Microphone','Converts sound waves into digital audio data.'],
+    ['Scanner','Converts a printed image into digital pixels.'],
+    ['Webcam','Captures video as a stream of digital frames.']
+  ];
+  const outputs=[
+    ['Monitor','Displays results as light on a screen.'],
+    ['Printer','Puts the result onto physical paper.'],
+    ['Speaker','Converts digital audio back into sound waves.'],
+    ['Projector','Displays a large image for a room to see.'],
+    ['Headphones','Delivers sound privately to one listener.']
+  ];
+  function build(list, wrapId, detailId){
+    const wrap=$(wrapId), detail=$(detailId);
+    list.forEach(([n,d])=>{
+      const chip=document.createElement('button');chip.className='io-chip';chip.textContent=n;
+      chip.addEventListener('click',()=>{$$('.io-chip',wrap).forEach(c=>c.classList.remove('sel'));chip.classList.add('sel');detail.textContent=d;});
+      wrap.appendChild(chip);
+    });
+  }
+  build(inputs,'#inputDevices','#inputDetail');
+  build(outputs,'#outputDevices','#outputDetail');
+})();
+
+/* 02 CPU THREE PARTS ACCORDION */
+(function cpuParts(){
+  const data=[
+    {i:'🧭',t:'Control Unit',s:'The manager / conductor',d:'Directs traffic inside the CPU. It fetches each instruction, figures out what it means, and tells the ALU and registers exactly what to do and when — without doing the actual calculations itself.'},
+    {i:'🧮',t:'ALU',s:'Arithmetic Logic Unit',d:'The part that actually does the work: all arithmetic (add, subtract, multiply, divide) and all logical comparisons (greater than, equal to). If the CPU "thinks", the ALU is doing the thinking.'},
+    {i:'📝',t:'Registers',s:"The CPU's own notepad",d:'A handful of extremely small, extremely fast storage slots built directly into the CPU, holding only the values being used right this instant — far faster to access than RAM, but able to hold very little at once.'}
+  ];
+  const grid=$('#cpuGrid');
+  data.forEach((c,i)=>{
+    const el=document.createElement('div');el.className='char';
+    el.innerHTML=`<button class="char-head" aria-expanded="false"><span class="char-ico">${c.i}</span><span><span class="char-ttl">${c.t}</span><br><span class="char-sub">${c.s}</span></span><span class="char-plus">+</span></button><div class="char-body"><div class="in">${c.d}</div></div>`;
+    const head=$('.char-head',el),body=$('.char-body',el);
+    head.addEventListener('click',()=>{const open=el.classList.toggle('open');head.setAttribute('aria-expanded',open);body.style.maxHeight=open?body.scrollHeight+'px':'0';});
+    grid.appendChild(el);
+    if(i===0){el.classList.add('open');head.setAttribute('aria-expanded','true');requestAnimationFrame(()=>{body.style.maxHeight=body.scrollHeight+'px';});}
+  });
+})();
+
+/* 03 ALU DEMO */
+(function alu(){
+  const aEl=$('#aluA'),bEl=$('#aluB'),symEl=$('#aluSym'),resEl=$('#aluResult');
+  let op='+';
+  function calc(){
+    const a=parseFloat(aEl.value)||0,b=parseFloat(bEl.value)||0;
+    let r;
+    if(op==='+')r=a+b; else if(op==='-')r=a-b; else if(op==='*')r=a*b;
+    else if(op==='>')r=(a>b)?'TRUE':'FALSE'; else if(op==='=')r=(a===b)?'TRUE':'FALSE';
+    resEl.textContent=r;
+    symEl.textContent=op==='*'?'×':(op==='>' ? '>' : op);
+  }
+  $$('.alu-op').forEach(btn=>{
+    btn.addEventListener('click',()=>{$$('.alu-op').forEach(b=>b.classList.remove('active'));btn.classList.add('active');op=btn.dataset.op;calc();});
+  });
+  aEl.addEventListener('input',calc);bEl.addEventListener('input',calc);
+  calc();
+})();
+
+/* 04 REGISTERS DEMO */
+(function registers(){
+  const ramVals=[42,17,9,63,101,8];
+  const ramCells=$('#ramCells'),regSlots=$('#regSlots'),regNote=$('#regNote');
+  let slots=[null,null,null,null], nextSlot=0;
+  ramVals.forEach(v=>{
+    const c=document.createElement('button');c.className='ram-cell';c.textContent=v;
+    c.addEventListener('click',()=>{
+      slots[nextSlot]=v;
+      render();
+      regNote.textContent='Loaded '+v+' into Register R'+(nextSlot+1)+'. The CPU can now use it instantly.';
+      nextSlot=(nextSlot+1)%4;
+    });
+    ramCells.appendChild(c);
+  });
+  function render(){
+    regSlots.innerHTML='';
+    slots.forEach((v,i)=>{
+      const s=document.createElement('div');s.className='reg-slot'+(v!==null?' filled':'');
+      s.textContent=v!==null?v:'R'+(i+1);
+      regSlots.appendChild(s);
+    });
+  }
+  render();
+})();
+
+/* 05 INSTRUCTION CYCLE */
+(function cycle(){
+  const svg=$('#cycleSvg'),cT=$('#cycleT'),cP=$('#cycleP'),cStep=$('#cycleStep');
+  const stages=[
+    {n:'Fetch',d:'The Control Unit retrieves the next instruction waiting in memory.'},
+    {n:'Decode',d:'The Control Unit works out exactly what the instruction means and what it needs.'},
+    {n:'Execute',d:'The instruction is carried out — often by the ALU — and any result is stored.'}
+  ];
+  function draw(active){
+    const cx=210,cy=110,r=80;
+    let g='';
+    const angles=[-90,30,150];
+    angles.forEach((a,i)=>{
+      const rad=a*Math.PI/180;
+      const x=cx+r*Math.cos(rad), y=cy+r*Math.sin(rad);
+      const on = i===active;
+      g+=`<circle cx="${x}" cy="${y}" r="34" fill="${on?'#123344':'#0e1b24'}" stroke="${on?'#22D3EE':'#1E3644'}" stroke-width="2.5"/>`;
+      g+=`<text x="${x}" y="${y+5}" text-anchor="middle" font-family="'Space Grotesk'" font-weight="700" font-size="13" fill="${on?'#22D3EE':'#8FAFB6'}">${stages[i].n}</text>`;
+    });
+    // curved connectors between the three stage circles
+    const pts=angles.map(a=>[cx+r*Math.cos(a*Math.PI/180), cy+r*Math.sin(a*Math.PI/180)]);
+    for(let i=0;i<3;i++){
+      const [x1,y1]=pts[i], [x2,y2]=pts[(i+1)%3];
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      const dx=mx-cx, dy=my-cy, dist=Math.hypot(dx,dy);
+      const cx2=cx+dx/dist*(dist+22), cy2=cy+dy/dist*(dist+22);
+      g+=`<path d="M ${x1} ${y1} Q ${cx2} ${cy2} ${x2} ${y2}" fill="none" stroke="#2c4a5a" stroke-width="2" marker-end="url(#cyArrow)"/>`;
+    }
+    g=`<defs><marker id="cyArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#2c4a5a"/></marker></defs>`+g;
+    svg.innerHTML=g;
+  }
+  function show(i){
+    draw(i);
+    cT.textContent=stages[i].n;
+    cP.textContent=stages[i].d;
+  }
+  show(0);
+  $('#cycleRun').addEventListener('click', async ()=>{
+    for(let i=0;i<3;i++){
+      show(i);
+      cStep.innerHTML='<b>Step '+(i+1)+' of 3:</b> '+stages[i].n;
+      await wait(700);
+    }
+    cStep.innerHTML='<b>Cycle complete.</b> The CPU immediately starts fetching the next instruction — this repeats billions of times per second.';
+    show(0);
+  });
+  $('#cycleReset').addEventListener('click', ()=>{show(0);cStep.textContent='';});
+})();
+
+/* 06a CLOCK SPEED */
+(function clock(){
+  const dot=$('#clockDot'),tickRate=$('#tickRate'),btnsWrap=$('#ghzButtons');
+  const speeds=[1,2,3,4,5];
+  let anim=null, curSpeed=2;
+  speeds.forEach(g=>{
+    const b=document.createElement('button');b.className='ghz-btn'+(g===curSpeed?' active':'');b.textContent=g+' GHz';
+    b.addEventListener('click',()=>{curSpeed=g;$$('.ghz-btn',btnsWrap).forEach(x=>x.classList.remove('active'));b.classList.add('active');tickRate.textContent=g;restart();});
+    btnsWrap.appendChild(b);
+  });
+  function restart(){
+    if(anim)cancelAnimationFrame(anim);
+    const dur=Math.max(120, 700/curSpeed);
+    let start=null;
+    function frame(ts){
+      if(start===null)start=ts;
+      const t=((ts-start)%dur)/dur;
+      const angle=t*360;
+      const rad=(angle-90)*Math.PI/180;
+      dot.style.transform=`translate(${Math.cos(rad)*42}px, ${Math.sin(rad)*42}px)`;
+      anim=requestAnimationFrame(frame);
+    }
+    if(!reduced) anim=requestAnimationFrame(frame);
+  }
+  tickRate.textContent=curSpeed;
+  restart();
+})();
+
+/* 06b MULTI-CORE TASK DEMO */
+(function cores(){
+  const lanesEl=$('#coreLanes'),verdict=$('#coreVerdict');
+  const btn1=$('#core1Btn'),btn4=$('#core4Btn');
+  let running=false;
+  function buildLanes(n){
+    lanesEl.innerHTML='';
+    for(let i=0;i<n;i++){
+      const lane=document.createElement('div');lane.className='core-lane';
+      lane.innerHTML=`<span class="cl">Core ${i+1}</span><div class="core-track" data-lane="${i}"></div>`;
+      lanesEl.appendChild(lane);
+    }
+  }
+  async function run1core(){
+    if(running)return;running=true;verdict.textContent='';
+    buildLanes(1);
+    const track=$('.core-track',lanesEl);
+    for(let i=0;i<8;i++){const t=document.createElement('div');t.className='core-task';track.appendChild(t);}
+    const tasks=$$('.core-task',track);
+    const t0=performance.now();
+    for(let i=0;i<8;i++){tasks[i].classList.add('done');await wait(280);}
+    const elapsed=((performance.now()-t0)/1000).toFixed(1);
+    verdict.innerHTML='1 core finished all 8 tasks <b>one at a time</b> \u2014 took the longest.';
+    running=false;
+  }
+  async function run4core(){
+    if(running)return;running=true;verdict.textContent='';
+    buildLanes(4);
+    const tracks=$$('.core-track',lanesEl);
+    tracks.forEach(tr=>{for(let i=0;i<2;i++){const t=document.createElement('div');t.className='core-task';tr.appendChild(t);}});
+    for(let wave=0;wave<2;wave++){
+      await Promise.all(tracks.map(tr=>new Promise(res=>{
+        setTimeout(()=>{tr.children[wave].classList.add('done');res();},280);
+      })));
+    }
+    verdict.innerHTML='4 cores finished the same 8 tasks <b>in parallel</b> \u2014 about 4× faster overall.';
+    running=false;
+  }
+  buildLanes(1);
+  btn1.addEventListener('click',run1core);
+  btn4.addEventListener('click',run4core);
+})();
+
+/* 07 CHIP MAKER TABS */
+(function chips(){
+  const data=[
+    {tt:'x86 · Desktop & Laptop', n:'Intel', g:'🔷',
+     d:'The longest-running chip maker for personal computers. Intel Core processors (i3/i5/i7/i9) power a huge share of the world\u2019s laptops and desktops, generally following the CISC design.',
+     rows:[['Design','CISC (x86)'],['Found in','Laptops, desktops, servers'],['Known for','Deep compatibility, strong single-core performance'],['Example chips','Core i5, Core i7, Core i9']]},
+    {tt:'x86 · Desktop & Laptop', n:'AMD', g:'🔶',
+     d:'Intel\u2019s biggest rival, also building CISC-style x86 chips. Known in recent years for offering strong multi-core performance, often at a more competitive price than Intel.',
+     rows:[['Design','CISC (x86)'],['Found in','Laptops, desktops, gaming PCs'],['Known for','Strong multi-core value, gaming performance'],['Example chips','Ryzen 5, Ryzen 7, Ryzen 9']]},
+    {tt:'RISC · Mobile & Beyond', n:'ARM', g:'🔻',
+     d:'ARM doesn\u2019t manufacture chips itself \u2014 it designs efficient RISC processor blueprints that other companies (Apple, Samsung, Qualcomm) build into their own chips. ARM chips prioritise low power use, making them the default choice for battery-powered devices.',
+     rows:[['Design','RISC'],['Found in','Smartphones, tablets, and now some laptops'],['Known for','Excellent battery efficiency'],['Example chips','Apple M-series, Qualcomm Snapdragon']]}
+  ];
+  const tabs=$('#chipTabs'),glyph=$('#chipGlyph'),tt=$('#chipTt'),name=$('#chipName'),desc=$('#chipDesc'),rows=$('#chipRows');
+  data.forEach((d,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' active':'');b.textContent=d.n;b.addEventListener('click',()=>show(i));tabs.appendChild(b);});
+  function show(i){const d=data[i];$$('.tab',tabs).forEach((b,bi)=>b.classList.toggle('active',bi===i));glyph.textContent=d.g;tt.textContent=d.tt;name.textContent=d.n;desc.textContent=d.d;rows.innerHTML=d.rows.map(r=>`<div class="trow"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');}
+  show(0);
+})();
+
+/* 09 MEMORY MATCH GAME */
+(function memoryMatch(){
+  const pairs=[
+    ['Input Unit','Brings data into the computer as binary'],
+    ['Output Unit','Turns binary results into something you sense'],
+    ['Control Unit','Directs every part of the CPU, like a conductor'],
+    ['ALU','Performs arithmetic and logical operations'],
+    ['Registers',"The CPU's own tiny, ultra-fast storage"],
+    ['Instruction Set','The fixed vocabulary of commands a CPU understands'],
+    ['Clock Speed','How many ticks per second a core can perform'],
+    ['RISC','A design using many simple, fast instructions']
+  ];
+  const grid=$('#matchGrid'),movesEl=$('#matchMoves'),foundEl=$('#matchFound'),winEl=$('#matchWin');
+  let cards=[],flipped=[],moves=0,found=0,lock=false;
+  function buildDeck(){
+    let deck=[];
+    pairs.forEach((p,i)=>{deck.push({pid:i,type:'term',text:p[0]});deck.push({pid:i,type:'def',text:p[1]});});
+    for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+    return deck;
+  }
+  function render(){
+    grid.innerHTML='';moves=0;found=0;flipped=[];lock=false;
+    movesEl.textContent=moves;foundEl.textContent=found;winEl.classList.remove('show');
+    cards=buildDeck().map((c,i)=>{
+      const el=document.createElement('div');el.className='match-card '+c.type;
+      el.innerHTML=`<span class="back">?</span><span class="face">${c.text}</span>`;
+      el.addEventListener('click',()=>flip(i));
+      grid.appendChild(el);
+      return {...c,el,matched:false};
+    });
+  }
+  function flip(i){
+    if(lock)return;
+    const c=cards[i];
+    if(c.matched||c.el.classList.contains('revealed'))return;
+    c.el.classList.add('revealed');
+    flipped.push(i);
+    if(flipped.length===2){
+      lock=true;moves++;movesEl.textContent=moves;
+      const [i1,i2]=flipped;
+      const c1=cards[i1],c2=cards[i2];
+      if(c1.pid===c2.pid && c1.type!==c2.type){
+        setTimeout(()=>{
+          c1.matched=c2.matched=true;
+          c1.el.classList.add('matched');c2.el.classList.add('matched');
+          found++;foundEl.textContent=found;
+          flipped=[];lock=false;
+          if(found===pairs.length){winEl.classList.add('show');}
+        },reduced?0:350);
+      }else{
+        setTimeout(()=>{
+          c1.el.classList.remove('revealed');c2.el.classList.remove('revealed');
+          flipped=[];lock=false;
+        },reduced?0:800);
+      }
+    }
+  }
+  $('#matchReset').addEventListener('click',render);
+  render();
+})();
+
+/* 10a WHICH COMPONENT AM I */
+(function partGame(){
+  const items=[
+    ['I direct traffic inside the CPU but never do the maths myself.','Control Unit'],
+    ['I do every addition, subtraction, and comparison.','ALU'],
+    ['I hold just a few values, but I am blazing fast.','Registers'],
+    ['I turn your keypress into binary the computer can use.','Input Unit'],
+    ['I turn binary results into a picture on a screen.','Output Unit'],
+    ['I am the fixed vocabulary of commands a CPU understands.','Instruction Set'],
+    ['I measure how many ticks per second a core performs.','Clock Speed'],
+    ['I contain the Control Unit, the ALU, and the Registers.','CPU']
+  ];
+  const OPTS=['Control Unit','ALU','Registers','Input Unit','Output Unit','Instruction Set','Clock Speed','CPU'];
+  const clueEl=$('#partClue'),opts=$('#partOpts'),fb=$('#partFb'),score=$('#partScore');let cur,solved=0;
+  function build(){opts.innerHTML='';const set=new Set([cur[1]]);while(set.size<4)set.add(OPTS[Math.floor(Math.random()*OPTS.length)]);[...set].sort(()=>Math.random()-0.5).forEach(o=>{const b=document.createElement('button');b.className='opt-btn';b.textContent=o;b.addEventListener('click',()=>pick(o,b));opts.appendChild(b);});}
+  function pick(o,b){if(opts.dataset.done)return;if(o===cur[1]){b.classList.add('correct');fb.className='feedback ok';fb.textContent='✓ Correct!';solved++;score.textContent='solved: '+solved;}else{b.classList.add('wrong');$$('.opt-btn',opts).forEach(x=>{if(x.textContent===cur[1])x.classList.add('correct');});fb.className='feedback no';fb.textContent='It\'s '+cur[1]+'.';}opts.dataset.done='1';}
+  function next(){cur=items[Math.floor(Math.random()*items.length)];clueEl.textContent=cur[0];fb.className='feedback';fb.textContent='Choose one.';opts.removeAttribute('data-done');build();}
+  $('#partNew').addEventListener('click',next);next();
+})();
+
+/* 10b RISC OR CISC GAME */
+(function rcGame(){
+  const items=[
+    ['Uses many simple instructions, each doing one small job','risc'],
+    ['Uses fewer, more powerful multi-step instructions','cisc'],
+    ['The design philosophy behind ARM and Apple M-series chips','risc'],
+    ['The design philosophy behind Intel and AMD x86 chips','cisc'],
+    ['Prioritises simplicity and speed per instruction','risc'],
+    ['Prioritises doing more in a single instruction','cisc']
+  ];
+  const clue=$('#rcClue'),fb=$('#rcFb'),bR=$('#rcRisc'),bC=$('#rcCisc');let cur,done=false;
+  function next(){cur=items[Math.floor(Math.random()*items.length)];clue.textContent=cur[0];fb.className='feedback';fb.textContent='';done=false;bR.className='opt-btn';bC.className='opt-btn';}
+  function ans(val,btn){if(done)return;done=true;const correct=(val===cur[1]);btn.classList.add(correct?'correct':'wrong');fb.className='feedback '+(correct?'ok':'no');fb.textContent=(correct?'✓ ':'✗ ')+'This describes '+(cur[1]==='risc'?'RISC.':'CISC.');}
+  bR.addEventListener('click',()=>ans('risc',bR));bC.addEventListener('click',()=>ans('cisc',bC));$('#rcNext').addEventListener('click',next);next();
+})();
+
+/* 10c QUIZ */
+(function quiz(){
+  const Q=[
+    {q:'Which unit converts your keypress into binary?',o:['Output Unit','Input Unit','ALU','Control Unit'],a:1,e:'The Input Unit converts real-world actions into binary the computer can process.'},
+    {q:'Which part of the CPU actually performs arithmetic and comparisons?',o:['Control Unit','Registers','ALU','Instruction Set'],a:2,e:'The Arithmetic Logic Unit (ALU) performs all arithmetic and logical operations.'},
+    {q:'What does the Control Unit do?',o:['Performs all calculations','Stores the final result permanently','Directs and coordinates every other part of the CPU','Displays the result on screen'],a:2,e:'The Control Unit fetches, decodes, and directs — it manages, but does not calculate.'},
+    {q:'Why are registers faster than RAM?',o:['They are physically larger','They are built directly into the CPU itself','They use a different type of electricity','They are not actually faster'],a:1,e:'Registers sit inside the CPU itself, making them far faster to access than RAM, though much smaller in capacity.'},
+    {q:'What is an "instruction set"?',o:['A list of files stored on a hard disk','The fixed vocabulary of commands a CPU understands','A type of monitor','A brand of processor'],a:1,e:'The instruction set is the complete list of basic commands a specific CPU is built to understand.'},
+    {q:'What does clock speed (GHz) measure?',o:['How much storage a computer has','How many billions of ticks per second a core can perform','How many programs can be installed','The brightness of the monitor'],a:1,e:'GHz measures billions of clock ticks per second — how quickly a single core can take steps.'},
+    {q:'Which of these is generally considered a RISC design?',o:['Intel Core i7','AMD Ryzen 9','ARM (used in most smartphones)','None of these'],a:2,e:'ARM designs are RISC (Reduced Instruction Set Computer), prioritising simple, efficient instructions.'}
+  ];
+  const box=$('#quiz'),scoreEl=$('#quizScore');let answered=0,correct=0;
+  Q.forEach((item,qi)=>{const d=document.createElement('div');d.className='q';d.innerHTML=`<div class="qt"><span class="n">Q${qi+1}</span>${item.q}</div><div class="opts"></div><div class="exp">${item.e}</div>`;const opts=$('.opts',d);item.o.forEach((txt,oi)=>{const b=document.createElement('button');b.className='opt';b.textContent=txt;b.addEventListener('click',()=>{if(d.classList.contains('answered'))return;d.classList.add('answered');answered++;if(oi===item.a){b.classList.add('correct');correct++;}else{b.classList.add('wrong');$$('.opt',opts)[item.a].classList.add('correct');}$$('.opt',opts).forEach(x=>x.disabled=true);scoreEl.textContent=`Score: ${correct} / ${answered}`+(answered===Q.length?' — all done!':'');});opts.appendChild(b);});box.appendChild(d);});
+})();
+</script>
+</body>
+</html>
