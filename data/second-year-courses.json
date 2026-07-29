@@ -1,0 +1,38 @@
+[
+  {
+    "code": "SY-CS-01",
+    "title": "Computer System Architecture",
+    "description": "Second-year core course covering digital logic, registers, instruction sets, addressing modes, I/O organization, memory, and computer architecture fundamentals.",
+    "type": "Core Course",
+    "overviewLink": "computer-system-architecture.html",
+    "lecturesLink": "computer-system-architecture.html#csa-lectures",
+    "assignmentsLink": "#",
+    "quizzesLink": "#",
+    "labLink": "#",
+    "status": "Available"
+  },
+  {
+    "code": "SY-CS-02",
+    "title": "Course To Be Added",
+    "description": "Space reserved for the second second-year course with lectures, assignments, quizzes, and practical resources.",
+    "type": "Core Course",
+    "overviewLink": "#",
+    "lecturesLink": "#",
+    "assignmentsLink": "#",
+    "quizzesLink": "#",
+    "labLink": "#",
+    "status": "Coming Soon"
+  },
+  {
+    "code": "SY-CS-03",
+    "title": "Course To Be Added",
+    "description": "Space reserved for the third second-year course with lectures, assignments, quizzes, and practical resources.",
+    "type": "Core Course",
+    "overviewLink": "#",
+    "lecturesLink": "#",
+    "assignmentsLink": "#",
+    "quizzesLink": "#",
+    "labLink": "#",
+    "status": "Coming Soon"
+  }
+]

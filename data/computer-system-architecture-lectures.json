@@ -1,0 +1,322 @@
+[
+  {
+    "number": "01",
+    "title": "Introduction",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Introduction to computer system architecture and the basic ideas behind digital hardware organization.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/COMP201 Th Lecture-1 Introduction.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "02",
+    "title": "Digital Logic Basics",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Foundational digital logic concepts that prepare students for combinational and sequential circuit design.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture-2.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "03A",
+    "title": "Minterms and Maxterms",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Boolean expression representation using minterms and maxterms.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture-3 (Minterms and Maxterms).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "03B",
+    "title": "Digital Logic Epilogue",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Supplementary follow-up material connected to early digital logic topics.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture-3 Epilogue.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "04",
+    "title": "K Maps",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Boolean simplification using Karnaugh maps.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture-4 K Maps.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "05",
+    "title": "Don't Care Conditions",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Use of don't care conditions in Boolean simplification and logic optimization.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture-5 Don't Care Conditions.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "06",
+    "title": "Prime Implicants",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Prime implicants and simplified logic expression selection.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture-6 Prime Implicants.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "07",
+    "title": "Combinational Circuits (Half and Full Adder)",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Combinational circuits with focus on half adders and full adders.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 7 Combinational Circuits (Half & Full Adder).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "08",
+    "title": "Multiplexer",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Multiplexer circuits and their role in digital system design.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 8 Multiplexer.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "09",
+    "title": "Decoders",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Decoder circuits and their use in hardware systems.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 9 Decoders.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "10",
+    "title": "Sequential Circuits",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Introduction to sequential circuits and state-based digital behavior.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 10 Sequential Circuits.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "11",
+    "title": "Latches",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Basic latch circuits and memory-like behavior in digital electronics.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 11 Latches.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "12",
+    "title": "SR and JK Flip Flop",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Flip-flop design and behavior with SR and JK models.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 12 SR and JK Flip Flop.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "13",
+    "title": "D and T Flip Flop",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Working and uses of D and T flip-flops in sequential logic.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 13 D & T Flip Flop.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "14",
+    "title": "Registers",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Registers and their role in storing and transferring binary data.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 14 Registers.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "15",
+    "title": "Counters",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Counter circuits and basic counting mechanisms in digital systems.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture15 Counters.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "16",
+    "title": "Memory Unit",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Introduction to memory units and how binary information is stored.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 16 Memory Unit.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "17",
+    "title": "Number System",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Number systems used in digital computers including binary and related forms.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 17 Number System.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "18",
+    "title": "Complements",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Complements in number representation and arithmetic operations.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 18 Complements.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "19",
+    "title": "Fixed and Floating Point Representation",
+    "section": "Unit I: Digital Logic Foundations",
+    "description": "Number representation using fixed-point and floating-point formats.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Lecture 19 Fixed and Floating Point Representation.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-1",
+    "title": "Common Registers and Bus System",
+    "section": "Unit II: Register Transfer and Control",
+    "description": "Common registers and the bus system used in computer organization.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 2 Lecture 1 Common Registers and Bus System.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-2",
+    "title": "Instruction Set",
+    "section": "Unit II: Register Transfer and Control",
+    "description": "Instruction set basics and the types of operations available to a processor.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit2 Lecture 2 Instruction Set.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-3",
+    "title": "Timing and Control, Instruction Cycle",
+    "section": "Unit II: Register Transfer and Control",
+    "description": "Instruction cycle flow and the timing and control operations behind execution.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit2 Lecture 3 Timing and Control, Instruction Cycle.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-4",
+    "title": "General Register Organization",
+    "section": "Unit II: Register Transfer and Control",
+    "description": "General register organization and data handling inside CPU structures.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit2 Lecture 4 General Register Organization.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-5",
+    "title": "Arithmetic Microoperations",
+    "section": "Unit II: Register Transfer and Control",
+    "description": "Arithmetic microoperations carried out at the register transfer level.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit2 Lecture 5 Arithmetic Microoperations.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-6",
+    "title": "Logic Microoperations",
+    "section": "Unit II: Register Transfer and Control",
+    "description": "Logic microoperations and their use in internal processor actions.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 2 Lecture 6 Logic Microoperations.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-7",
+    "title": "Stack Organization",
+    "section": "Unit II: Register Transfer and Control",
+    "description": "Stack organization and its use in data handling and subroutine support.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 2 Lecture 7 Stack organization.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-8",
+    "title": "Microprogrammed Control",
+    "section": "Unit II: Register Transfer and Control",
+    "description": "Microprogrammed control unit concepts and control memory organization.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 2 Lecture 8 Microprogrammed control.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-1",
+    "title": "Instruction Formats",
+    "section": "Unit III: Instructions and Programming",
+    "description": "Instruction formats and how machine instructions are structured.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 3 Lecture 1 Instruction Formats.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-2A",
+    "title": "Addressing Modes",
+    "section": "Unit III: Instructions and Programming",
+    "description": "Addressing modes used by processors to locate operands.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 3 Lecture 2 Addressing Modes.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-2B",
+    "title": "Addressing Modes (Part II)",
+    "section": "Unit III: Instructions and Programming",
+    "description": "Continuation of processor addressing modes and operand access methods.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/COMP 201TH Unit3 Lecture 2 Addressing Modes (Part-II).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-3",
+    "title": "Instruction Code and Machine Language",
+    "section": "Unit III: Instructions and Programming",
+    "description": "Machine language, instruction codes, and how low-level instructions are interpreted.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 3 Lecture 3 Instruction Code and Machine Language.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-4",
+    "title": "Assembly Language",
+    "section": "Unit III: Instructions and Programming",
+    "description": "Assembly language concepts and symbolic representation of machine operations.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 3 Lecture 4 Assembly Language.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-5",
+    "title": "Input Output Programming",
+    "section": "Unit III: Instructions and Programming",
+    "description": "Programming considerations for input and output operations.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp201TH Unit 3 Lecture 5 Input Output Programming.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-1",
+    "title": "Peripheral Devices",
+    "section": "Unit IV: Input/Output Organization",
+    "description": "Overview of peripheral devices and their interaction with the computer system.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp 201TH Unit 4 Lecture 1 Peripheral Devices.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-2",
+    "title": "Input Output Interface",
+    "section": "Unit IV: Input/Output Organization",
+    "description": "Input-output interface mechanisms used between CPU and peripherals.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp 201TH Unit 4 Lecture 2 Input output Interface.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-3",
+    "title": "Modes of Data Transfer",
+    "section": "Unit IV: Input/Output Organization",
+    "description": "Different modes of data transfer used in I/O systems.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp 201TH Unit 4 Lecture 3 Modes of Data Transfer.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-4",
+    "title": "Priority Interrupt",
+    "section": "Unit IV: Input/Output Organization",
+    "description": "Interrupt systems and priority interrupt handling.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp 201TH Unit 4 Lecture 4 Priority Interrupt.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-5",
+    "title": "Direct Memory Access",
+    "section": "Unit IV: Input/Output Organization",
+    "description": "Direct memory access and its role in efficient data transfer.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp 201TH Unit 4 Lecture 5 Direct Memory Access.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-6",
+    "title": "DMA Controller and DMA Transfer",
+    "section": "Unit IV: Input/Output Organization",
+    "description": "DMA controller architecture and DMA-based transfer process.",
+    "lecture": "downloads/second-year/computer-system-architecture/lectures/Comp 201TH Unit 4 Lecture 6 DMA controller and DMA Transfer.pdf",
+    "status": "Available"
+  }
+]

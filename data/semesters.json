@@ -15,10 +15,10 @@
   },
   {
     "name": "Second Year",
-    "title": "Three Course Areas",
-    "description": "Second-year theory, practicals, assignments, and question banks.",
+    "title": "Computer System Architecture and More",
+    "description": "Second-year course area with Computer System Architecture lectures and space for additional course material.",
     "link": "second-year.html",
-    "status": "Coming Soon"
+    "status": "Available"
   },
   {
     "name": "Third Year",
