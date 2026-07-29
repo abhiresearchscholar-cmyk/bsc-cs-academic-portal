@@ -1,0 +1,138 @@
+[
+  {
+    "number": "01",
+    "title": "What's Database and Why",
+    "section": "Unit I: Introduction to DBMS",
+    "description": "Introduction to databases, their purpose, and why database systems are needed.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Comp202TH Lecture 1 Whats database and Why.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "02",
+    "title": "DBMS",
+    "section": "Unit I: Introduction to DBMS",
+    "description": "Overview of database management systems and their core functions.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Comp202TH Lecture 2 DBMS.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "03",
+    "title": "File Oriented System vs Database",
+    "section": "Unit I: Introduction to DBMS",
+    "description": "Comparison between file-oriented systems and database systems.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Comp202TH Lecture 3-File Oriented System vs Database.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "04",
+    "title": "Data Models",
+    "section": "Unit I: Introduction to DBMS",
+    "description": "Introduction to data models used to represent database structure and relationships.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Comp202TH Lecture 4 - Data Models.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "05",
+    "title": "DBMS Architecture and Data Independence",
+    "section": "Unit I: Introduction to DBMS",
+    "description": "Study of DBMS architecture and the concept of data independence.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Comp202Th Lecture 5 DBMS Architecture and Data Independence.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "06",
+    "title": "Database Design Phases",
+    "section": "Unit I: Introduction to DBMS",
+    "description": "Phases involved in designing a database system.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Comp202TH Lecture 6 Database Design Phases.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "07",
+    "title": "Data Modelling using the Entity Relationship Model",
+    "section": "Unit II: ER Modeling and SQL",
+    "description": "Entity-relationship modeling for conceptual database design.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Comp202TH Lecture7- Data Modelling using the Entity Relationship Model.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "08A",
+    "title": "SQL",
+    "section": "Unit II: ER Modeling and SQL",
+    "description": "Introduction to SQL and its role in defining and manipulating data.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Comp202TH Lecture 8 SQL.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "08B",
+    "title": "SQL99 Schema Definition Constraints",
+    "section": "Unit II: ER Modeling and SQL",
+    "description": "Schema definition and constraints in SQL99.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Lecture 8 SQL99 Schema Definition Constraints.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "08C",
+    "title": "SQL Queries Basic Hands-on",
+    "section": "Unit II: ER Modeling and SQL",
+    "description": "Basic hands-on SQL queries for practice and understanding.",
+    "lecture": "downloads/second-year/database-management-system/lectures/SQL Queries Basic-hands on.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-1",
+    "title": "Relational Model",
+    "section": "Unit III: Relational Model and Algebra",
+    "description": "Introduction to the relational model of data.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Unit III Lecture 1 Relational Model.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-2",
+    "title": "Relational Constraints",
+    "section": "Unit III: Relational Model and Algebra",
+    "description": "Constraints used in the relational model to preserve data integrity.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Unit III Lecture 2 Relational constraints.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-3",
+    "title": "Relational Algebra (Part I)",
+    "section": "Unit III: Relational Model and Algebra",
+    "description": "First part of relational algebra operations and expressions.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Unit III Lecture 3 Realtional Algebra (Part-I).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-4",
+    "title": "Relational Algebra (Part II)",
+    "section": "Unit III: Relational Model and Algebra",
+    "description": "Continuation of relational algebra concepts and query operations.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Unit III Lecture 4 Realtional Algebra(Part-II).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-1",
+    "title": "Database Normalization",
+    "section": "Unit IV: Normalization and Keys",
+    "description": "Introduction to database normalization for reducing redundancy and anomalies.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Unit IV Lecture 1 Database Normalization.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-2",
+    "title": "Database Normalization (Part II)",
+    "section": "Unit IV: Normalization and Keys",
+    "description": "Continuation of normalization concepts and normal forms.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Unit IV Lecture 2 Database Normalization.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-3",
+    "title": "Types of Keys in Relational Model and Codd Rules",
+    "section": "Unit IV: Normalization and Keys",
+    "description": "Types of keys in the relational model and an introduction to Codd rules.",
+    "lecture": "downloads/second-year/database-management-system/lectures/Unit IV Lecture 3 Types of Keys in Relational Model & Codd Rules.pdf",
+    "status": "Available"
+  }
+]

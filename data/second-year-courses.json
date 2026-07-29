@@ -13,15 +13,15 @@
   },
   {
     "code": "SY-CS-02",
-    "title": "Course To Be Added",
-    "description": "Space reserved for the second second-year course with lectures, assignments, quizzes, and practical resources.",
+    "title": "Database Management System",
+    "description": "Second-year core course covering databases, DBMS architecture, data models, ER modeling, SQL, relational algebra, normalization, and keys.",
     "type": "Core Course",
-    "overviewLink": "#",
-    "lecturesLink": "#",
+    "overviewLink": "database-management-system.html",
+    "lecturesLink": "database-management-system.html#dbms-lectures",
     "assignmentsLink": "#",
     "quizzesLink": "#",
     "labLink": "#",
-    "status": "Coming Soon"
+    "status": "Available"
   },
   {
     "code": "SY-CS-03",
