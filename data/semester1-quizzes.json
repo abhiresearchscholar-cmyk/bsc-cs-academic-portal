@@ -1,10 +1,11 @@
 [
   {
     "number": "01",
-    "title": "Computer Basics",
-    "topic": "Meaning and uses of computers",
+    "title": "Computer Fundamentals: Learn by Doing",
+    "topic": "Computer basics, binary, generations, devices, memory, and processing",
     "marks": 10,
-    "quizFile": "quizzes/semester1/quiz-01-computer-basics.json",
+    "quizLink": "quizzes/semester1/html/quiz-01-computer-fundamentals.html",
+    "quizFile": "#",
     "status": "Available"
   },
   {

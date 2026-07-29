@@ -1,6 +1,6 @@
 async function loadJson(path) {
   const separator = path.includes("?") ? "&" : "?";
-  const response = await fetch(path + separator + "v=20260713-mdc-course-menu");
+  const response = await fetch(path + separator + "v=20260729-core-quiz01");
   if (!response.ok) {
     throw new Error("Could not load " + path);
   }
@@ -168,7 +168,11 @@ async function renderQuizzes() {
 
   const quizzes = await loadJson("data/semester1-quizzes.json");
   container.innerHTML = quizzes.map(function (quiz) {
-    const quizLink = quiz.quizFile && quiz.quizFile !== "#" ? "quiz-player.html?quiz=" + encodeURIComponent(quiz.quizFile) : "#";
+    const quizLink = quiz.quizLink && quiz.quizLink !== "#"
+      ? quiz.quizLink
+      : quiz.quizFile && quiz.quizFile !== "#"
+        ? "quiz-player.html?quiz=" + encodeURIComponent(quiz.quizFile)
+        : "#";
     return `
       <article class="card searchable-item" data-search-text="${textForSearch([quiz.number, quiz.title, quiz.topic, quiz.status])}">
         <p class="tag">Quiz ${quiz.number} · Marks: ${quiz.marks}</p>

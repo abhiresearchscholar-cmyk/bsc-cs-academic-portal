@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Computer Fundamentals: Learn by Doing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===================== DESIGN TOKENS ===================== */
+:root{
+  --bg:#F4F7FB;
+  --surface:#FFFFFF;
+  --surface-2:#EBF0F9;
+  --surface-3:#DEE7F5;
+  --ink:#12192B;
+  --ink-soft:#4E5A72;
+  --ink-faint:#8996AC;
+  --line:#D7E0EF;
+  --blue:#2856C7;
+  --blue-deep:#173B8C;
+  --teal:#0E8F88;
+  --amber:#F2A93B;
+  --amber-deep:#C9820A;
+  --green:#1E9E67;
+  --green-deep:#12734A;
+  --red:#E1503F;
+  --red-deep:#B23325;
+  --violet:#7C5CFC;
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow:0 1px 2px rgba(18,25,43,.04), 0 8px 24px -8px rgba(18,25,43,.10);
+  --shadow-lg:0 4px 8px rgba(18,25,43,.05), 0 20px 48px -12px rgba(18,25,43,.18);
+  --font-display:'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body:'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-mono:'IBM Plex Mono', 'Courier New', monospace;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{ font-family:var(--font-display); margin:0; letter-spacing:-.01em; }
+p{ margin:0; }
+button{ font-family:inherit; }
+:focus-visible{ outline:3px solid var(--violet); outline-offset:2px; }
+img,svg{ display:block; max-width:100%; }
+.container{ max-width:900px; margin:0 auto; padding:0 20px; }
+.mono{ font-family:var(--font-mono); }
+
+/* ===================== BITSTREAM SIGNATURE DIVIDER ===================== */
+.bitstream{
+  overflow:hidden; white-space:nowrap; height:34px; display:flex; align-items:center;
+  background:var(--ink); border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+.bitstream span{
+  font-family:var(--font-mono); font-size:14px; letter-spacing:.35em; color:var(--teal);
+  display:inline-block; padding-left:100%;
+  animation:scrollbits 22s linear infinite;
+}
+@keyframes scrollbits{ from{ transform:translateX(0);} to{ transform:translateX(-100%);} }
+
+/* ===================== HEADER / NAV ===================== */
+.site-header{
+  position:sticky; top:0; z-index:50; background:rgba(244,247,251,.92);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+}
+.header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 20px; max-width:900px; margin:0 auto; }
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-mark{
+  width:34px; height:34px; border-radius:8px; background:var(--ink); color:var(--amber);
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:600; font-size:13px; flex-shrink:0;
+}
+.brand-text{ font-family:var(--font-display); font-weight:700; font-size:15px; line-height:1.15; }
+.brand-text small{ display:block; font-family:var(--font-mono); font-weight:400; font-size:10.5px; color:var(--ink-soft); letter-spacing:.05em; text-transform:uppercase; }
+.reset-btn{
+  background:var(--surface); border:1.5px solid var(--line); color:var(--ink-soft);
+  border-radius:20px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.reset-btn:hover{ border-color:var(--red); color:var(--red-deep); }
+
+.progress-row{ padding:0 20px 12px; max-width:900px; margin:0 auto; }
+.progress-track{
+  height:8px; border-radius:6px; background:var(--surface-3); overflow:hidden; margin-bottom:8px;
+}
+.progress-fill{
+  height:100%; width:0%; border-radius:6px;
+  background:linear-gradient(90deg, var(--blue), var(--teal), var(--green));
+  transition:width .5s ease;
+}
+.led-row{ display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+.led-row::-webkit-scrollbar{ display:none; }
+.led{
+  flex:0 0 auto; display:flex; align-items:center; gap:6px; padding:5px 10px 5px 6px;
+  border-radius:20px; background:var(--surface); border:1.5px solid var(--line);
+  font-size:11.5px; font-weight:600; color:var(--ink-soft); text-decoration:none; white-space:nowrap;
+  cursor:pointer;
+}
+.led-dot{ width:9px; height:9px; border-radius:50%; background:var(--surface-3); border:1.5px solid var(--ink-faint); flex-shrink:0; }
+.led.lit{ background:#E6F6EE; border-color:var(--green); color:var(--green-deep); }
+.led.lit .led-dot{ background:var(--green); border-color:var(--green); box-shadow:0 0 0 3px rgba(30,158,103,.18); }
+.progress-text{ font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); margin-top:6px; }
+
+/* ===================== HERO ===================== */
+.hero{ padding:56px 20px 40px; max-width:900px; margin:0 auto; }
+.hero-eyebrow{
+  display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12.5px;
+  color:var(--blue-deep); background:var(--surface-2); border:1px solid var(--surface-3);
+  padding:6px 12px; border-radius:20px; margin-bottom:18px; letter-spacing:.03em;
+}
+.hero h1{ font-size:clamp(32px,6vw,52px); line-height:1.06; margin-bottom:16px; }
+.hero h1 .accent{ color:var(--blue); }
+.hero p.lead{ font-size:clamp(16px,2.4vw,19px); color:var(--ink-soft); max-width:640px; margin-bottom:26px; }
+.hero-stats{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:8px; }
+.hero-stat{
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 14px;
+  font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:8px;
+}
+.hero-stat b{ color:var(--ink); font-family:var(--font-mono); }
+.hero-note{
+  margin-top:22px; background:var(--ink); color:#DDEBFF; border-radius:14px; padding:16px 18px;
+  font-size:14px; line-height:1.55;
+}
+.hero-note b{ color:var(--amber); }
+
+/* ===================== MODULES ===================== */
+.module{ padding:52px 0 8px; }
+.module-inner{ max-width:900px; margin:0 auto; padding:0 20px; }
+.module-head{ margin-bottom:22px; }
+.module-eyebrow{
+  font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.08em; color:var(--blue-deep);
+  font-size:12.5px; font-weight:600; display:flex; align-items:center; gap:8px; margin-bottom:8px;
+}
+.module-eyebrow .num{
+  width:24px; height:24px; border-radius:7px; background:var(--blue); color:#fff; display:inline-flex;
+  align-items:center; justify-content:center; font-size:12px; flex-shrink:0;
+}
+.module.bonus .module-eyebrow .num{ background:var(--violet); }
+.module.final .module-eyebrow .num{ background:var(--green); }
+.module-title{ font-size:clamp(22px,3.6vw,30px); margin-bottom:8px; }
+.module-lecture-tag{
+  display:inline-block; font-family:var(--font-mono); font-size:11.5px; color:var(--teal);
+  background:#E6F5F4; border:1px solid #C6E9E7; padding:3px 9px; border-radius:8px; margin-bottom:12px;
+}
+.module-intro{ color:var(--ink-soft); font-size:15.5px; max-width:640px; }
+
+.activity-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:22px; box-shadow:var(--shadow); margin-top:18px;
+}
+.activity-instruction{ font-weight:600; font-size:15px; margin-bottom:14px; color:var(--ink); }
+.round-label{ font-family:var(--font-mono); font-size:12px; color:var(--ink-faint); margin-bottom:10px; }
+
+/* ---- toolbar ---- */
+.toolbar{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.btn{
+  font-weight:600; font-size:14px; border-radius:10px; padding:10px 16px;
+  border:2px solid var(--ink); background:var(--surface); color:var(--ink);
+  cursor:pointer; display:inline-flex; align-items:center; gap:7px; min-height:44px;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.btn:hover{ transform:translateY(-1px); box-shadow:0 4px 10px rgba(18,25,43,.08); }
+.btn:active{ transform:translateY(0); }
+.btn-primary{ background:var(--blue); border-color:var(--blue); color:#fff; }
+.btn-hint{ background:#FFF6E6; border-color:var(--amber-deep); color:var(--amber-deep); }
+.btn-explain{ background:#F1EEFF; border-color:var(--violet); color:#5A3FD6; }
+.btn-ghost{ background:transparent; border-color:var(--line); color:var(--ink-soft); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+
+/* ---- feedback / explanation panels ---- */
+.panel{ margin-top:14px; border-radius:12px; padding:14px 16px; font-size:14.5px; line-height:1.55; display:none; }
+.panel.show{ display:block; }
+.panel-feedback.ok{ background:#E9F8F0; border:1.5px solid var(--green); color:var(--green-deep); }
+.panel-feedback.bad{ background:#FDECEA; border:1.5px solid var(--red); color:var(--red-deep); }
+.panel-hint{ background:#FFF8EA; border:1.5px dashed var(--amber-deep); color:#7A5200; }
+.panel-explain{ background:#F4F1FF; border:1.5px solid var(--violet); color:#3B2A8C; }
+.panel b{ font-weight:700; }
+.panel-title{ font-family:var(--font-mono); font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:4px; opacity:.75; }
+
+/* ---- generic cards / chips used across activities ---- */
+.chip-pool{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+.chip{
+  background:var(--surface-2); border:2px solid var(--surface-3); border-radius:12px;
+  padding:10px 14px; font-size:14px; font-weight:600; color:var(--ink); cursor:pointer;
+  min-height:44px; display:flex; align-items:center; gap:8px; text-align:left;
+  touch-action:manipulation;
+}
+.chip:hover{ border-color:var(--blue); }
+.chip .sub{ display:block; font-weight:400; font-size:12px; color:var(--ink-soft); }
+.chip.placed{ opacity:.35; cursor:default; }
+.chip.placed:hover{ border-color:var(--surface-3); }
+.chip.selected{ border-color:var(--blue); box-shadow:0 0 0 3px rgba(40,86,199,.15); }
+.chip.correct{ border-color:var(--green); background:#E9F8F0; }
+.chip.incorrect{ border-color:var(--red); background:#FDECEA; }
+
+.slot-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; }
+.slot{
+  flex:1 1 160px; min-height:64px; border:2px dashed var(--line); border-radius:12px;
+  display:flex; align-items:center; justify-content:center; padding:8px; position:relative;
+  background:var(--bg);
+}
+.slot .slot-index{
+  position:absolute; top:-9px; left:10px; background:var(--ink); color:var(--amber);
+  font-family:var(--font-mono); font-size:10.5px; padding:1px 6px; border-radius:6px;
+}
+.slot.filled{ border-style:solid; border-color:var(--blue); background:var(--surface); }
+.slot .placed-card{
+  width:100%; background:var(--surface); border:2px solid var(--blue); border-radius:10px;
+  padding:9px 12px; font-weight:600; font-size:13.5px; cursor:pointer; text-align:center;
+}
+.slot .placed-card .sub{ color:var(--ink-soft); font-weight:400; font-size:11.5px; }
+.slot-arrow{ display:flex; align-items:center; justify-content:center; color:var(--ink-faint); font-size:20px; flex:0 0 auto; padding:0 2px; }
+
+/* ---- classification bins ---- */
+.bin-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:16px; }
+@media (max-width:720px){ .bin-grid{ grid-template-columns:repeat(2,1fr); } }
+.bin{
+  border:2px dashed var(--surface-3); border-radius:14px; padding:12px; min-height:150px; background:var(--surface-2);
+}
+.bin.dragover{ border-color:var(--blue); background:#E4EEFF; }
+.bin-label{ font-family:var(--font-mono); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.bin-icon{ font-size:16px; }
+.bin-items{ display:flex; flex-direction:column; gap:6px; min-height:20px; }
+.bin-item{
+  background:var(--surface); border:2px solid var(--line); border-radius:9px; padding:7px 10px;
+  font-size:13px; font-weight:600; cursor:pointer; text-align:left;
+}
+.bin-item.correct{ border-color:var(--green); background:#E9F8F0; }
+.bin-item.incorrect{ border-color:var(--red); background:#FDECEA; }
+
+/* ---- matching ---- */
+.match-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:560px){ .match-grid{ grid-template-columns:1fr; } }
+.match-col-label{ font-family:var(--font-mono); font-size:11.5px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; letter-spacing:.05em; }
+.match-btn{
+  width:100%; text-align:left; background:var(--surface-2); border:2px solid var(--surface-3);
+  border-radius:11px; padding:11px 13px; font-size:14px; font-weight:600; cursor:pointer; margin-bottom:8px; min-height:44px;
+}
+.match-btn.selected{ border-color:var(--blue); background:#E4EEFF; }
+.match-btn.matched{ border-color:var(--green); background:#E9F8F0; color:var(--green-deep); cursor:default; opacity:.85; }
+.match-btn.wrong-flash{ border-color:var(--red); background:#FDECEA; }
+.match-btn:disabled{ cursor:default; }
+.match-progress{ font-family:var(--font-mono); font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; }
+
+/* ---- choice / MCQ ---- */
+.option-list{ display:flex; flex-direction:column; gap:10px; }
+.option{
+  display:flex; align-items:flex-start; gap:10px; text-align:left; width:100%;
+  background:var(--surface-2); border:2px solid var(--surface-3); border-radius:12px;
+  padding:12px 14px; font-size:14.5px; cursor:pointer; min-height:44px;
+}
+.option .letter{
+  flex-shrink:0; width:26px; height:26px; border-radius:7px; background:var(--surface); border:1.5px solid var(--line);
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:var(--ink-soft);
+}
+.option.selected{ border-color:var(--blue); background:#E4EEFF; }
+.option.selected .letter{ background:var(--blue); border-color:var(--blue); color:#fff; }
+.option.correct{ border-color:var(--green); background:#E9F8F0; }
+.option.correct .letter{ background:var(--green); border-color:var(--green); color:#fff; }
+.option.incorrect{ border-color:var(--red); background:#FDECEA; }
+.option.incorrect .letter{ background:var(--red); border-color:var(--red); color:#fff; }
+.scenario-story{
+  background:var(--surface-2); border-left:4px solid var(--teal); border-radius:8px;
+  padding:12px 14px; font-size:14.5px; margin-bottom:14px; color:var(--ink); font-style:italic;
+}
+
+/* ---- flowchart visual ---- */
+.flow-shape{ font-weight:700; font-size:13.5px; padding:12px 10px; text-align:center; border:2px solid var(--blue); background:#fff; }
+.flow-oval{ border-radius:40px; }
+.flow-rect{ border-radius:6px; }
+.flow-parallelogram{ transform:skewX(-12deg); }
+.flow-parallelogram span{ display:inline-block; transform:skewX(12deg); }
+
+/* ---- byte builder ---- */
+.byte-row{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:20px 0; }
+.bit-tile{
+  width:56px; height:64px; border-radius:10px; border:2px solid var(--ink); background:var(--surface);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; user-select:none;
+  font-family:var(--font-mono);
+}
+.bit-tile .bit-val{ font-size:22px; font-weight:700; }
+.bit-tile .place-val{ font-size:10px; color:var(--ink-soft); margin-top:2px; }
+.bit-tile.on{ background:var(--ink); color:var(--amber); }
+.bit-tile.on .place-val{ color:#C9820A; }
+.byte-readout{ text-align:center; margin:12px 0 4px; }
+.byte-readout .target{ font-family:var(--font-mono); font-size:15px; color:var(--ink-soft); }
+.byte-readout .current{ font-family:var(--font-mono); font-size:38px; font-weight:700; color:var(--blue-deep); }
+
+/* ---- final challenge ---- */
+.final-progress{ font-family:var(--font-mono); font-size:13px; color:var(--ink-soft); margin-bottom:10px; }
+.final-score-hero{
+  text-align:center; padding:26px 10px 10px;
+}
+.final-score-hero .big-score{ font-family:var(--font-display); font-size:56px; color:var(--blue-deep); }
+.final-score-hero .big-score span{ font-size:26px; color:var(--ink-faint); }
+.final-band{
+  display:inline-block; margin-top:6px; padding:6px 16px; border-radius:20px; font-weight:700; font-size:14px;
+}
+.summary-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px; }
+@media (max-width:640px){ .summary-grid{ grid-template-columns:1fr; } }
+.summary-col-title{ font-weight:700; font-size:14px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.summary-item{ border-radius:10px; padding:10px 12px; font-size:13.5px; margin-bottom:8px; line-height:1.5; }
+.summary-item.ok{ background:#E9F8F0; border:1px solid #BFE9D4; }
+.summary-item.bad{ background:#FDECEA; border:1px solid #F6C9C2; }
+.summary-item .qtopic{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); text-transform:uppercase; display:block; margin-bottom:2px; }
+.revision-banner{
+  margin-top:18px; background:var(--ink); color:#fff; border-radius:12px; padding:16px 18px; font-size:15px;
+}
+.revision-banner b{ color:var(--amber); }
+
+/* ---- misc ---- */
+.link-btn{ background:none; border:none; color:var(--blue); font-weight:600; cursor:pointer; text-decoration:underline; font-size:13.5px; padding:4px; }
+.two-col{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:600px){ .two-col{ grid-template-columns:1fr; } }
+footer.site-footer{
+  text-align:center; padding:40px 20px 60px; color:var(--ink-faint); font-size:13px;
+}
+.why-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px; }
+@media (max-width:700px){ .why-grid{ grid-template-columns:1fr; } }
+.why-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px; font-size:13.5px; }
+.why-card b{ display:block; margin-bottom:4px; font-family:var(--font-display); font-size:14.5px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-mark">01</div>
+      <div class="brand-text">Computer Fundamentals<small>Learn by Doing &middot; Lectures 1&ndash;5</small></div>
+    </div>
+    <button class="reset-btn" id="globalReset" type="button">&#8635; Reset all</button>
+  </div>
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="led-row" id="ledRow"></div>
+    <div class="progress-text" id="progressText">0 / 9 modules complete</div>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="hero-eyebrow">&#9679; Section I &middot; Introduction to Computers</span>
+  <h1>Stop memorising.<br><span class="accent">Start doing.</span></h1>
+  <p class="lead">Nine hands-on activities built from Lectures 1&ndash;5 &mdash; how a computer works, its characteristics and evolution, types &amp; block diagram, memory &amp; storage, and input/output devices. Every activity gives you a hint, checks your answer, lets you try again, and always explains <em>why</em>.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">&#128218; <b>5</b>&nbsp;lectures covered</div>
+    <div class="hero-stat">&#127919; <b>9</b>&nbsp;graded modules</div>
+    <div class="hero-stat">&#127918; <b>1</b>&nbsp;bonus game</div>
+    <div class="hero-stat">&#10067; <b>10</b>&nbsp;question final challenge</div>
+  </div>
+  <div class="hero-note">Tip for revising on the go: every card can be tapped &mdash; there's nothing to drag on a small screen. Stuck? Press <b>Hint</b>. Got it wrong? Press <b>Try Again</b>. Want the concept spelled out? Press <b>Show Explanation</b> &mdash; anytime, whether you're right or wrong.</div>
+</section>
+
+<div class="bitstream" aria-hidden="true"><span>01001000 01100101 01101100 01101100 01101111 00100000 01000010 01010011 01100011 00100000 01000011 01010011 00100000 00110001 00110000 00110001 &nbsp;&nbsp;&nbsp; 01001000 01100101 01101100 01101100 01101111 00100000 01000010 01010011 01100011 00100000 01000011 01010011 00100000 00110001 00110000 00110001</span></div>
+
+<!-- ============ MODULE 1: CONCEPT SEQUENCING ============ -->
+<section class="module" id="mod-sequence">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="seq">1</span> Concept Sequencing</p>
+      <h2 class="module-title">Put the story in order</h2>
+      <span class="module-lecture-tag">Lecture 01 &middot; How a Computer Works</span>
+      <p class="module-intro">Tap the shuffled cards in the order you believe is correct. They'll drop into the numbered slots below &mdash; tap a placed card to send it back and rearrange.</p>
+    </div>
+    <div id="app-sequence"></div>
+  </div>
+</section>
+
+<div class="bitstream" aria-hidden="true"><span>00100000&#8594;00100001&#8594;00100010&#8594;00100011 &nbsp;&nbsp;&nbsp; INPUT&nbsp;&#8594;&nbsp;PROCESS&nbsp;&#8594;&nbsp;OUTPUT&nbsp;&#8594;&nbsp;STORAGE &nbsp;&nbsp;&nbsp; 00100000&#8594;00100001&#8594;00100010&#8594;00100011 &nbsp;&nbsp;&nbsp; INPUT&nbsp;&#8594;&nbsp;PROCESS&nbsp;&#8594;&nbsp;OUTPUT&nbsp;&#8594;&nbsp;STORAGE</span></div>
+
+<!-- ============ BONUS: BINARY BYTE BUILDER ============ -->
+<section class="module bonus" id="mod-bytebuilder">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num">&#9733;</span> Bonus Arcade &middot; Binary Byte Builder</p>
+      <h2 class="module-title">Build a byte, one switch at a time</h2>
+      <span class="module-lecture-tag">Lecture 01 &middot; Bits &amp; Bytes</span>
+      <p class="module-intro">Eight switches, eight place values &mdash; 128 down to 1. Flip the tiles on and off until your byte equals the target number, just like the byte widget from class.</p>
+    </div>
+    <div id="app-bytebuilder"></div>
+  </div>
+</section>
+
+<!-- ============ MODULE 2: COMPUTER GENERATION TIMELINE ============ -->
+<section class="module" id="mod-generations">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="gen">2</span> Computer Generation Timeline</p>
+      <h2 class="module-title">Order the five generations</h2>
+      <span class="module-lecture-tag">Lecture 02 &middot; Characteristics &amp; Evolution</span>
+      <p class="module-intro">Each generation is defined by a smaller, faster switch than the one before it. Arrange them from the earliest to the most recent.</p>
+    </div>
+    <div id="app-generations"></div>
+  </div>
+</section>
+
+<!-- ============ MODULE 3: FIND THE WRONG STATEMENT ============ -->
+<section class="module" id="mod-wrongstatement">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="wrong">3</span> Find the Wrong Statement</p>
+      <h2 class="module-title">Spot the one that's lying</h2>
+      <span class="module-lecture-tag">Mixed &middot; Lectures 01&ndash;04</span>
+      <p class="module-intro">Three of these four cards are true. One is completely wrong. Tap the incorrect one, then check your answer.</p>
+    </div>
+    <div id="app-wrongstatement"></div>
+  </div>
+</section>
+
+<div class="bitstream" aria-hidden="true"><span>KEYBOARD&nbsp;&#8594;&nbsp;INPUT &nbsp;&nbsp;&nbsp; MONITOR&nbsp;&#8594;&nbsp;OUTPUT &nbsp;&nbsp;&nbsp; RAM&nbsp;&#8594;&nbsp;MEMORY &nbsp;&nbsp;&nbsp; SSD&nbsp;&#8594;&nbsp;STORAGE &nbsp;&nbsp;&nbsp; KEYBOARD&nbsp;&#8594;&nbsp;INPUT &nbsp;&nbsp;&nbsp; MONITOR&nbsp;&#8594;&nbsp;OUTPUT &nbsp;&nbsp;&nbsp; RAM&nbsp;&#8594;&nbsp;MEMORY &nbsp;&nbsp;&nbsp; SSD&nbsp;&#8594;&nbsp;STORAGE</span></div>
+
+<!-- ============ MODULE 4: DRAG & DROP CLASSIFICATION ============ -->
+<section class="module" id="mod-classification">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="class">4</span> Drag &amp; Drop Classification</p>
+      <h2 class="module-title">Sort every device into its home</h2>
+      <span class="module-lecture-tag">Lectures 04 &amp; 05 &middot; Memory, Storage &amp; I/O Devices</span>
+      <p class="module-intro">Drag a device into a category on a computer &mdash; or on a phone, just tap a device to select it, then tap the category it belongs to. Tap an item already in a bin to pull it back out.</p>
+    </div>
+    <div id="app-classification"></div>
+  </div>
+</section>
+
+<!-- ============ MODULE 5: MATCH THE PAIRS ============ -->
+<section class="module" id="mod-matching">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="match">5</span> Match the Pairs</p>
+      <h2 class="module-title">Connect each term to its meaning</h2>
+      <span class="module-lecture-tag">Lectures 01, 03 &amp; 04 &middot; Core Vocabulary</span>
+      <p class="module-intro">Tap a term on the left, then tap its matching definition on the right. Matched pairs lock in green.</p>
+    </div>
+    <div id="app-matching"></div>
+  </div>
+</section>
+
+<div class="bitstream" aria-hidden="true"><span>REGISTERS&nbsp;&#8594;&nbsp;CACHE&nbsp;&#8594;&nbsp;RAM&nbsp;&#8594;&nbsp;SECONDARY STORAGE &nbsp;&nbsp;&nbsp; FASTEST&nbsp;&#8594;&nbsp;SLOWEST &nbsp;&nbsp;&nbsp; REGISTERS&nbsp;&#8594;&nbsp;CACHE&nbsp;&#8594;&nbsp;RAM&nbsp;&#8594;&nbsp;SECONDARY STORAGE &nbsp;&nbsp;&nbsp; FASTEST&nbsp;&#8594;&nbsp;SLOWEST</span></div>
+
+<!-- ============ MODULE 6: MEMORY HIERARCHY PUZZLE ============ -->
+<section class="module" id="mod-hierarchy">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="mem">6</span> Memory Hierarchy Puzzle</p>
+      <h2 class="module-title">Fastest to slowest</h2>
+      <span class="module-lecture-tag">Lecture 04 &middot; Memory &amp; Storage</span>
+      <p class="module-intro">Memory trades speed for size: the higher up the ladder, the faster &mdash; and smaller &mdash; it is. Arrange these four from fastest down to slowest.</p>
+    </div>
+    <div id="app-hierarchy"></div>
+  </div>
+</section>
+
+<!-- ============ MODULE 7: FLOWCHART BUILDER ============ -->
+<section class="module" id="mod-flowchart">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="flow">7</span> Flowchart Builder</p>
+      <h2 class="module-title">Build the process, shape by shape</h2>
+      <span class="module-lecture-tag">Lectures 01 &amp; 03 &middot; The Processing Cycle</span>
+      <p class="module-intro">Every simple process follows this shape. Arrange the steps in order and watch the real flowchart symbols appear &mdash; ovals for Start/End, parallelograms for Input/Output, a rectangle for Processing.</p>
+    </div>
+    <div id="app-flowchart"></div>
+  </div>
+</section>
+
+<!-- ============ MODULE 8: SCENARIO-BASED QUESTIONS ============ -->
+<section class="module" id="mod-scenarios">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="scenario">8</span> Scenario-Based Questions</p>
+      <h2 class="module-title">What's really going on here?</h2>
+      <span class="module-lecture-tag">Mixed &middot; Lectures 02, 04 &amp; 05</span>
+      <p class="module-intro">Five everyday situations. Pick the explanation that actually matches the concept &mdash; then read why.</p>
+    </div>
+    <div id="app-scenarios"></div>
+  </div>
+</section>
+
+<div class="bitstream" aria-hidden="true"><span>START&nbsp;&#8594;&nbsp;INPUT&nbsp;&#8594;&nbsp;PROCESS&nbsp;&#8594;&nbsp;OUTPUT&nbsp;&#8594;&nbsp;END &nbsp;&nbsp;&nbsp; GIGO: GARBAGE IN, GARBAGE OUT &nbsp;&nbsp;&nbsp; START&nbsp;&#8594;&nbsp;INPUT&nbsp;&#8594;&nbsp;PROCESS&nbsp;&#8594;&nbsp;OUTPUT&nbsp;&#8594;&nbsp;END &nbsp;&nbsp;&nbsp; GIGO: GARBAGE IN, GARBAGE OUT</span></div>
+
+<!-- ============ MODULE 9: FINAL REVISION CHALLENGE ============ -->
+<section class="module final" id="mod-final">
+  <div class="module-inner">
+    <div class="module-head">
+      <p class="module-eyebrow"><span class="num" data-led-target="final">9</span> Final Revision Challenge</p>
+      <h2 class="module-title">10 questions. Everything you've learned.</h2>
+      <span class="module-lecture-tag">All of Lectures 01&ndash;05</span>
+      <p class="module-intro">A mixed, exam-style run through every topic. At the end you'll get your score, a full answer review, and exactly which topics to revise.</p>
+    </div>
+    <div id="app-final"></div>
+  </div>
+</section>
+
+<section class="module" style="padding-top:0;">
+  <div class="module-inner">
+    <h3 style="font-size:19px;margin-bottom:6px;">Why this page works this way</h3>
+    <div class="why-grid">
+      <div class="why-card"><b>Nothing is magic</b>Once a concept clicks through your own hands &mdash; sorting it, sequencing it, breaking it &mdash; no lecture slide about it should feel intimidating again.</div>
+      <div class="why-card"><b>You can debug your own gaps</b>The "topics to revise" list at the end tells you exactly where to go back, instead of a single vague score.</div>
+      <div class="why-card"><b>Mistakes teach as much as right answers</b>Every check comes with an explanation, whether you got it right or wrong &mdash; because the goal here is understanding, not just a checkmark.</div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <p>Computer Fundamentals: Learn by Doing &middot; built from Lectures 1&ndash;5 for first-year B.Sc. Computer Science students.</p>
+  <p style="margin-top:6px;">Progress is tracked for this session only &mdash; press <b>Reset all</b> anytime to start over.</p>
+</footer>
+
+<script>
+/* =====================================================================
+   UTILITIES
+===================================================================== */
+function qs(sel, root){ return (root||document).querySelector(sel); }
+function el(tag, cls, html){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t=a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+function esc(str){
+  return String(str).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; });
+}
+
+/* =====================================================================
+   PROGRESS TRACKING
+===================================================================== */
+var PROGRESS_ITEMS = [
+  {id:'seq',    label:'Sequencing',     target:'mod-sequence'},
+  {id:'gen',    label:'Generations',    target:'mod-generations'},
+  {id:'wrong',  label:'Wrong Statement',target:'mod-wrongstatement'},
+  {id:'class',  label:'Classification', target:'mod-classification'},
+  {id:'match',  label:'Matching',       target:'mod-matching'},
+  {id:'mem',    label:'Memory Hierarchy',target:'mod-hierarchy'},
+  {id:'flow',   label:'Flowchart',      target:'mod-flowchart'},
+  {id:'scenario',label:'Scenarios',     target:'mod-scenarios'},
+  {id:'final',  label:'Final Challenge',target:'mod-final'}
+];
+var progressState = {};
+PROGRESS_ITEMS.forEach(function(p){ progressState[p.id] = false; });
+
+var moduleResetters = [];
+
+function renderLeds(){
+  var row = qs('#ledRow');
+  row.innerHTML = '';
+  PROGRESS_ITEMS.forEach(function(p){
+    var a = el('a','led');
+    a.href = '#'+p.target;
+    a.setAttribute('data-id', p.id);
+    a.innerHTML = '<span class="led-dot"></span>'+esc(p.label);
+    row.appendChild(a);
+  });
+}
+
+function markComplete(id){
+  if(progressState[id]) return;
+  progressState[id] = true;
+  updateProgressUI();
+}
+
+function updateProgressUI(){
+  var total = PROGRESS_ITEMS.length;
+  var done = 0;
+  PROGRESS_ITEMS.forEach(function(p){ if(progressState[p.id]) done++; });
+  qs('#progressFill').style.width = (done/total*100)+'%';
+  qs('#progressText').textContent = done+' / '+total+' modules complete';
+  PROGRESS_ITEMS.forEach(function(p){
+    var dot = document.querySelector('.led[data-id="'+p.id+'"]');
+    if(dot) dot.classList.toggle('lit', !!progressState[p.id]);
+  });
+}
+
+function resetEverything(){
+  PROGRESS_ITEMS.forEach(function(p){ progressState[p.id] = false; });
+  updateProgressUI();
+  moduleResetters.forEach(function(fn){ try{ fn(); }catch(e){} });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* =====================================================================
+   GENERIC CONTROL BAR (Hint / Check / Try Again / Explanation)
+===================================================================== */
+function buildControls(root, opts){
+  opts = opts || {};
+  var bar = el('div','toolbar');
+  var hintBtn = el('button','btn btn-hint','&#128161; Hint');
+  var checkBtn = el('button','btn btn-primary','&#10003; Check Answer');
+  var tryBtn = el('button','btn btn-ghost','&#8635; Try Again');
+  var explainBtn = el('button','btn btn-explain','&#128218; Show Explanation');
+  hintBtn.type = 'button'; checkBtn.type='button'; tryBtn.type='button'; explainBtn.type='button';
+  bar.appendChild(hintBtn); bar.appendChild(checkBtn); bar.appendChild(tryBtn); bar.appendChild(explainBtn);
+  root.appendChild(bar);
+
+  var hintPanel = el('div','panel panel-hint','<span class="panel-title">Hint</span>');
+  var explainPanel = el('div','panel panel-explain','<span class="panel-title">Explanation</span>');
+  var feedbackPanel = el('div','panel panel-feedback','');
+  root.appendChild(hintPanel);
+  root.appendChild(feedbackPanel);
+  root.appendChild(explainPanel);
+
+  hintBtn.addEventListener('click', function(){
+    hintPanel.classList.toggle('show');
+  });
+  explainBtn.addEventListener('click', function(){
+    explainPanel.classList.toggle('show');
+  });
+  checkBtn.addEventListener('click', function(){ if(opts.onCheck) opts.onCheck(); });
+  tryBtn.addEventListener('click', function(){ if(opts.onTryAgain) opts.onTryAgain(); });
+
+  return {
+    bar: bar, hintBtn: hintBtn, checkBtn: checkBtn, tryBtn: tryBtn, explainBtn: explainBtn,
+    hintPanel: hintPanel, explainPanel: explainPanel, feedbackPanel: feedbackPanel,
+    setHint: function(text){ hintPanel.innerHTML = '<span class="panel-title">Hint</span>'+text; },
+    setExplain: function(text){ explainPanel.innerHTML = '<span class="panel-title">Explanation</span>'+text; },
+    showFeedback: function(ok, text){
+      feedbackPanel.className = 'panel panel-feedback show ' + (ok?'ok':'bad');
+      feedbackPanel.innerHTML = (ok? '&#9989; ' : '&#10060; ') + text;
+    },
+    hideFeedback: function(){
+      feedbackPanel.classList.remove('show');
+    },
+    openExplain: function(){ explainPanel.classList.add('show'); }
+  };
+}
+
+/* =====================================================================
+   ORDERING ACTIVITY (Concept Sequencing / Generations / Hierarchy / Flowchart)
+===================================================================== */
+function OrderingActivity(mount, config){
+  var roundIndex = 0;
+  var currentOrder = [];
+  var controls = null;
+
+  function currentRound(){ return config.rounds[roundIndex]; }
+
+  function renderCardInner(item){
+    var sub = item.sub ? '<span class="sub">'+esc(item.sub)+'</span>' : '';
+    return '<span>'+esc(item.label)+sub+'</span>';
+  }
+
+  function build(){
+    mount.innerHTML = '';
+    var round = currentRound();
+    currentOrder = [];
+
+    if(config.rounds.length > 1){
+      mount.appendChild(el('div','round-label','Round '+(roundIndex+1)+' of '+config.rounds.length+' &middot; '+esc(round.title||'')));
+    } else if(round.title){
+      mount.appendChild(el('div','round-label', esc(round.title)));
+    }
+    if(round.instruction){
+      mount.appendChild(el('div','activity-instruction', esc(round.instruction)));
+    }
+
+    var pool = el('div','chip-pool');
+    var slotRow = el('div','slot-row');
+    mount.appendChild(pool);
+    mount.appendChild(slotRow);
+
+    function renderPool(){
+      pool.innerHTML = '';
+      shuffledItems.forEach(function(item){
+        var placed = currentOrder.indexOf(item.id) !== -1;
+        var chip = el('button', 'chip' + (placed? ' placed':''), renderCardInner(item));
+        chip.type='button';
+        chip.disabled = placed;
+        chip.addEventListener('click', function(){ placeItem(item.id); });
+        pool.appendChild(chip);
+      });
+    }
+
+    function renderSlots(){
+      slotRow.innerHTML = '';
+      round.items.forEach(function(item, idx){
+        if(idx>0){ slotRow.appendChild(el('div','slot-arrow','&#8594;')); }
+        var placedId = currentOrder[idx];
+        var slot = el('div','slot'+(placedId?' filled':''));
+        var indexTag = el('div','slot-index', String(idx+1));
+        slot.appendChild(indexTag);
+        if(placedId){
+          var placedItem = round.items.filter(function(i){ return i.id===placedId; })[0];
+          var cardEl;
+          if(round.flowShapes){
+            var shape = round.flowShapes[placedId] || 'rect';
+            cardEl = el('button','placed-card flow-shape flow-'+shape, '<span>'+esc(placedItem.label)+'</span>');
+          } else {
+            cardEl = el('button','placed-card', renderCardInner(placedItem));
+          }
+          cardEl.type='button';
+          cardEl.addEventListener('click', function(){ removeItem(placedId); });
+          slot.appendChild(cardEl);
+        }
+        slotRow.appendChild(slot);
+      });
+    }
+
+    var shuffledItems = shuffle(round.items);
+
+    function placeItem(id){
+      if(currentOrder.indexOf(id) !== -1) return;
+      if(currentOrder.length >= round.items.length) return;
+      currentOrder.push(id);
+      renderPool(); renderSlots();
+      controls.hideFeedback();
+    }
+    function removeItem(id){
+      currentOrder = currentOrder.filter(function(x){ return x!==id; });
+      renderPool(); renderSlots();
+      controls.hideFeedback();
+    }
+
+    renderPool(); renderSlots();
+
+    controls = buildControls(mount, {
+      onCheck: function(){
+        if(currentOrder.length < round.items.length){
+          controls.showFeedback(false, 'Place all the cards into the slots first.');
+          return;
+        }
+        var correctCount = 0;
+        round.correctOrder.forEach(function(id, i){ if(currentOrder[i]===id) correctCount++; });
+        var allCorrect = correctCount === round.items.length;
+        if(allCorrect){
+          controls.showFeedback(true, 'Correct order! ' + (round.items.length) + ' out of ' + round.items.length + ' in the right place.');
+          controls.openExplain();
+          advance();
+        } else {
+          controls.showFeedback(false, correctCount+' out of '+round.items.length+' cards are in the right position. Rearrange and check again, or press Hint.');
+        }
+      },
+      onTryAgain: function(){
+        currentOrder = [];
+        renderPool(); renderSlots();
+        controls.hideFeedback();
+      }
+    });
+    controls.setHint(round.hint);
+    controls.setExplain(round.explanation);
+  }
+
+  function advance(){
+    if(roundIndex < config.rounds.length - 1){
+      var nextWrap = el('div');
+      nextWrap.style.marginTop = '14px';
+      var nextBtn = el('button','btn btn-primary','Next Round &#8594;');
+      nextBtn.type='button';
+      nextBtn.addEventListener('click', function(){ roundIndex++; build(); });
+      nextWrap.appendChild(nextBtn);
+      mount.appendChild(nextWrap);
+    } else {
+      if(config.onAllComplete) config.onAllComplete();
+      var doneWrap = el('div','panel panel-feedback ok show','&#127881; <b>All rounds complete!</b> This module is marked done in your progress bar above.');
+      doneWrap.style.marginTop = '14px';
+      mount.appendChild(doneWrap);
+    }
+  }
+
+  build();
+
+  moduleResetters.push(function(){ roundIndex = 0; build(); });
+}
+
+/* =====================================================================
+   CLASSIFICATION ACTIVITY (drag-and-drop / tap-to-sort bins)
+===================================================================== */
+function ClassificationActivity(mount, config){
+  var location = {}; // itemId -> binId or 'pool'
+  var checked = false;
+  var selectedItem = null;
+  var controls;
+
+  config.items.forEach(function(it){ location[it.id] = 'pool'; });
+
+  function build(){
+    mount.innerHTML = '';
+    var pool = el('div','chip-pool');
+    mount.appendChild(pool);
+    var grid = el('div','bin-grid');
+    mount.appendChild(grid);
+
+    var binEls = {};
+    config.bins.forEach(function(bin){
+      var b = el('div','bin');
+      b.setAttribute('data-bin', bin.id);
+      var label = el('div','bin-label','<span class="bin-icon">'+bin.icon+'</span>'+esc(bin.label));
+      var itemsWrap = el('div','bin-items');
+      b.appendChild(label);
+      b.appendChild(itemsWrap);
+      grid.appendChild(b);
+      binEls[bin.id] = {el:b, items:itemsWrap};
+
+      b.addEventListener('dragover', function(e){ e.preventDefault(); b.classList.add('dragover'); });
+      b.addEventListener('dragleave', function(){ b.classList.remove('dragover'); });
+      b.addEventListener('drop', function(e){
+        e.preventDefault(); b.classList.remove('dragover');
+        var id = e.dataTransfer.getData('text/plain');
+        if(id){ location[id] = bin.id; checked=false; render(); }
+      });
+      b.addEventListener('click', function(e){
+        if(e.target.closest('.bin-item')) return;
+        if(selectedItem){ location[selectedItem]=bin.id; selectedItem=null; checked=false; render(); }
+      });
+    });
+
+    function render(){
+      pool.innerHTML = '';
+      config.items.forEach(function(it){
+        if(location[it.id] !== 'pool') return;
+        var chip = el('button','chip'+(selectedItem===it.id?' selected':''), '<span>'+esc(it.label)+(it.sub?'<span class="sub">'+esc(it.sub)+'</span>':'')+'</span>');
+        chip.type='button';
+        chip.draggable = true;
+        chip.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text/plain', it.id); });
+        chip.addEventListener('click', function(){
+          selectedItem = (selectedItem===it.id) ? null : it.id;
+          render();
+        });
+        pool.appendChild(chip);
+      });
+
+      config.bins.forEach(function(bin){
+        var wrap = binEls[bin.id].items;
+        wrap.innerHTML = '';
+        config.items.forEach(function(it){
+          if(location[it.id] !== bin.id) return;
+          var cls = 'bin-item';
+          if(checked){ cls += (it.bin===bin.id) ? ' correct' : ' incorrect'; }
+          var chip = el('button', cls, esc(it.label));
+          chip.type='button';
+          chip.addEventListener('click', function(){
+            location[it.id]='pool'; checked=false; render();
+          });
+          wrap.appendChild(chip);
+        });
+      });
+    }
+    render();
+
+    controls = buildControls(mount, {
+      onCheck: function(){
+        var placedCount = config.items.filter(function(it){ return location[it.id]!=='pool'; }).length;
+        if(placedCount < config.items.length){
+          controls.showFeedback(false, 'Sort every device into a category first &mdash; '+(config.items.length-placedCount)+' still in the pool.');
+          return;
+        }
+        checked = true;
+        var correct = config.items.filter(function(it){ return location[it.id]===it.bin; }).length;
+        render();
+        var allCorrect = correct === config.items.length;
+        controls.showFeedback(allCorrect, correct+' out of '+config.items.length+' devices sorted correctly.'+(allCorrect?'':' Red-ringed items are in the wrong category &mdash; tap one to move it back, then try again.'));
+        controls.openExplain();
+        if(allCorrect){
+          markComplete('class');
+        }
+      },
+      onTryAgain: function(){
+        config.items.forEach(function(it){ location[it.id]='pool'; });
+        checked=false; selectedItem=null;
+        render();
+        controls.hideFeedback();
+      }
+    });
+    controls.setHint(config.hint);
+    controls.setExplain(config.explanation);
+  }
+
+  build();
+  moduleResetters.push(function(){
+    config.items.forEach(function(it){ location[it.id]='pool'; });
+    checked=false; selectedItem=null;
+    build();
+  });
+}
+
+/* =====================================================================
+   MATCHING ACTIVITY (Match the Pairs)
+===================================================================== */
+function MatchingActivity(mount, config){
+  var roundIndex = 0;
+  var controls;
+
+  function build(){
+    mount.innerHTML = '';
+    var round = config.rounds[roundIndex];
+    var matched = {}; // term id -> true
+    var selectedTerm = null;
+
+    if(config.rounds.length > 1){
+      mount.appendChild(el('div','round-label','Round '+(roundIndex+1)+' of '+config.rounds.length+' &middot; '+esc(round.title)));
+    }
+    var progressLine = el('div','match-progress','0 of '+round.pairs.length+' pairs matched');
+    mount.appendChild(progressLine);
+
+    var gridWrap = el('div','match-grid');
+    var termCol = el('div');
+    var defCol = el('div');
+    termCol.appendChild(el('div','match-col-label','Term'));
+    defCol.appendChild(el('div','match-col-label','Definition'));
+    gridWrap.appendChild(termCol);
+    gridWrap.appendChild(defCol);
+    mount.appendChild(gridWrap);
+
+    var terms = round.pairs.map(function(p,i){ return {id:'t'+i, text:p.term, pairIndex:i}; });
+    var defs = round.pairs.map(function(p,i){ return {id:'d'+i, text:p.def, pairIndex:i}; });
+    var termsShuffled = shuffle(terms);
+    var defsShuffled = shuffle(defs);
+
+    function renderCols(){
+      termCol.querySelectorAll('.match-btn').forEach(function(n){ n.remove(); });
+      defCol.querySelectorAll('.match-btn').forEach(function(n){ n.remove(); });
+      termsShuffled.forEach(function(t){
+        var isMatched = !!matched[t.pairIndex];
+        var btn = el('button','match-btn'+(isMatched?' matched':'')+(selectedTerm===t.id?' selected':''), esc(t.text));
+        btn.type='button';
+        btn.disabled = isMatched;
+        btn.addEventListener('click', function(){
+          selectedTerm = (selectedTerm===t.id) ? null : t.id;
+          renderCols();
+        });
+        termCol.appendChild(btn);
+      });
+      defsShuffled.forEach(function(d){
+        var isMatched = !!matched[d.pairIndex];
+        var btn = el('button','match-btn'+(isMatched?' matched':''), esc(d.text));
+        btn.type='button';
+        btn.disabled = isMatched;
+        btn.addEventListener('click', function(){
+          if(!selectedTerm) return;
+          var termObj = terms.filter(function(t){ return t.id===selectedTerm; })[0];
+          if(termObj.pairIndex === d.pairIndex){
+            matched[d.pairIndex] = true;
+            selectedTerm = null;
+            renderCols();
+            var count = Object.keys(matched).length;
+            progressLine.textContent = count+' of '+round.pairs.length+' pairs matched';
+            if(count === round.pairs.length){
+              controls.showFeedback(true, 'All pairs matched for this round!');
+              controls.openExplain();
+              advanceRound();
+            }
+          } else {
+            btn.classList.add('wrong-flash');
+            var termBtns = termCol.querySelectorAll('.match-btn');
+            termBtns.forEach(function(tb){ if(tb.textContent===termObj.text) tb.classList.add('wrong-flash'); });
+            controls.showFeedback(false, 'Not quite a pair &mdash; try again, or press Hint.');
+            setTimeout(function(){
+              btn.classList.remove('wrong-flash');
+              termBtns.forEach(function(tb){ tb.classList.remove('wrong-flash'); });
+              selectedTerm = null;
+              renderCols();
+            }, 650);
+          }
+        });
+        defCol.appendChild(btn);
+      });
+    }
+    renderCols();
+
+    controls = buildControls(mount, {
+      onCheck: function(){
+        var count = Object.keys(matched).length;
+        if(count === round.pairs.length){
+          controls.showFeedback(true, 'This round is fully matched. Nicely done!');
+        } else {
+          controls.showFeedback(false, count+' of '+round.pairs.length+' pairs matched so far. Keep tapping terms and definitions.');
+        }
+        controls.openExplain();
+      },
+      onTryAgain: function(){
+        matched = {}; selectedTerm = null;
+        termsShuffled = shuffle(terms); defsShuffled = shuffle(defs);
+        progressLine.textContent = '0 of '+round.pairs.length+' pairs matched';
+        renderCols();
+        controls.hideFeedback();
+      }
+    });
+    controls.setHint(round.hint);
+    controls.setExplain(round.explanation);
+  }
+
+  function advanceRound(){
+    if(roundIndex < config.rounds.length-1){
+      var nextWrap = el('div');
+      nextWrap.style.marginTop = '14px';
+      var nextBtn = el('button','btn btn-primary','Next Round &#8594;');
+      nextBtn.type='button';
+      nextBtn.addEventListener('click', function(){ roundIndex++; build(); });
+      nextWrap.appendChild(nextBtn);
+      mount.appendChild(nextWrap);
+    } else {
+      if(config.onAllComplete) config.onAllComplete();
+      var doneWrap = el('div','panel panel-feedback ok show','&#127881; <b>All matching rounds complete!</b>');
+      doneWrap.style.marginTop = '14px';
+      mount.appendChild(doneWrap);
+    }
+  }
+
+  build();
+  moduleResetters.push(function(){ roundIndex = 0; build(); });
+}
+
+/* =====================================================================
+   CHOICE ACTIVITY (Find the Wrong Statement / Scenario-Based Questions)
+===================================================================== */
+function ChoiceActivity(mount, config){
+  var roundIndex = 0;
+  var selected = null;
+  var checked = false;
+  var controls;
+
+  function build(){
+    mount.innerHTML = '';
+    var round = config.rounds[roundIndex];
+    selected = null; checked = false;
+
+    if(config.rounds.length > 1){
+      mount.appendChild(el('div','round-label', (config.roundNounCapital||'Round')+' '+(roundIndex+1)+' of '+config.rounds.length));
+    }
+    if(round.story){
+      mount.appendChild(el('div','scenario-story', '&#128172; '+esc(round.story)));
+    }
+    mount.appendChild(el('div','activity-instruction', esc(round.prompt)));
+
+    var list = el('div','option-list');
+    mount.appendChild(list);
+
+    var letters = ['A','B','C','D','E'];
+    function renderOptions(){
+      list.innerHTML = '';
+      round.options.forEach(function(opt, i){
+        var cls = 'option';
+        if(!checked && selected===opt.id) cls += ' selected';
+        if(checked){
+          if(opt.id === round.correctId) cls += ' correct';
+          else if(opt.id === selected) cls += ' incorrect';
+        }
+        var btn = el('button', cls, '<span class="letter">'+letters[i]+'</span><span>'+esc(opt.label)+'</span>');
+        btn.type='button';
+        btn.disabled = checked;
+        btn.addEventListener('click', function(){
+          selected = opt.id;
+          renderOptions();
+        });
+        list.appendChild(btn);
+      });
+    }
+    renderOptions();
+
+    controls = buildControls(mount, {
+      onCheck: function(){
+        if(!selected){
+          controls.showFeedback(false, 'Choose an option first.');
+          return;
+        }
+        checked = true;
+        renderOptions();
+        var ok = selected === round.correctId;
+        controls.showFeedback(ok, ok ? 'Correct!' : 'Not quite &mdash; the highlighted card in green is the right answer.');
+        controls.openExplain();
+        advance(ok);
+      },
+      onTryAgain: function(){
+        selected = null; checked = false;
+        renderOptions();
+        controls.hideFeedback();
+      }
+    });
+    controls.setHint(round.hint);
+    controls.setExplain(round.explanation);
+  }
+
+  function advance(ok){
+    var wrap = el('div');
+    wrap.style.marginTop = '14px';
+    if(roundIndex < config.rounds.length - 1){
+      var nextBtn = el('button','btn btn-primary','Next &#8594;');
+      nextBtn.type='button';
+      nextBtn.addEventListener('click', function(){ roundIndex++; build(); });
+      wrap.appendChild(nextBtn);
+    } else {
+      if(config.onAllComplete) config.onAllComplete();
+      wrap.className = 'panel panel-feedback ok show';
+      wrap.innerHTML = '&#127881; <b>All done here!</b> This module is marked complete above.';
+    }
+    mount.appendChild(wrap);
+  }
+
+  build();
+  moduleResetters.push(function(){ roundIndex = 0; build(); });
+}
+
+/* =====================================================================
+   BONUS: BINARY BYTE BUILDER
+===================================================================== */
+function ByteBuilderActivity(mount){
+  var placeValues = [128,64,32,16,8,4,2,1];
+  var bits = [0,0,0,0,0,0,0,0];
+  var target = 0;
+  var controls;
+
+  function newTarget(){
+    target = 3 + Math.floor(Math.random()*250); // 3..252
+  }
+  newTarget();
+
+  function currentValue(){
+    var sum = 0;
+    bits.forEach(function(b,i){ if(b) sum += placeValues[i]; });
+    return sum;
+  }
+
+  function build(){
+    mount.innerHTML = '';
+    var readout = el('div','byte-readout');
+    mount.appendChild(readout);
+    var row = el('div','byte-row');
+    mount.appendChild(row);
+
+    function render(){
+      readout.innerHTML = '<div class="target">Target number: <b class="mono">'+target+'</b></div><div class="current">'+currentValue()+'</div>';
+      row.innerHTML = '';
+      bits.forEach(function(b, i){
+        var tile = el('div','bit-tile'+(b?' on':''), '<span class="bit-val">'+b+'</span><span class="place-val">'+placeValues[i]+'</span>');
+        tile.addEventListener('click', function(){
+          bits[i] = bits[i] ? 0 : 1;
+          controls.hideFeedback();
+          render();
+        });
+        row.appendChild(tile);
+      });
+    }
+    render();
+
+    var extraRow = el('div','toolbar');
+    var newTargetBtn = el('button','btn btn-ghost','&#127922; New Target');
+    newTargetBtn.type='button';
+    newTargetBtn.addEventListener('click', function(){
+      newTarget(); bits=[0,0,0,0,0,0,0,0];
+      render(); controls.hideFeedback();
+    });
+    extraRow.appendChild(newTargetBtn);
+    mount.appendChild(extraRow);
+
+    controls = buildControls(mount, {
+      onCheck: function(){
+        var ok = currentValue() === target;
+        controls.showFeedback(ok, ok ? 'That\'s exactly '+target+'! Your bits are worth '+bits.map(function(b,i){return b?placeValues[i]:null;}).filter(Boolean).join(' + ')+'.' : 'Your switches currently make '+currentValue()+', not '+target+'. Keep adjusting &mdash; each tile is worth double the one to its right.');
+        controls.openExplain();
+      },
+      onTryAgain: function(){
+        bits = [0,0,0,0,0,0,0,0];
+        render();
+        controls.hideFeedback();
+      }
+    });
+    controls.setHint('Work from the left. Is the target &ge; 128? Turn that tile on and subtract 128, then check against 64, and so on &mdash; exactly like the byte widget in Lecture 01.');
+    controls.setExplain('Eight switches (a byte) can represent 256 different patterns, 0 to 255. Each tile is worth double the one to its right: 128, 64, 32, 16, 8, 4, 2, 1. Turning tiles on and adding their place values is exactly how binary numbers work &mdash; and it is exactly what happens inside a byte of RAM.');
+  }
+
+  build();
+  moduleResetters.push(function(){
+    newTarget(); bits=[0,0,0,0,0,0,0,0];
+    build();
+  });
+}
+
+/* =====================================================================
+   FINAL REVISION CHALLENGE
+===================================================================== */
+function FinalChallengeActivity(mount, questions){
+  var order = questions.map(function(_, i){ return i; });
+  var qIndex = 0;
+  var answers = []; // { qi, chosenId, correct, topic }
+  var selected = null;
+  var checked = false;
+  var controls;
+
+  function currentQ(){ return questions[order[qIndex]]; }
+
+  function buildQuestion(){
+    mount.innerHTML = '';
+    selected = null; checked = false;
+    var q = currentQ();
+
+    mount.appendChild(el('div','final-progress','Question '+(qIndex+1)+' of '+questions.length+' &middot; Topic: '+esc(q.topic)));
+    mount.appendChild(el('div','activity-instruction', esc(q.prompt)));
+
+    var list = el('div','option-list');
+    mount.appendChild(list);
+    var letters = ['A','B','C','D','E'];
+
+    function renderOptions(){
+      list.innerHTML = '';
+      q.options.forEach(function(opt, i){
+        var cls = 'option';
+        if(!checked && selected===opt.id) cls += ' selected';
+        if(checked){
+          if(opt.id === q.correctId) cls += ' correct';
+          else if(opt.id === selected) cls += ' incorrect';
+        }
+        var btn = el('button', cls, '<span class="letter">'+letters[i]+'</span><span>'+esc(opt.label)+'</span>');
+        btn.type='button';
+        btn.disabled = checked;
+        btn.addEventListener('click', function(){ selected = opt.id; renderOptions(); });
+        list.appendChild(btn);
+      });
+    }
+    renderOptions();
+
+    controls = buildControls(mount, {
+      onCheck: function(){
+        if(!selected){ controls.showFeedback(false, 'Choose an option first.'); return; }
+        checked = true;
+        renderOptions();
+        var ok = selected === q.correctId;
+        recordAnswer(ok);
+        controls.showFeedback(ok, ok ? 'Correct!' : 'Not quite &mdash; the correct answer is highlighted in green.');
+        controls.openExplain();
+        showNextControl();
+      },
+      onTryAgain: function(){
+        selected = null; checked = false;
+        renderOptions();
+        controls.hideFeedback();
+        answers = answers.filter(function(a){ return a.qi !== order[qIndex]; });
+      }
+    });
+    controls.setHint(q.hint);
+    controls.setExplain(q.explanation);
+  }
+
+  function recordAnswer(ok){
+    answers = answers.filter(function(a){ return a.qi !== order[qIndex]; });
+    answers.push({ qi: order[qIndex], chosenId: selected, correct: ok, topic: currentQ().topic });
+  }
+
+  function showNextControl(){
+    var wrap = el('div');
+    wrap.style.marginTop = '14px';
+    var btn = el('button','btn btn-primary', qIndex < questions.length-1 ? 'Next Question &#8594;' : 'See My Results &#8594;');
+    btn.type='button';
+    btn.addEventListener('click', function(){
+      if(qIndex < questions.length-1){ qIndex++; buildQuestion(); }
+      else { showSummary(); }
+    });
+    wrap.appendChild(btn);
+    mount.appendChild(wrap);
+  }
+
+  function showSummary(){
+    markComplete('final');
+    mount.innerHTML = '';
+    var score = answers.filter(function(a){ return a.correct; }).length;
+    var total = questions.length;
+    var band, bandColor;
+    if(score >= 9){ band='Excellent!'; bandColor='#1E9E67'; }
+    else if(score >= 7){ band='Good work!'; bandColor='#0E8F88'; }
+    else if(score >= 5){ band='Fair &mdash; keep practicing.'; bandColor='#F2A93B'; }
+    else { band='Let\'s revise together.'; bandColor='#E1503F'; }
+
+    var hero = el('div','final-score-hero');
+    hero.innerHTML = '<div class="big-score">'+score+'<span>/'+total+'</span></div>'
+      + '<div class="final-band mono" style="background:'+bandColor+'22;color:'+bandColor+';">'+band+'</div>';
+    mount.appendChild(hero);
+
+    var grid = el('div','summary-grid');
+    var colOk = el('div');
+    colOk.appendChild(el('div','summary-col-title','&#9989; Correct answers'));
+    var colBad = el('div');
+    colBad.appendChild(el('div','summary-col-title','&#10060; Needs another look'));
+
+    var wrongTopics = {};
+    answers.sort(function(a,b){ return a.qi - b.qi; }).forEach(function(a){
+      var q = questions[a.qi];
+      if(a.correct){
+        var okItem = el('div','summary-item ok','<span class="qtopic">'+esc(q.topic)+'</span>'+esc(q.prompt));
+        colOk.appendChild(okItem);
+      } else {
+        wrongTopics[q.topic] = true;
+        var correctOpt = q.options.filter(function(o){ return o.id===q.correctId; })[0];
+        var badItem = el('div','summary-item bad','<span class="qtopic">'+esc(q.topic)+'</span>'+esc(q.prompt)+'<br><b>Correct answer:</b> '+esc(correctOpt.label));
+        colBad.appendChild(badItem);
+      }
+    });
+    if(colOk.children.length === 1){ colOk.appendChild(el('div','summary-item bad','None yet &mdash; but every explanation above will help.')); }
+    if(colBad.children.length === 1){ colBad.appendChild(el('div','summary-item ok','Nothing here &mdash; you got every question right!')); }
+
+    grid.appendChild(colOk); grid.appendChild(colBad);
+    mount.appendChild(grid);
+
+    var topicsList = Object.keys(wrongTopics);
+    var banner = el('div','revision-banner');
+    if(topicsList.length === 0){
+      banner.innerHTML = '&#127881; <b>Perfect score!</b> You have a solid handle on Lectures 1&ndash;5. Try the activities above again for extra speed, or move on to Lecture 06.';
+    } else {
+      banner.innerHTML = '&#128218; <b>Revise:</b> '+topicsList.join(', ')+'. Scroll back up to the matching activity for each topic and try it once more &mdash; that repetition is what makes it stick.';
+    }
+    mount.appendChild(banner);
+
+    var restartWrap = el('div');
+    restartWrap.style.marginTop = '16px';
+    var restartBtn = el('button','btn btn-ghost','&#8635; Restart Challenge');
+    restartBtn.type='button';
+    restartBtn.addEventListener('click', function(){
+      order = shuffle(questions.map(function(_,i){ return i; }));
+      qIndex = 0; answers = [];
+      buildQuestion();
+    });
+    restartWrap.appendChild(restartBtn);
+    mount.appendChild(restartWrap);
+  }
+
+  buildQuestion();
+  moduleResetters.push(function(){
+    order = questions.map(function(_,i){ return i; });
+    qIndex = 0; answers = [];
+    buildQuestion();
+  });
+}
+
+/* =====================================================================
+   CONTENT DATA &mdash; drawn from Lectures 01&ndash;05
+===================================================================== */
+
+/* ---- 1. Concept Sequencing ---- */
+var SEQUENCE_ROUNDS = [
+  {
+    title: 'The Data Journey',
+    instruction: 'Tap the cards in the order a computer usually handles your work.',
+    items: [
+      {id:'input', label:'Input', sub:'You give data: typing, clicking, scanning'},
+      {id:'process', label:'Processing', sub:'The CPU works on it (Control Unit + ALU)'},
+      {id:'output', label:'Output', sub:'The result is shown to you: screen, printer, speaker'},
+      {id:'storage', label:'Storage', sub:'Data is saved permanently for later: disk / SSD'}
+    ],
+    correctOrder: ['input','process','output','storage'],
+    hint: 'Think about typing and saving a document: what happens the very first moment you touch the keyboard, and what happens right at the end if you want it back tomorrow?',
+    explanation: 'A computer takes your <b>Input</b>, runs it through <b>Processing</b> in the CPU, shows you the <b>Output</b>, and can keep it in <b>Storage</b> for later. This is the big-picture cycle behind everything you do &mdash; it matches the Input &rarr; CPU &rarr; Output layout of the block diagram (Lecture 03), with Storage sitting alongside for anything that needs to survive a power-off.'
+  },
+  {
+    title: 'From Your Words to a Signal',
+    instruction: 'Put these translation layers in order, from what YOU write down to what the SILICON actually understands.',
+    items: [
+      {id:'code', label:'High-Level Code', sub:'e.g. print("Hello")'},
+      {id:'asm', label:'Assembly Language', sub:'Short human-readable mnemonics like MOV, ADD'},
+      {id:'machine', label:'Machine Code', sub:'Pure 0s and 1s the CPU can execute'},
+      {id:'voltage', label:'Electrical Voltage', sub:'High voltage = 1, low voltage = 0, on a real wire'}
+    ],
+    correctOrder: ['code','asm','machine','voltage'],
+    hint: 'Which one reads most like English, and which one is closest to actual electricity moving through a wire?',
+    explanation: 'Lecture 01 showed that every layer just hides the one below it: your <b>Code</b> is translated into <b>Assembly</b>, which becomes <b>Machine Code</b> (pure binary), which finally becomes a pattern of <b>Voltage</b> on a wire. "Understanding" is really just this fall from meaning to metal &mdash; and it lands right back at a switch turning on and off.'
+  }
+];
+
+/* ---- 2. Computer Generation Timeline ---- */
+var GENERATIONS_ROUNDS = [{
+  title: 'Five Generations',
+  instruction: 'Arrange the generations from earliest to most recent.',
+  items: [
+    {id:'vt', label:'Vacuum Tubes', sub:'Gen I &middot; 1940&ndash;1956 &middot; filled a whole room'},
+    {id:'tr', label:'Transistors', sub:'Gen II &middot; smaller, faster, cooler switch'},
+    {id:'ic', label:'Integrated Circuits', sub:'Gen III &middot; many transistors on one chip'},
+    {id:'mp', label:'Microprocessors', sub:'Gen IV &middot; a whole CPU on a single chip'},
+    {id:'ai', label:'Artificial Intelligence', sub:'Gen V &middot; machines that learn and adapt'}
+  ],
+  correctOrder: ['vt','tr','ic','mp','ai'],
+  hint: 'Each generation is defined by a smaller, faster switch than the one before it &mdash; from a glowing glass tube to billions of switches on a fingernail-sized chip.',
+  explanation: 'Lecture 02\'s five generations: <b>Gen I Vacuum Tubes</b> (1940&ndash;56, room-sized) &rarr; <b>Gen II Transistors</b> (smaller, faster, less heat) &rarr; <b>Gen III Integrated Circuits</b> (many transistors on one chip) &rarr; <b>Gen IV Microprocessors</b> (a whole CPU on one chip) &rarr; <b>Gen V AI</b> (machines that learn). Every step follows Moore\'s Law: smaller, faster and cheaper than the one before it.'
+}];
+
+/* ---- 3. Find the Wrong Statement ---- */
+var WRONGSTATEMENT_ROUNDS = [
+  {
+    prompt: 'Three of these are true. Which one is wrong?',
+    options: [
+      {id:'a', label:'A bit can only be 0 or 1.'},
+      {id:'b', label:'A byte is made of 8 bits.'},
+      {id:'c', label:'One byte can represent 256 different values (0 to 255).'},
+      {id:'d', label:'One byte can represent 1,000 different values.'}
+    ],
+    correctId: 'd',
+    hint: 'A byte has 8 switches, and each switch has 2 states. How many combinations does that really give you?',
+    explanation: '8 bits give 2<sup>8</sup> = <b>256</b> possible patterns, numbered 0 to 255 &mdash; not 1,000. "One byte can represent 1,000 different values" is the wrong statement.'
+  },
+  {
+    prompt: 'Three of these are true. Which one is wrong?',
+    options: [
+      {id:'a', label:'Vacuum tubes were used in the First Generation of computers.'},
+      {id:'b', label:'Moore\'s Law says transistor count roughly doubles every two years.'},
+      {id:'c', label:'Computers can think creatively and come up with their own ideas.'},
+      {id:'d', label:'GIGO means wrong input leads to wrong output.'}
+    ],
+    correctId: 'c',
+    hint: 'Lecture 02\'s "limits" section was very clear about what a computer has no common sense about.',
+    explanation: 'Computers have speed and perfect accuracy, but <b>no common sense, intent, or feelings</b> &mdash; they only ever do exactly what they are told. "Computers can think creatively and come up with their own ideas" is the wrong statement.'
+  },
+  {
+    prompt: 'Three of these are true. Which one is wrong?',
+    options: [
+      {id:'a', label:'RAM is volatile &mdash; it loses its data when the power is off.'},
+      {id:'b', label:'ROM is non-volatile &mdash; it keeps its data without power.'},
+      {id:'c', label:'Cache memory is bigger and slower than RAM.'},
+      {id:'d', label:'Registers are the fastest memory, located inside the CPU.'}
+    ],
+    correctId: 'c',
+    hint: 'What is the entire point of putting a cache between the CPU and RAM in the first place?',
+    explanation: 'Cache sits between the CPU and RAM specifically because it is <b>smaller and faster</b> than RAM &mdash; that speed is what avoids the CPU waiting. "Cache memory is bigger and slower than RAM" is the wrong statement.'
+  },
+  {
+    prompt: 'Three of these are true. Which one is wrong?',
+    options: [
+      {id:'a', label:'The Control Unit directs and coordinates the computer\'s operations.'},
+      {id:'b', label:'The ALU performs arithmetic and logical operations.'},
+      {id:'c', label:'A supercomputer is smaller and less powerful than a microcomputer.'},
+      {id:'d', label:'Secondary storage keeps data permanently, even without power.'}
+    ],
+    correctId: 'c',
+    hint: 'Remember the "by size and power" classification: which end of that list is the fastest, and which end fits in your pocket?',
+    explanation: 'The size classification runs <b>Supercomputer &rarr; Mainframe &rarr; Mini &rarr; Microcomputer</b>, from the fastest, most powerful machines down to personal, single-user ones. A supercomputer is far more powerful than a microcomputer, not less &mdash; that\'s the wrong statement.'
+  }
+];
+
+/* ---- 4. Drag & Drop Classification ---- */
+var CLASSIFICATION_CONFIG = {
+  bins: [
+    {id:'input', label:'Input', icon:'&#128245;'},
+    {id:'output', label:'Output', icon:'&#128227;'},
+    {id:'memory', label:'Memory', icon:'&#129504;'},
+    {id:'storage', label:'Storage', icon:'&#128193;'}
+  ],
+  items: [
+    {id:'keyboard', label:'Keyboard', bin:'input'},
+    {id:'mouse', label:'Mouse', bin:'input'},
+    {id:'mic', label:'Microphone', bin:'input'},
+    {id:'monitor', label:'Monitor', bin:'output'},
+    {id:'printer', label:'Printer', bin:'output'},
+    {id:'speaker', label:'Speaker', bin:'output'},
+    {id:'ram', label:'RAM', bin:'memory'},
+    {id:'rom', label:'ROM', bin:'memory'},
+    {id:'cache', label:'Cache', bin:'memory'},
+    {id:'hdd', label:'Hard Disk (HDD)', bin:'storage'},
+    {id:'ssd', label:'SSD', bin:'storage'},
+    {id:'usb', label:'USB Flash Drive', bin:'storage'}
+  ],
+  hint: 'Ask yourself: does this bring data INTO the computer, send it OUT to you, hold data temporarily while the CPU works (MEMORY), or keep it permanently even when the power is off (STORAGE)?',
+  explanation: '<b>Input</b> devices (keyboard, mouse, microphone) convert the real world into binary. <b>Output</b> devices (monitor, printer, speaker) convert binary back into something you can see or hear (Lecture 05). <b>Memory</b> &mdash; RAM, ROM, Cache &mdash; is primary, works directly with the CPU, and (except ROM) is temporary. <b>Storage</b> &mdash; HDD, SSD, USB &mdash; is secondary: bigger, cheaper, and permanent (Lecture 04).'
+};
+
+/* ---- 5. Match the Pairs ---- */
+var MATCHING_ROUNDS = [
+  {
+    title: 'Core Hardware',
+    pairs: [
+      {term:'CPU', def:'The brain of the computer; fetches, decodes and executes instructions.'},
+      {term:'ALU', def:'The part of the CPU that performs arithmetic and logical operations.'},
+      {term:'Control Unit', def:'Directs and coordinates every operation using control signals.'},
+      {term:'RAM', def:'Fast, temporary memory that holds a running program; loses data when power is off.'},
+      {term:'ROM', def:'Non-volatile memory that stores permanent start-up instructions like the BIOS.'},
+      {term:'Cache', def:'Small, very fast memory between the CPU and RAM, holding frequently used data.'}
+    ],
+    hint: 'Three of these live inside the CPU (Lecture 01/03); the other three are types of memory (Lecture 04).',
+    explanation: 'The <b>CPU</b> is the brain, built from the <b>ALU</b> (does the maths and logic) and the <b>Control Unit</b> (directs everything). <b>RAM</b> is fast and temporary; <b>ROM</b> is permanent start-up instructions; <b>Cache</b> is the small, ultra-fast memory that sits between the CPU and RAM.'
+  },
+  {
+    title: 'Core Concepts',
+    pairs: [
+      {term:'Bit', def:'The smallest unit of data &mdash; a single 0 or 1.'},
+      {term:'Byte', def:'A group of 8 bits, enough to store one character.'},
+      {term:'Transistor', def:'An electronic switch with no moving parts; billions sit on one chip.'},
+      {term:'GIGO', def:'Garbage In, Garbage Out &mdash; wrong input always gives a wrong (but perfectly computed) output.'},
+      {term:'Volatile', def:'A type of memory that loses its contents the moment power is switched off.'},
+      {term:'Non-Volatile', def:'A type of memory that keeps its contents even without power.'}
+    ],
+    hint: 'This round mixes Lecture 01 (bits, bytes, transistors) with Lecture 02 (GIGO) and Lecture 04 (volatility).',
+    explanation: 'A <b>Bit</b> is one 0 or 1; 8 of them make a <b>Byte</b>. A <b>Transistor</b> is the switch underneath it all. <b>GIGO</b> reminds us the computer is always accurate &mdash; the fault is in the data or instructions. <b>Volatile</b> memory (like RAM) needs power to hold data; <b>Non-Volatile</b> memory (like ROM) does not.'
+  }
+];
+
+/* ---- 6. Memory Hierarchy Puzzle ---- */
+var HIERARCHY_ROUNDS = [{
+  instruction: 'Arrange these four from FASTEST down to SLOWEST.',
+  items: [
+    {id:'reg', label:'Registers', sub:'Tiny, fastest storage locations inside the CPU'},
+    {id:'cache', label:'Cache', sub:'Small, very fast memory between CPU and RAM'},
+    {id:'ram', label:'RAM', sub:'Main working memory for running programs'},
+    {id:'sec', label:'Secondary Storage', sub:'HDD / SSD / Cloud &mdash; big, cheap, permanent'}
+  ],
+  correctOrder: ['reg','cache','ram','sec'],
+  hint: 'Think of a desk: what\'s in your hand, what\'s on the desktop, what\'s in the drawer, and what\'s in a warehouse across town? Closer always means faster, but smaller.',
+  explanation: 'The memory hierarchy trades speed for size: <b>Registers</b> (inside the CPU, fastest, tiniest) &rarr; <b>Cache</b> (small and very fast) &rarr; <b>RAM</b> (bigger, slower, holds running programs) &rarr; <b>Secondary Storage</b> (biggest, cheapest, but slowest and permanent). Going up the ladder: faster, smaller, costlier. Going down: bigger, cheaper, slower.'
+}];
+
+/* ---- 7. Flowchart Builder ---- */
+var FLOWCHART_ROUNDS = [{
+  instruction: 'Arrange the steps to complete this simple process.',
+  flowShapes: {start:'oval', input:'parallelogram', process:'rect', output:'parallelogram', end:'oval'},
+  items: [
+    {id:'start', label:'Start'},
+    {id:'input', label:'Input Data'},
+    {id:'process', label:'Process Data'},
+    {id:'output', label:'Produce Output'},
+    {id:'end', label:'End'}
+  ],
+  correctOrder: ['start','input','process','output','end'],
+  hint: 'Every flowchart begins and ends with an oval. Data always has to come IN before it can be processed, and OUT after.',
+  explanation: 'This is the shape of almost any simple algorithm: <b>Start</b> (oval) &rarr; <b>Input Data</b> (parallelogram, matching Lecture 05\'s Input Unit) &rarr; <b>Process Data</b> (rectangle, the CPU\'s job from Lecture 01/03) &rarr; <b>Produce Output</b> (parallelogram, the Output Unit) &rarr; <b>End</b> (oval). Ovals mark the boundaries, parallelograms mark data moving in or out, and rectangles mark actual processing.'
+}];
+
+/* ---- 8. Scenario-Based Questions ---- */
+var SCENARIO_ROUNDS = [
+  {
+    story: 'Riya\'s laptop suddenly loses power while she is typing an unsaved document. When it restarts, the whole document is gone.',
+    prompt: 'Which concept best explains what just happened?',
+    options: [
+      {id:'a', label:'The hard disk got corrupted.'},
+      {id:'b', label:'RAM is volatile, so it loses data the moment power is cut.'},
+      {id:'c', label:'The Control Unit crashed.'},
+      {id:'d', label:'The ROM chip failed.'}
+    ],
+    correctId: 'b',
+    hint: 'Where was her unsaved document actually sitting while she was typing &mdash; RAM, or permanent storage?',
+    explanation: 'An unsaved document lives in <b>RAM</b>, the computer\'s fast working memory. Lecture 04 explained RAM is <b>volatile</b>: cut the power, and everything in it vanishes instantly. Once she saves it to the hard disk or SSD (non-volatile storage), it would survive a power cut.'
+  },
+  {
+    story: 'A shopkeeper\'s billing software shows a total of &#8377;10,000 for one packet of biscuits priced &#8377;10, because someone typed the quantity as 1000 instead of 1.',
+    prompt: 'What best explains this mistake?',
+    options: [
+      {id:'a', label:'The computer made a calculation mistake.'},
+      {id:'b', label:'GIGO &mdash; Garbage In, Garbage Out.'},
+      {id:'c', label:'The printer malfunctioned.'},
+      {id:'d', label:'The RAM was full.'}
+    ],
+    correctId: 'b',
+    hint: 'Did the computer\'s multiplication go wrong, or did a human enter the wrong number in the first place?',
+    explanation: 'This is a textbook <b>GIGO</b> case (Lecture 02): the computer multiplied 10 &times; 1000 perfectly and accurately &mdash; the mistake was the wrong number typed in. Accuracy is a property of the machine, not the data you feed it.'
+  },
+  {
+    story: 'A college office needs to print 2,000 pages of an exam question bank quickly and cheaply &mdash; almost all plain black text.',
+    prompt: 'Which printer technology suits this job best?',
+    options: [
+      {id:'a', label:'Inkjet printer'},
+      {id:'b', label:'Laser printer'},
+      {id:'c', label:'A photo printer'},
+      {id:'d', label:'It doesn\'t matter, they\'re identical.'}
+    ],
+    correctId: 'b',
+    hint: 'Which technology from Lecture 05 was described as faster and cheaper per page for bulk text?',
+    explanation: 'Lecture 05 compared the two directly: <b>Laser</b> printers are fast, especially for text, and cheaper per page for high volumes &mdash; perfect for 2,000 pages of exam papers. Inkjet is better suited to photos and low-volume colour printing at home.'
+  },
+  {
+    story: 'On her phone, Ananya swipes with a bare finger and can pinch two fingers together to zoom out on a photo smoothly.',
+    prompt: 'Which touchscreen technology is her phone most likely using?',
+    options: [
+      {id:'a', label:'Resistive'},
+      {id:'b', label:'Capacitive'},
+      {id:'c', label:'Infrared'},
+      {id:'d', label:'It must be a mechanical keypad, not a touchscreen.'}
+    ],
+    correctId: 'b',
+    hint: 'One touch technology needs firm pressure and works with gloves; the other senses your finger\'s electrical charge and supports multi-touch.',
+    explanation: '<b>Capacitive</b> touchscreens (Lecture 05) sense the electrical charge of a bare fingertip and are very responsive to light touch, which is exactly what makes multi-touch gestures like pinch-to-zoom possible. Resistive screens need physical pressure and work with any object, including a gloved hand, but don\'t support smooth multi-touch.'
+  },
+  {
+    story: 'A student says: "My phone is my camera, my calculator, my alarm clock, my map, and my gaming device &mdash; all in the same box."',
+    prompt: 'Which characteristic of computers is this describing?',
+    options: [
+      {id:'a', label:'Accuracy'},
+      {id:'b', label:'Versatility'},
+      {id:'c', label:'Diligence'},
+      {id:'d', label:'Reliability'}
+    ],
+    correctId: 'b',
+    hint: 'Which of the seven characteristics from Lecture 02 is about doing MANY different jobs, just by loading a different program?',
+    explanation: '<b>Versatility</b> is exactly this: a general-purpose computer (or phone) can do a huge variety of tasks simply by running different programs &mdash; camera app, calculator app, maps app &mdash; all on the same hardware.'
+  }
+];
+
+/* ---- 9. Final Revision Challenge (10 mixed questions) ---- */
+var FINAL_QUESTIONS = [
+  {
+    topic: 'Binary & Bits',
+    prompt: 'How many different values can a single byte (8 bits) represent?',
+    options: [{id:'a',label:'8'},{id:'b',label:'100'},{id:'c',label:'256'},{id:'d',label:'1,000'}],
+    correctId: 'c',
+    hint: '2 to the power of 8 is...?',
+    explanation: '8 bits give 2<sup>8</sup> = <b>256</b> possible patterns, from 0 to 255.'
+  },
+  {
+    topic: 'CPU & Logic Units',
+    prompt: 'Which three parts make up the CPU in the classic block diagram?',
+    options: [
+      {id:'a',label:'Input, Output, Storage'},
+      {id:'b',label:'Control Unit, ALU, Registers'},
+      {id:'c',label:'RAM, ROM, Cache'},
+      {id:'d',label:'Keyboard, Mouse, Monitor'}
+    ],
+    correctId: 'b',
+    hint: 'Two of these "do" things, and one "remembers" things briefly, all inside the CPU.',
+    explanation: 'Inside the CPU sit the <b>Control Unit</b> (directs operations), the <b>ALU</b> (does arithmetic and logic), and <b>Registers</b> (tiny, ultra-fast internal storage) &mdash; from Lectures 01 and 03.'
+  },
+  {
+    topic: 'Characteristics (GIGO)',
+    prompt: 'What does GIGO stand for?',
+    options: [
+      {id:'a',label:'General Input General Output'},
+      {id:'b',label:'Garbage In, Garbage Out'},
+      {id:'c',label:'Global Information Gateway Online'},
+      {id:'d',label:'Graphics In, Graphics Out'}
+    ],
+    correctId: 'b',
+    hint: 'This is about what happens when you feed a perfectly accurate machine the wrong data.',
+    explanation: '<b>GIGO &mdash; Garbage In, Garbage Out</b>. The computer computes with perfect accuracy; if the result is wrong, the input or instructions were wrong (Lecture 02).'
+  },
+  {
+    topic: 'Computer Generations',
+    prompt: 'Which generation of computers introduced Integrated Circuits (ICs)?',
+    options: [{id:'a',label:'First'},{id:'b',label:'Second'},{id:'c',label:'Third'},{id:'d',label:'Fourth'}],
+    correctId: 'c',
+    hint: 'Vacuum tubes were Gen I, transistors were Gen II...',
+    explanation: 'The <b>Third Generation</b> packed many transistors onto a single chip &mdash; the Integrated Circuit (Lecture 02).'
+  },
+  {
+    topic: 'Types of Computers',
+    prompt: 'A washing-machine controller is built to do only one job and cannot be reprogrammed for anything else. What type of computer is this?',
+    options: [
+      {id:'a',label:'General-purpose computer'},
+      {id:'b',label:'Special-purpose computer'},
+      {id:'c',label:'Supercomputer'},
+      {id:'d',label:'Mainframe'}
+    ],
+    correctId: 'b',
+    hint: 'One is a jack-of-all-trades; the other is a one-job specialist.',
+    explanation: 'A <b>Special-purpose</b> computer is built and programmed for exactly one task &mdash; a washing-machine controller, an ATM, or a traffic signal &mdash; and does that one job extremely efficiently (Lecture 03).'
+  },
+  {
+    topic: 'Memory (RAM & Volatility)',
+    prompt: 'Which of these loses its data the instant the power is switched off?',
+    options: [{id:'a',label:'ROM'},{id:'b',label:'Hard Disk'},{id:'c',label:'RAM'},{id:'d',label:'SSD'}],
+    correctId: 'c',
+    hint: 'This is the one type of memory that is described as "volatile."',
+    explanation: '<b>RAM</b> is volatile working memory &mdash; it needs constant power to hold data (Lecture 04). ROM, Hard Disks and SSDs are all non-volatile.'
+  },
+  {
+    topic: 'Cache Memory',
+    prompt: 'When the CPU finds the data it needs already sitting in the cache, what is this called?',
+    options: [{id:'a',label:'A miss'},{id:'b',label:'A hit'},{id:'c',label:'A fault'},{id:'d',label:'A crash'}],
+    correctId: 'b',
+    hint: 'One word means "found it fast," the other means "have to go get it from slower RAM."',
+    explanation: 'That\'s a <b>hit</b> &mdash; fast, because the data was already in cache. A <b>miss</b> means the CPU must fetch it from the slower RAM instead (Lecture 04).'
+  },
+  {
+    topic: 'Input Devices (Touch)',
+    prompt: 'Which touchscreen technology senses the electrical charge of your fingertip and supports pinch-to-zoom?',
+    options: [{id:'a',label:'Resistive'},{id:'b',label:'Capacitive'},{id:'c',label:'Infrared'},{id:'d',label:'Mechanical'}],
+    correctId: 'b',
+    hint: 'This is the technology used in nearly every modern smartphone.',
+    explanation: '<b>Capacitive</b> touchscreens sense a fingertip\'s electrical charge, which is what enables multi-touch gestures like pinch-to-zoom (Lecture 05).'
+  },
+  {
+    topic: 'Output Devices (Printers)',
+    prompt: 'Which printer technology is generally faster and cheaper per page for bulk plain-text printing?',
+    options: [{id:'a',label:'Inkjet'},{id:'b',label:'Laser'},{id:'c',label:'3D printing'},{id:'d',label:'Photo printing only'}],
+    correctId: 'b',
+    hint: 'One sprays liquid ink droplets; the other uses a laser beam, static electricity and heat to fuse toner powder.',
+    explanation: '<b>Laser</b> printers are faster and cheaper per page for bulk text (Lecture 05). Inkjet is usually better for photos and colour-rich documents.'
+  },
+  {
+    topic: 'Memory Units',
+    prompt: 'Which of these correctly orders memory units from smallest to largest?',
+    options: [
+      {id:'a',label:'GB &rarr; MB &rarr; KB &rarr; Byte'},
+      {id:'b',label:'Byte &rarr; KB &rarr; MB &rarr; GB'},
+      {id:'c',label:'MB &rarr; GB &rarr; Byte &rarr; KB'},
+      {id:'d',label:'KB &rarr; Byte &rarr; GB &rarr; MB'}
+    ],
+    correctId: 'b',
+    hint: 'Each unit is roughly 1024 times the one before it.',
+    explanation: 'From smallest to largest: <b>Byte &rarr; KB &rarr; MB &rarr; GB</b> (and onward to TB, PB), each about 1024&times; the last (Lecture 04).'
+  }
+];
+
+/* =====================================================================
+   INITIALISE EVERYTHING
+===================================================================== */
+document.addEventListener('DOMContentLoaded', function(){
+  renderLeds();
+  updateProgressUI();
+
+  new OrderingActivity(qs('#app-sequence'), {
+    rounds: SEQUENCE_ROUNDS,
+    onAllComplete: function(){ markComplete('seq'); }
+  });
+
+  new ByteBuilderActivity(qs('#app-bytebuilder'));
+
+  new OrderingActivity(qs('#app-generations'), {
+    rounds: GENERATIONS_ROUNDS,
+    onAllComplete: function(){ markComplete('gen'); }
+  });
+
+  new ChoiceActivity(qs('#app-wrongstatement'), {
+    rounds: WRONGSTATEMENT_ROUNDS,
+    roundNounCapital: 'Set',
+    onAllComplete: function(){ markComplete('wrong'); }
+  });
+
+  new ClassificationActivity(qs('#app-classification'), CLASSIFICATION_CONFIG);
+
+  new MatchingActivity(qs('#app-matching'), {
+    rounds: MATCHING_ROUNDS,
+    onAllComplete: function(){ markComplete('match'); }
+  });
+
+  new OrderingActivity(qs('#app-hierarchy'), {
+    rounds: HIERARCHY_ROUNDS,
+    onAllComplete: function(){ markComplete('mem'); }
+  });
+
+  new OrderingActivity(qs('#app-flowchart'), {
+    rounds: FLOWCHART_ROUNDS,
+    onAllComplete: function(){ markComplete('flow'); }
+  });
+
+  new ChoiceActivity(qs('#app-scenarios'), {
+    rounds: SCENARIO_ROUNDS,
+    roundNounCapital: 'Scenario',
+    onAllComplete: function(){ markComplete('scenario'); }
+  });
+
+  new FinalChallengeActivity(qs('#app-final'), FINAL_QUESTIONS);
+
+  qs('#globalReset').addEventListener('click', resetEverything);
+});
+</script>
+</body>
+</html>
