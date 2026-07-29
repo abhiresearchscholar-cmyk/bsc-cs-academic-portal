@@ -1,0 +1,26 @@
+[
+  {
+    "code": "TY-CS-01",
+    "title": "Operating System",
+    "description": "Third-year core course covering operating system concepts, processes, scheduling, memory management, shell basics, and system-level understanding.",
+    "type": "Core Course",
+    "overviewLink": "operating-system.html",
+    "lecturesLink": "operating-system.html#os-lectures",
+    "assignmentsLink": "#",
+    "quizzesLink": "#",
+    "labLink": "#",
+    "status": "Available"
+  },
+  {
+    "code": "TY-CS-02",
+    "title": "Course To Be Added",
+    "description": "Space reserved for the second third-year course with lectures, assignments, quizzes, and practical resources.",
+    "type": "Core Course",
+    "overviewLink": "#",
+    "lecturesLink": "#",
+    "assignmentsLink": "#",
+    "quizzesLink": "#",
+    "labLink": "#",
+    "status": "Coming Soon"
+  }
+]

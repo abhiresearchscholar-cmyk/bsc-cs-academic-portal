@@ -22,9 +22,9 @@
   },
   {
     "name": "Third Year",
-    "title": "Two Course Areas",
-    "description": "Advanced topics, project work, practicals, and revision material.",
+    "title": "Operating System and Advanced Courses",
+    "description": "Third-year course area with Operating System lectures and space for additional advanced course material.",
     "link": "third-year.html",
-    "status": "Coming Soon"
+    "status": "Available"
   }
 ]

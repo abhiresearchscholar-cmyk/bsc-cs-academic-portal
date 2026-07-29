@@ -87,6 +87,35 @@ async function renderSemesterOneCourses() {
   }).join("");
 }
 
+async function renderThirdYearCourses() {
+  const container = document.querySelector("[data-render='third-year-courses']");
+  if (!container) {
+    return;
+  }
+
+  const courses = await loadJson("data/third-year-courses.json");
+  container.innerHTML = courses.map(function (course) {
+    return `
+      <article class="course-card searchable-item" data-search-text="${textForSearch([course.code, course.title, course.description, course.type, course.status])}">
+        <div class="course-meta">
+          <p class="tag">${course.code}</p>
+          ${course.type ? `<span class="course-type">${course.type}</span>` : ""}
+        </div>
+        <h2>${course.title}</h2>
+        <p>${course.description}</p>
+        <p><span class="status-badge ${statusClass(course.status)}">${course.status}</span></p>
+        <div class="card-actions">
+          ${linkButton(course.overviewLink, "Overview", "button small")}
+          ${linkButton(course.lecturesLink, "Lectures", "button small secondary")}
+          ${linkButton(course.assignmentsLink, "Assignments", "button small muted")}
+          ${linkButton(course.quizzesLink, "Quizzes", "button small muted")}
+          ${linkButton(course.labLink, "Lab", "button small muted")}
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
 async function renderLectures() {
   const container = document.querySelector("[data-render='semester1-lectures']");
   if (!container) {
@@ -133,6 +162,29 @@ async function renderMdcComputerFundamentalsLectures() {
     `;
   }).join("");
   setupSearch("#mdc-lecture-search", ".mdc-lecture-card");
+}
+
+async function renderOperatingSystemLectures() {
+  const container = document.querySelector("[data-render='operating-system-lectures']");
+  if (!container) {
+    return;
+  }
+
+  const lectures = await loadJson("data/operating-system-lectures.json");
+  container.innerHTML = lectures.map(function (lecture) {
+    return `
+      <article class="card lecture-card searchable-item" data-search-text="${textForSearch([lecture.number, lecture.title, lecture.section, lecture.description, lecture.status])}">
+        <p class="tag">${lecture.section}</p>
+        <h2>Lecture ${lecture.number}: ${lecture.title}</h2>
+        <p>${lecture.description}</p>
+        <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
+        <div class="card-actions">
+          ${linkButton(lecture.lecture, "Open PDF", "button small")}
+        </div>
+      </article>
+    `;
+  }).join("");
+  setupSearch("#os-lecture-search", "[data-render='operating-system-lectures'] .lecture-card");
 }
 
 async function renderAssignments() {
@@ -233,8 +285,10 @@ function setupStaticSearch() {
 
 renderSemesters();
 renderSemesterOneCourses();
+renderThirdYearCourses();
 renderLectures();
 renderMdcComputerFundamentalsLectures();
+renderOperatingSystemLectures();
 renderAssignments();
 renderQuizzes();
 renderAnnouncements();

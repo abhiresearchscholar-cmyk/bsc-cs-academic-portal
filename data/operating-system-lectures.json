@@ -1,0 +1,234 @@
+[
+  {
+    "number": "I-1",
+    "title": "The Basics: What and Why",
+    "section": "Unit I: Fundamentals of Operating Systems",
+    "description": "Introduction to operating systems, their purpose, and why they are needed in modern computer systems.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit I  Lecture 1 The Basics What and Why.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-2",
+    "title": "System Software and Resource Abstraction",
+    "section": "Unit I: Fundamentals of Operating Systems",
+    "description": "Overview of system software and the abstraction layers an operating system provides over hardware resources.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit I  Lecture 2 System Software and Resource Abstraction.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-3",
+    "title": "OS Strategies",
+    "section": "Unit I: Fundamentals of Operating Systems",
+    "description": "Key operating system design strategies and the trade-offs behind resource management decisions.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit I  Lecture 3 OS strategies.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-4A",
+    "title": "Types of Operating System (Part I)",
+    "section": "Unit I: Fundamentals of Operating Systems",
+    "description": "Classification of operating systems with the first part of the topic on common OS types and their uses.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit I  Lecture 4 (Part-I) Types of Operating System.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-4B",
+    "title": "Types of Operating System (Part II)",
+    "section": "Unit I: Fundamentals of Operating Systems",
+    "description": "Continuation of operating system types with further examples and distinctions between different models.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit I  Lecture 4(Part-II) Types of Operating System.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-1",
+    "title": "Operating System Services and Process Modes",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Core services provided by an operating system along with user mode and kernel mode concepts.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 1 Operating System services and Process Modes.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-2",
+    "title": "System Calls",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Introduction to system calls and how application programs request services from the operating system.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 2 System Calls.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-3",
+    "title": "System Programs",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Discussion of system programs, utilities, and tools that support users and system operation.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 3 System Programs.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-4",
+    "title": "Process Management (Part I)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Foundations of process management including processes, states, and execution basics.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 4 Process Management (Part-1).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-5",
+    "title": "Process Management (Part II)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Continuation of process management topics with deeper coverage of process behavior and control.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 5 Process Management (Part-II).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-6",
+    "title": "Process Management (Part III)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Further process management concepts building toward coordination and execution management.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 6 Process Management (Part-III).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-7",
+    "title": "Process Management (Part IV)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Advanced process management coverage extending the earlier parts of the unit.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 7 Process Management (Part-IV).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-8",
+    "title": "Process Management (Part V)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Final part of the process management sequence before moving into CPU scheduling topics.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 8 Process Management (Part-V).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-9A",
+    "title": "Scheduling (Part I)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Introduction to CPU scheduling concepts, goals, and common terminology.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 9 Scheduling (Part-I).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-9B",
+    "title": "Scheduling (Part II)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Continuation of scheduling methods with additional examples and scheduling logic.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 9 Scheduling (Part-II).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-10",
+    "title": "Scheduling (Part II)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Additional scheduling material continuing the study of CPU scheduling techniques.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 10 Scheduling (Part-II).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-11",
+    "title": "Scheduling (Part III)",
+    "section": "Unit II: Processes, System Calls, and Scheduling",
+    "description": "Later scheduling concepts and comparative study of scheduling approaches.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit II Lecture 11 Scheduling (Part-III).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-1",
+    "title": "Memory Management",
+    "section": "Unit III: Memory Management and Virtual Memory",
+    "description": "Introduction to memory management and the role of the operating system in handling main memory.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit III Lecture 1 (Memory Management).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-2",
+    "title": "Address Space",
+    "section": "Unit III: Memory Management and Virtual Memory",
+    "description": "Concept of address space and how programs view and use memory.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit III Lecture 2 (Address Space).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-3",
+    "title": "Address Binding",
+    "section": "Unit III: Memory Management and Virtual Memory",
+    "description": "Address binding methods and the relationship between logical and physical addresses.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit III Lecture 3 (Address Binding).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-4",
+    "title": "Memory Allocation Techniques (Part I)",
+    "section": "Unit III: Memory Management and Virtual Memory",
+    "description": "First part of memory allocation techniques used to manage processes in memory.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit III Lecture 4 (Memory Allocation Techniques) Part I.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-5",
+    "title": "Memory Allocation Techniques (Part II)",
+    "section": "Unit III: Memory Management and Virtual Memory",
+    "description": "Continuation of memory allocation techniques with more allocation strategies and issues.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit III Lecture 5 (Memory Allocation Techniques) Part II.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-6",
+    "title": "Memory Allocation Techniques (Part III)",
+    "section": "Unit III: Memory Management and Virtual Memory",
+    "description": "Final part of memory allocation techniques before moving into virtual memory.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit III Lecture 6 (Memory Allocation Techniques) Part III.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-7",
+    "title": "Virtual Memory",
+    "section": "Unit III: Memory Management and Virtual Memory",
+    "description": "Study of virtual memory and how it expands the effective memory available to programs.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit III Lecture 7 Virtual Memory.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-8",
+    "title": "Page Replacement Algorithms",
+    "section": "Unit III: Memory Management and Virtual Memory",
+    "description": "Overview of page replacement algorithms used in virtual memory systems.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit III Lecture 8 Page Replacment Algorithms.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-1",
+    "title": "Shell Introduction",
+    "section": "Unit IV: Shell and Scripting",
+    "description": "Introduction to the shell and its role in interacting with the operating system.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit IV Lecture 1 Shell Introduction.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-2",
+    "title": "Linux Text Editors (VI)",
+    "section": "Unit IV: Shell and Scripting",
+    "description": "Coverage of Linux text editing basics with emphasis on the VI editor.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit IV Lecture 2 Linux Text Editors (VI).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-3",
+    "title": "Shell Scripting",
+    "section": "Unit IV: Shell and Scripting",
+    "description": "Introduction to shell scripting for automating tasks in a Unix or Linux environment.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit IV Lecture 3 Shell Scripting.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-4",
+    "title": "Shell Variables and System Calls",
+    "section": "Unit IV: Shell and Scripting",
+    "description": "Use of shell variables and the link between scripts, commands, and system calls.",
+    "lecture": "downloads/third-year/operating-system/lectures/Unit IV Lecture 4 Shell Variables and System Calls.pdf",
+    "status": "Available"
+  }
+]
