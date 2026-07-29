@@ -22,5 +22,17 @@
     "quizzesLink": "#",
     "labLink": "#",
     "status": "Available"
+  },
+  {
+    "code": "TY-CS-03",
+    "title": "Software Engineering",
+    "description": "Third-year core course covering software process models, requirements, design, metrics, configuration management, testing, and CASE tools.",
+    "type": "Core Course",
+    "overviewLink": "software-engineering.html",
+    "lecturesLink": "software-engineering.html#se-lectures",
+    "assignmentsLink": "#",
+    "quizzesLink": "#",
+    "labLink": "#",
+    "status": "Available"
   }
 ]

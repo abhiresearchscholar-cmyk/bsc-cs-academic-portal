@@ -1,0 +1,338 @@
+[
+  {
+    "number": "I-1",
+    "title": "Introduction",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Introduction to software engineering and the need for disciplined software development practices.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 1 Introduction.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-2",
+    "title": "Software Process Models (Waterfall Model)",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Overview of software process models with focus on the waterfall model and its stages.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 2 Software Process Models (Waterfall Model).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-3",
+    "title": "Incremental and Prototype Model",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Study of incremental and prototype models and where each model is useful.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 3 Incremental and Prototype Model.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-4",
+    "title": "Evolutionary and Spiral Model",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Software development through evolutionary and spiral models with iterative risk-aware design.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 4 Evolutionary and Spiral Model.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-5",
+    "title": "Software Requirements",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Introduction to software requirements and their role in building correct systems.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 5 Software Requirements.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-6",
+    "title": "Requirement Elicitation Process",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Methods and process of gathering software requirements from stakeholders.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 6 Requirement Elicitation Process.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-7A",
+    "title": "Requirements Validation and Management (Part I)",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Validation and management of requirements to keep software development aligned with user needs.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 7(Part-I) Requirements Validation and Management.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-8B",
+    "title": "Requirements Validation and Management (Part II)",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Continuation of requirements validation and management practices.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 8(Part-II) Requirements Validation and Management.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-9",
+    "title": "Software Prototyping",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Role of prototyping in requirement clarification, feedback, and early design exploration.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 9 Software Prototyping.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-10",
+    "title": "Rapid Prototyping Techniques and UI Prototyping",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Rapid prototyping techniques with emphasis on user interface prototyping.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 10 Rapid Prototyping Techniques & UI Prototyping.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-11",
+    "title": "Requirement Analysis and Modeling",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Requirement analysis methods and basic modeling approaches for software systems.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Lecture 11 Requirement Analysis and Modeling.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-SA",
+    "title": "Structural Analysis and Data Dictionary",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Supplementary reading on structural analysis and the use of a data dictionary in modeling.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Structural Analysis and Data Dictionary.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "I-TM",
+    "title": "Transform Mapping (Recommended Read)",
+    "section": "Unit I: Introduction and Requirements",
+    "description": "Recommended reading on transform mapping concepts used in software design.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Transform Mapping (recommended Read).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-1",
+    "title": "Software Design Basics",
+    "section": "Unit II: Software Design",
+    "description": "Unit II introductory lecture on software design concepts and structured design thinking.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit II Lecture 1.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-2",
+    "title": "Design Concepts",
+    "section": "Unit II: Software Design",
+    "description": "Continuation of design-oriented concepts for building maintainable software systems.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit II Lecture 2.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-3",
+    "title": "Modularity",
+    "section": "Unit II: Software Design",
+    "description": "Modularity and decomposition as core principles of software design.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit II Lecture 3 Modularity .pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-4",
+    "title": "Design Heuristic and Design Document",
+    "section": "Unit II: Software Design",
+    "description": "Design heuristics and the purpose of design documents in software projects.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit II Lecture 4 Design Heuristic and Design Document.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-5",
+    "title": "Architectural Design",
+    "section": "Unit II: Software Design",
+    "description": "Architectural design concepts and high-level organization of software systems.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit II Lecture 5 Architectural Design.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-6",
+    "title": "Architectural Styles",
+    "section": "Unit II: Software Design",
+    "description": "Common architectural styles and their application in software systems.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit II Lecture 6 Architectural Styles.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-7",
+    "title": "Transform and Transaction Mapping",
+    "section": "Unit II: Software Design",
+    "description": "Transform and transaction mapping approaches used in structured software design.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit II Lecture 7 Transform and Transaction Mapping.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-8",
+    "title": "User Interface Design",
+    "section": "Unit II: Software Design",
+    "description": "Principles and methods of effective user interface design.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit II Lecture 8 User Interface Design.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-1",
+    "title": "The SCM Process",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Software configuration management process and its importance in controlled development.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture 1 The SCM Process.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-2",
+    "title": "Identification and Version Control",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Configuration item identification and version control concepts in software engineering.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture 2 Idenfitifcation and Version Control.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-3",
+    "title": "Change Control and Configuration Audit",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Managing change and auditing configurations to maintain software integrity.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture 3 Change Control & Configuration Audit.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-4",
+    "title": "Software Measurements",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Introduction to software measurement and the role of metrics in evaluation and planning.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture 4 Softwre Measurements.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-5",
+    "title": "Size Metrics (LOC)",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Software size measurement using lines of code and related estimation ideas.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture 5 Size Metrics (LOC).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-6",
+    "title": "Function Oriented Metrics (Function Point)",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Function point based metrics for software size and effort estimation.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture 6 Function Oriented Metrics (Function Point).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-7",
+    "title": "Data Structure and Information Flow Measure",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Metrics related to data structure complexity and information flow.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture 7 Data Structure and Information Flow Measure.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-8",
+    "title": "Estimation for Software Projects",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Approaches for estimating software project effort, size, and schedule.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture8 Estimation for Software Projects.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-9",
+    "title": "Empirical Estimation Models (COCOMO)",
+    "section": "Unit III: SCM, Metrics, and Estimation",
+    "description": "Empirical estimation models with focus on the COCOMO model.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit III Lecture 9 Emprical Estimation Models (COCOMO).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-1",
+    "title": "Testing",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Introduction to software testing and the role of verification in quality assurance.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 1 Testing.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-2",
+    "title": "Black Box Testing",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Black box testing strategies based on external behavior and expected outputs.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 2 Black Box Testing.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-3",
+    "title": "Structural Testing",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Structural testing approaches that examine internal code structure.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 3 Structural Testing.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-4",
+    "title": "Regression Testing",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Regression testing to ensure new changes do not break existing behavior.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 4 Regression Testing.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-5",
+    "title": "Software Testing Strategies",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Testing strategies used to plan and organize software verification activities.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 5 Software Testing Strategies.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-6",
+    "title": "Software Testing Strategies (Part II) Unit Testing",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Continuation of testing strategies with focus on unit testing concepts.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 6 Software Testing Strategies (Part-II) Unit Testing.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-7",
+    "title": "Integration Testing",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Integration testing methods for verifying combined software components.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 7 Integration Testing.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-8",
+    "title": "Validation and System Testing",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Validation and system testing approaches for end-to-end software checking.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 8 Validation and System Testing.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-9",
+    "title": "Debugging",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Debugging processes and techniques for locating and fixing software defects.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 9 Debugging.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-10",
+    "title": "Reverse Engineering",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Reverse engineering concepts for understanding and recovering existing systems.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 10 Reverse Engineering.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-11",
+    "title": "Re-engineering",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Software re-engineering for improving and restructuring existing systems.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit IV Lecture 11 Re engineering.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-12",
+    "title": "CASE Tools",
+    "section": "Unit IV: Testing and Maintenance",
+    "description": "Computer-Aided Software Engineering tools and their role across the software lifecycle.",
+    "lecture": "downloads/third-year/software-engineering/lectures/Unit4 Lecture 12 CASE Tools.pdf",
+    "status": "Available"
+  }
+]

@@ -210,6 +210,29 @@ async function renderDataStructureAndAlgorithmsLectures() {
   setupSearch("#dsa-lecture-search", "[data-render='data-structure-and-algorithms-lectures'] .lecture-card");
 }
 
+async function renderSoftwareEngineeringLectures() {
+  const container = document.querySelector("[data-render='software-engineering-lectures']");
+  if (!container) {
+    return;
+  }
+
+  const lectures = await loadJson("data/software-engineering-lectures.json");
+  container.innerHTML = lectures.map(function (lecture) {
+    return `
+      <article class="card lecture-card searchable-item" data-search-text="${textForSearch([lecture.number, lecture.title, lecture.section, lecture.description, lecture.status])}">
+        <p class="tag">${lecture.section}</p>
+        <h2>Lecture ${lecture.number}: ${lecture.title}</h2>
+        <p>${lecture.description}</p>
+        <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
+        <div class="card-actions">
+          ${linkButton(lecture.lecture, "Open PDF", "button small")}
+        </div>
+      </article>
+    `;
+  }).join("");
+  setupSearch("#se-lecture-search", "[data-render='software-engineering-lectures'] .lecture-card");
+}
+
 async function renderAssignments() {
   const container = document.querySelector("[data-render='semester1-assignments']");
   if (!container) {
@@ -313,6 +336,7 @@ renderLectures();
 renderMdcComputerFundamentalsLectures();
 renderOperatingSystemLectures();
 renderDataStructureAndAlgorithmsLectures();
+renderSoftwareEngineeringLectures();
 renderAssignments();
 renderQuizzes();
 renderAnnouncements();
