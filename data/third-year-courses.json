@@ -13,14 +13,14 @@
   },
   {
     "code": "TY-CS-02",
-    "title": "Course To Be Added",
-    "description": "Space reserved for the second third-year course with lectures, assignments, quizzes, and practical resources.",
+    "title": "Data Structure and Algorithms",
+    "description": "Third-year core course covering data structures, stacks, queues, linked lists, trees, searching, memory concepts, and file organization.",
     "type": "Core Course",
-    "overviewLink": "#",
-    "lecturesLink": "#",
+    "overviewLink": "data-structure-and-algorithms.html",
+    "lecturesLink": "data-structure-and-algorithms.html#dsa-lectures",
     "assignmentsLink": "#",
     "quizzesLink": "#",
     "labLink": "#",
-    "status": "Coming Soon"
+    "status": "Available"
   }
 ]

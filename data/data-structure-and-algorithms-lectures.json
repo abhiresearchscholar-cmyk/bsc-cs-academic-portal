@@ -1,0 +1,170 @@
+[
+  {
+    "number": "01",
+    "title": "Data Structures: What and Why",
+    "section": "Unit I: Core Data Structures",
+    "description": "Introduction to data structures, their need, and why organized data handling is important in computing.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 1- Data Structures what and why.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "02",
+    "title": "Stacks",
+    "section": "Unit I: Core Data Structures",
+    "description": "Introduction to stacks and their operations, behavior, and practical applications.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 2- Stacks.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "03",
+    "title": "Stacks: Balanced Parenthesis, Infix and Postfix Notation",
+    "section": "Unit I: Core Data Structures",
+    "description": "Use of stacks in expression handling, balanced parenthesis checking, and infix to postfix ideas.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 3- Stacks (Balanced Parenthesis, infix and postfix notation).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "04",
+    "title": "Queues",
+    "section": "Unit I: Core Data Structures",
+    "description": "Queue data structure, basic operations, and applications of FIFO processing.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 4- Queues.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "05",
+    "title": "Linked Lists",
+    "section": "Unit I: Core Data Structures",
+    "description": "Introduction to linked lists, node-based storage, and linear dynamic data structures.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 5-  Linked Lists.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "06",
+    "title": "Linked Lists (Part II)",
+    "section": "Unit I: Core Data Structures",
+    "description": "Continuation of linked lists with extended operations and variations.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 6- Linked Lists (Part-II).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "09A",
+    "title": "Binary Trees",
+    "section": "Unit I: Trees and Tree Traversal",
+    "description": "Basic concepts of binary trees and how hierarchical structures are represented and used.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 9- Binary Trees.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "09B",
+    "title": "Binary Search Trees (Part I)",
+    "section": "Unit I: Trees and Tree Traversal",
+    "description": "Introduction to binary search trees and their ordered storage and searching behavior.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 9 Binary Search Trees (Part-I).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "10",
+    "title": "Binary Search Trees (Part I)",
+    "section": "Unit I: Trees and Tree Traversal",
+    "description": "Further discussion of binary search trees and related operations.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 10 Binary Search Trees (Part-I).pdf",
+    "status": "Available"
+  },
+  {
+    "number": "11",
+    "title": "Binary Search Tree (Part II)",
+    "section": "Unit I: Trees and Tree Traversal",
+    "description": "Continuation of binary search trees with additional operations and examples.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Lecture 11 Binary Search Tree (Part-II_.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "OB",
+    "title": "Buffering",
+    "section": "Unit I: Supplemental Topics",
+    "description": "Supplemental lecture on buffering concepts and temporary data handling.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/O Buffering.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-1",
+    "title": "Searching",
+    "section": "Unit II: Searching and Memory Concepts",
+    "description": "Introduction to searching techniques and the need for efficient search operations.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit II Lecture 1- Searching.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-2",
+    "title": "Binary Search",
+    "section": "Unit II: Searching and Memory Concepts",
+    "description": "Detailed study of binary search and its efficiency compared with simpler methods.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit II Lecture 2- Binary Search.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-3",
+    "title": "Implementing Linear and Binary Search in Python",
+    "section": "Unit II: Searching and Memory Concepts",
+    "description": "Practical implementation-focused lecture on linear and binary search using Python.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit II Lecture 3- Implementing Linear and Binary Search in Python.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-4",
+    "title": "Memory Management",
+    "section": "Unit II: Searching and Memory Concepts",
+    "description": "Introduction to memory management ideas related to program execution and storage use.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit II Lecture 4-Memory Management.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-5",
+    "title": "Memory Management Issue",
+    "section": "Unit II: Searching and Memory Concepts",
+    "description": "Common issues in memory management and the challenges of allocation and reclamation.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit II Lecture 5- Memory Managment Issue.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-6A",
+    "title": "Garbage Collection Algorithms for Equal Sized Blocks",
+    "section": "Unit II: Searching and Memory Concepts",
+    "description": "Garbage collection methods with emphasis on equal-sized memory block strategies.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit II Lecture 6 Garbage Collection Algorithms for equal sized blocks.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "II-6B",
+    "title": "Mark and Sweep Algorithm",
+    "section": "Unit II: Searching and Memory Concepts",
+    "description": "Part two of garbage collection concepts with focus on the mark-and-sweep algorithm.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit II Lecture 6 Part 2 Mark and Sweep Algorithm.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-1",
+    "title": "Characteristics of Storage Devices",
+    "section": "Unit III: Storage and File Systems",
+    "description": "Overview of storage devices and their important performance and usage characteristics.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit III Lecture 1 Characteristics of storage devices.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "III-3",
+    "title": "Basic File System Operations",
+    "section": "Unit III: Storage and File Systems",
+    "description": "Introduction to basic file system operations and how systems manage stored data.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit III Lecture 3 Basic File System Operations.pdf",
+    "status": "Available"
+  },
+  {
+    "number": "IV-1",
+    "title": "File Organizations",
+    "section": "Unit IV: File Organization",
+    "description": "Study of file organization methods and how data is arranged for efficient access.",
+    "lecture": "downloads/third-year/data-structure-and-algorithms/lectures/Unit IV File Organizations .pdf",
+    "status": "Available"
+  }
+]
