@@ -107,6 +107,7 @@ async function renderSecondYearCourses() {
         <div class="card-actions">
           ${linkButton(course.overviewLink, "Overview", "button small")}
           ${linkButton(course.lecturesLink, "Lectures", "button small secondary")}
+          ${course.syllabusLink ? linkButton(course.syllabusLink, "Syllabus and Books", "button small secondary") : ""}
           ${linkButton(course.assignmentsLink, "Assignments", "button small muted")}
           ${linkButton(course.quizzesLink, "Quizzes", "button small muted")}
           ${linkButton(course.labLink, "Lab", "button small muted")}
