@@ -11,6 +11,7 @@
   {
     "number": "02",
     "title": "Inside the Machine",
+    "notesTitle": "Evolution of Computers",
     "section": "MDC Computer Fundamentals",
     "description": "Interactive beginner lecture introducing the main parts inside a computer and how those components work together.",
     "lecture": "downloads/semester1/mdc/lectures/lecture-02-inside-the-machine.html",

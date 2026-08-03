@@ -209,7 +209,7 @@ async function renderMdcComputerFundamentalsNotes() {
     return `
       <article class="card lecture-card searchable-item" data-search-text="${textForSearch([lecture.number, lecture.title, lecture.section, lecture.description, lecture.status])}">
         <p class="tag">${lecture.section}</p>
-        <h2>Lecture ${lecture.number}: ${lecture.title}</h2>
+        <h2>Lecture ${lecture.number}: ${lecture.notesTitle || lecture.title}</h2>
         <p>${lecture.description}</p>
         <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
         <div class="card-actions">
