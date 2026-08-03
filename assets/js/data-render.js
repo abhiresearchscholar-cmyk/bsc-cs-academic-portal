@@ -186,7 +186,6 @@ async function renderMdcComputerFundamentalsLectures() {
         <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
         <div class="card-actions">
           ${linkButton(lecture.lecture, "Open Lecture", "button small")}
-          ${lecture.notes && lecture.notes !== "#" ? linkButton(lecture.notes, "PDF Notes", "button small secondary") : ""}
         </div>
       </article>
     `;
