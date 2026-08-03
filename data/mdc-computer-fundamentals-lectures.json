@@ -16,5 +16,13 @@
     "lecture": "downloads/semester1/mdc/lectures/lecture-02-inside-the-machine.html",
     "notes": "downloads/semester1/mdc/notes/lecture-02-evolution-of-computers.pdf",
     "status": "Available"
+  },
+  {
+    "number": "03",
+    "title": "Generations of Computers",
+    "section": "MDC Computer Fundamentals",
+    "description": "PDF notes covering the generations of computers and the major technological shifts across computing history.",
+    "notes": "downloads/semester1/mdc/notes/lecture-03-generations-of-computers.pdf",
+    "status": "Available"
   }
 ]
