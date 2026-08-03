@@ -194,6 +194,33 @@ async function renderMdcComputerFundamentalsLectures() {
   setupSearch("#mdc-lecture-search", ".mdc-lecture-card");
 }
 
+async function renderMdcComputerFundamentalsNotes() {
+  const container = document.querySelector("[data-render='mdc-computer-fundamentals-notes']");
+  if (!container) {
+    return;
+  }
+
+  const lectures = await loadJson("data/mdc-computer-fundamentals-lectures.json");
+  const notesOnly = lectures.filter(function (lecture) {
+    return lecture.notes && lecture.notes !== "#";
+  });
+
+  container.innerHTML = notesOnly.map(function (lecture) {
+    return `
+      <article class="card lecture-card searchable-item" data-search-text="${textForSearch([lecture.number, lecture.title, lecture.section, lecture.description, lecture.status])}">
+        <p class="tag">${lecture.section}</p>
+        <h2>Lecture ${lecture.number}: ${lecture.title}</h2>
+        <p>${lecture.description}</p>
+        <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
+        <div class="card-actions">
+          ${linkButton(lecture.notes, "Open PDF Notes", "button small secondary")}
+        </div>
+      </article>
+    `;
+  }).join("");
+  setupSearch("#mdc-note-search", "[data-render='mdc-computer-fundamentals-notes'] .lecture-card");
+}
+
 async function renderOperatingSystemLectures() {
   const container = document.querySelector("[data-render='operating-system-lectures']");
   if (!container) {
@@ -411,6 +438,7 @@ renderSecondYearCourses();
 renderThirdYearCourses();
 renderLectures();
 renderMdcComputerFundamentalsLectures();
+renderMdcComputerFundamentalsNotes();
 renderOperatingSystemLectures();
 renderDataStructureAndAlgorithmsLectures();
 renderSoftwareEngineeringLectures();
