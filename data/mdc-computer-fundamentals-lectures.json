@@ -33,5 +33,13 @@
     "description": "PDF notes covering the major types of computers and their uses in real-world situations.",
     "notes": "downloads/semester1/mdc/notes/lecture-04-types-of-computers.pdf",
     "status": "Available"
+  },
+  {
+    "number": "05",
+    "title": "Basic Components of a Computer System",
+    "section": "MDC Computer Fundamentals",
+    "description": "PDF notes covering the major components of a computer system and how they work together.",
+    "notes": "downloads/semester1/mdc/notes/lecture-05-basic-components-of-a-computer-system.pdf",
+    "status": "Available"
   }
 ]
