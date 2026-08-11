@@ -41,5 +41,13 @@
     "description": "PDF notes covering the major components of a computer system and how they work together.",
     "notes": "downloads/semester1/mdc/notes/lecture-05-basic-components-of-a-computer-system.pdf",
     "status": "Available"
+  },
+  {
+    "number": "06",
+    "title": "Instruction Set, Registers, and Processor Speed",
+    "section": "MDC Computer Fundamentals",
+    "description": "PDF notes covering instruction sets, registers, and processor speed in a beginner-friendly way.",
+    "notes": "downloads/semester1/mdc/notes/lecture-06-instruction-set-registers-processor-speed.pdf",
+    "status": "Available"
   }
 ]
