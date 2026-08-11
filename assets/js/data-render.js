@@ -162,12 +162,38 @@ async function renderLectures() {
         <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
         <div class="card-actions">
           ${lecture.lecture ? linkButton(lecture.lecture, "Open Lecture", "button small") : linkButton("#", "Lecture Coming Soon", "button small")}
-          ${lecture.notes && lecture.notes !== "#" ? linkButton(lecture.notes, "PDF Notes", "button small secondary") : ""}
         </div>
       </article>
     `;
   }).join("");
   setupSearch("#lecture-search", ".lecture-card");
+}
+
+async function renderSemesterOneNotes() {
+  const container = document.querySelector("[data-render='semester1-notes']");
+  if (!container) {
+    return;
+  }
+
+  const lectures = await loadJson("data/semester1-lectures.json");
+  const notesOnly = lectures.filter(function (lecture) {
+    return lecture.notes && lecture.notes !== "#";
+  });
+
+  container.innerHTML = notesOnly.map(function (lecture) {
+    return `
+      <article class="card lecture-card searchable-item" data-search-text="${textForSearch([lecture.number, lecture.notesTitle || lecture.title, lecture.section, lecture.description, lecture.status])}">
+        <p class="tag">${lecture.section}</p>
+        <h2>Lecture ${lecture.number}: ${lecture.notesTitle || lecture.title}</h2>
+        <p>${lecture.description}</p>
+        <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
+        <div class="card-actions">
+          ${linkButton(lecture.notes, "Open PDF Notes", "button small secondary")}
+        </div>
+      </article>
+    `;
+  }).join("");
+  setupSearch("#semester1-note-search", "[data-render='semester1-notes'] .lecture-card");
 }
 
 async function renderMdcComputerFundamentalsLectures() {
@@ -436,6 +462,7 @@ renderSemesterOneCourses();
 renderSecondYearCourses();
 renderThirdYearCourses();
 renderLectures();
+renderSemesterOneNotes();
 renderMdcComputerFundamentalsLectures();
 renderMdcComputerFundamentalsNotes();
 renderOperatingSystemLectures();

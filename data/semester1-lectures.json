@@ -2,11 +2,12 @@
   {
     "number": "01",
     "title": "How a Computer Works",
+    "notesTitle": "Introduction to Computers",
     "section": "Section I: Introduction to Computers",
     "description": "Interactive lecture explaining how input, processing, memory, storage, and output work together.",
     "lecture": "downloads/semester1/lectures/lecture-01-how-computers-work.html",
     "ppt": "#",
-    "notes": "downloads/semester1/notes/lecture-01-notes.pdf",
+    "notes": "downloads/semester1/notes/lecture-01-introduction-to-computers.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
