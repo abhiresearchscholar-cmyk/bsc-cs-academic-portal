@@ -25,5 +25,13 @@
     "description": "PDF notes covering the generations of computers and the major technological shifts across computing history.",
     "notes": "downloads/semester1/mdc/notes/lecture-03-generations-of-computers.pdf",
     "status": "Available"
+  },
+  {
+    "number": "04",
+    "title": "Types of Computers",
+    "section": "MDC Computer Fundamentals",
+    "description": "PDF notes covering the major types of computers and their uses in real-world situations.",
+    "notes": "downloads/semester1/mdc/notes/lecture-04-types-of-computers.pdf",
+    "status": "Available"
   }
 ]
