@@ -30,10 +30,11 @@
   {
     "number": "03",
     "title": "Types of Computers & The Block Diagram",
+    "notesTitle": "Block Diagram of a Computer",
     "section": "Section I: Introduction to Computers",
     "description": "Interactive lecture covering types of computers and the basic block diagram of a computer system.",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-03-block-diagram-of-a-computer.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
