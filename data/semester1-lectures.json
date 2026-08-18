@@ -86,10 +86,11 @@
   {
     "number": "07",
     "title": "Machine, Assembly & High-Level Languages",
+    "notesTitle": "Basic Programming Concepts",
     "section": "Section I: Introduction to Computers",
     "description": "Interactive lecture explaining machine language, assembly language, high-level languages, compilers, and interpreters.",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-07-basic-programming-concepts.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
