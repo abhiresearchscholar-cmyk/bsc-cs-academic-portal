@@ -132,5 +132,18 @@
     "lab": "lab.html",
     "quiz": "#",
     "status": "Coming Soon"
+  },
+  {
+    "number": "01",
+    "title": "Introduction to Word Processing and its Features",
+    "notesTitle": "Introduction to Word Processing and its Features",
+    "section": "Section II: Word Processing",
+    "description": "Introductory lecture on word processing and its key features for creating, editing, and formatting documents.",
+    "ppt": "#",
+    "notes": "downloads/semester1/notes/section-ii-lecture-01-word-processing-and-its-features.pdf",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Available"
   }
 ]
