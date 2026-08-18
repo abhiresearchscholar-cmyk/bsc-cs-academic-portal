@@ -72,10 +72,11 @@
   {
     "number": "06",
     "title": "Software & Operating Systems",
+    "notesTitle": "Software and Operating Systems",
     "section": "Section I: Introduction to Computers",
     "description": "Interactive lecture explaining system software, application software, and how operating systems manage computer hardware.",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-06-software-and-operating-systems.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
