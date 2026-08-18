@@ -58,10 +58,11 @@
   {
     "number": "05",
     "title": "Input & Output Devices",
+    "notesTitle": "Input and Output Devices",
     "section": "Section I: Introduction to Computers",
     "description": "Interactive lecture explaining common input devices, output devices, and how users communicate with computers.",
     "ppt": "#",
-    "notes": "#",
+    "notes": "downloads/semester1/notes/lecture-05-input-and-output-devices.pdf",
     "diagram": "#",
     "lab": "lab.html",
     "quiz": "#",
