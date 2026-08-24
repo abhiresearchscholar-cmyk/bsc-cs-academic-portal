@@ -158,5 +158,18 @@
     "lab": "lab.html",
     "quiz": "#",
     "status": "Available"
+  },
+  {
+    "number": "03",
+    "title": "Mail Merge, Printing & PDF",
+    "notesTitle": "Mail Merge, Printing & PDF",
+    "section": "Section II: Word Processing",
+    "description": "Lecture on using mail merge, print settings, and exporting documents to PDF in word processing software.",
+    "ppt": "#",
+    "notes": "downloads/semester1/notes/section-ii-lecture-03-mail-merge-printing-pdf.pdf",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Available"
   }
 ]
