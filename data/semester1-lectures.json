@@ -145,5 +145,18 @@
     "lab": "lab.html",
     "quiz": "#",
     "status": "Available"
+  },
+  {
+    "number": "02",
+    "title": "Tables, Objects, Page Layout & Proofing Tools",
+    "notesTitle": "Tables, Objects, Page Layout & Proofing Tools",
+    "section": "Section II: Word Processing",
+    "description": "Lecture on building tables, inserting objects, managing page layout, and using proofing tools in word processing software.",
+    "ppt": "#",
+    "notes": "downloads/semester1/notes/section-ii-lecture-02-tables-objects-page-layout-proofing-tools.pdf",
+    "diagram": "#",
+    "lab": "lab.html",
+    "quiz": "#",
+    "status": "Available"
   }
 ]
