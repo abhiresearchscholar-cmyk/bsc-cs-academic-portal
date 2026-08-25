@@ -49,5 +49,14 @@
     "description": "PDF notes covering instruction sets, registers, and processor speed in a beginner-friendly way.",
     "notes": "downloads/semester1/mdc/notes/lecture-06-instruction-set-registers-processor-speed.pdf",
     "status": "Available"
+  },
+  {
+    "number": "07",
+    "title": "Memory, Storage and Peripherals",
+    "notesTitle": "Memory, Storage and Peripherals",
+    "section": "Section II: Memory, Storage and Peripherals",
+    "description": "PDF notes covering memory, storage devices, and common peripherals in a beginner-friendly way.",
+    "notes": "downloads/semester1/mdc/notes/lecture-07-memory-storage-peripherals.pdf",
+    "status": "Available"
   }
 ]
