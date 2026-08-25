@@ -58,5 +58,14 @@
     "description": "PDF notes covering memory, storage devices, and common peripherals in a beginner-friendly way.",
     "notes": "downloads/semester1/mdc/notes/lecture-07-memory-storage-peripherals.pdf",
     "status": "Available"
+  },
+  {
+    "number": "02",
+    "title": "Input Devices",
+    "notesTitle": "Input Devices",
+    "section": "Section II: Input Devices",
+    "description": "PDF notes covering common input devices and how they are used in a computer system.",
+    "notes": "downloads/semester1/mdc/notes/lecture-02-input-devices.pdf",
+    "status": "Available"
   }
 ]
