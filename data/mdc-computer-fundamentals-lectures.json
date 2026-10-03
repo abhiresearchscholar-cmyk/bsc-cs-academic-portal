@@ -67,5 +67,14 @@
     "description": "PDF notes covering common input devices and how they are used in a computer system.",
     "notes": "downloads/semester1/mdc/notes/lecture-02-input-devices.pdf",
     "status": "Available"
+  },
+  {
+    "number": "03",
+    "title": "Output Devices",
+    "notesTitle": "Output Devices",
+    "section": "Section II: Output Devices",
+    "description": "PDF notes covering output devices and how they present information from a computer.",
+    "notes": "downloads/semester1/mdc/notes/lecture-03-output-devices.pdf",
+    "status": "Available"
   }
 ]
