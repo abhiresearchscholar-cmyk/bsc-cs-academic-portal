@@ -171,5 +171,12 @@
     "lab": "lab.html",
     "quiz": "#",
     "status": "Available"
+  },
+  {
+    "title": "MS Excel: Complete Lectures",
+    "section": "Section III: MS Excel",
+    "description": "Complete PDF lectures covering spreadsheets, workbooks, formulas, functions, charts, pivot tables, and macros.",
+    "notes": "downloads/semester1/notes/section-iii-ms-excel-complete-lectures.pdf",
+    "status": "Available"
   }
 ]

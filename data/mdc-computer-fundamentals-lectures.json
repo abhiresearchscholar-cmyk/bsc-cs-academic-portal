@@ -76,12 +76,5 @@
     "description": "PDF notes covering output devices and how they present information from a computer.",
     "notes": "downloads/semester1/mdc/notes/lecture-03-output-devices.pdf",
     "status": "Available"
-  },
-  {
-    "title": "MS Excel: Complete Lectures",
-    "section": "Section III: MS Excel",
-    "description": "Complete PDF lectures covering spreadsheets, workbooks, formulas, functions, charts, pivot tables, and macros.",
-    "notes": "downloads/semester1/mdc/notes/section-iii-ms-excel-complete-lectures.pdf",
-    "status": "Available"
   }
 ]
