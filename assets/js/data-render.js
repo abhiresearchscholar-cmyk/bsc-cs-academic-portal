@@ -1,6 +1,6 @@
 async function loadJson(path) {
   const separator = path.includes("?") ? "&" : "?";
-  const response = await fetch(path + separator + "v=20261003-mdc-output-devices");
+  const response = await fetch(path + separator + "v=20261003-mdc-ms-excel");
   if (!response.ok) {
     throw new Error("Could not load " + path);
   }
@@ -202,7 +202,9 @@ async function renderMdcComputerFundamentalsLectures() {
     return;
   }
 
-  const lectures = await loadJson("data/mdc-computer-fundamentals-lectures.json");
+  const lectures = (await loadJson("data/mdc-computer-fundamentals-lectures.json")).filter(function (lecture) {
+    return lecture.number;
+  });
   container.innerHTML = lectures.map(function (lecture) {
     return `
       <article class="card lecture-card mdc-lecture-card searchable-item" data-search-text="${textForSearch([lecture.number, lecture.title, lecture.section, lecture.description, lecture.status])}">
@@ -234,7 +236,7 @@ async function renderMdcComputerFundamentalsNotes() {
     return `
       <article class="card lecture-card searchable-item" data-search-text="${textForSearch([lecture.number, lecture.title, lecture.section, lecture.description, lecture.status])}">
         <p class="tag">${lecture.section}</p>
-        <h2>Lecture ${lecture.number}: ${lecture.notesTitle || lecture.title}</h2>
+        <h2>${lecture.number ? `Lecture ${lecture.number}: ` : ""}${lecture.notesTitle || lecture.title}</h2>
         <p>${lecture.description}</p>
         <p><span class="status-badge ${statusClass(lecture.status)}">${lecture.status}</span></p>
         <div class="card-actions">
