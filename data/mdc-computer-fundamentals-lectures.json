@@ -76,5 +76,13 @@
     "description": "PDF notes covering output devices and how they present information from a computer.",
     "notes": "downloads/semester1/mdc/notes/lecture-03-output-devices.pdf",
     "status": "Available"
+  },
+  {
+    "number": "01",
+    "title": "Software Types",
+    "section": "Section III: Software Types",
+    "description": "Detailed exam notes covering software classification, system software, application software, and examples.",
+    "notes": "downloads/semester1/mdc/notes/section-iii-lecture-01-software-types.pdf",
+    "status": "Available"
   }
 ]
