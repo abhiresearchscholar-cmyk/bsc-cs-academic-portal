@@ -84,5 +84,13 @@
     "description": "Detailed exam notes covering software classification, system software, application software, and examples.",
     "notes": "downloads/semester1/mdc/notes/section-iii-lecture-01-software-types.pdf",
     "status": "Available"
+  },
+  {
+    "number": "02",
+    "title": "Operating Systems, Cloud OS and Virtual Machines",
+    "section": "Section III: Operating Systems",
+    "description": "Exam notes covering operating system functions, cloud-based operating systems, and virtual machines.",
+    "notes": "downloads/semester1/mdc/notes/section-iii-lecture-02-operating-systems-cloud-vm.pdf",
+    "status": "Available"
   }
 ]
